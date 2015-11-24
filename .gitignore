@@ -48,4 +48,4 @@ node_modules
 typings
 !typings/custom.d.ts
 *.js
-.vscode/*.*
+.vscode
