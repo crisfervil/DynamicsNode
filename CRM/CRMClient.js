@@ -1,43 +1,50 @@
+/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../typings/custom.d.ts" />
 var DataTable_1 = require("../Data/DataTable");
-var SoapXmlParser_1 = require("./SoapXmlParser");
-var SoapXmlHelper_1 = require("./SoapXmlHelper");
-var HttpRequestUtil_1 = require("./HttpRequestUtil");
-var CRMConnection_1 = require("./CRMConnection");
 var Guid_1 = require("./Guid");
 var path = require("path");
+var edge = require("edge");
 var CRMClient = (function () {
-    function CRMClient(pConnection) {
-        this.SOAP_ENDPOINT = '/XRMServices/2011/Organization.svc/web';
-        if (!pConnection)
-            pConnection = "default";
-        if (pConnection instanceof CRMConnection_1.CRMConnection) {
-            this.connection = pConnection;
+    function CRMClient(connectionString) {
+        this.connectionString = connectionString;
+        var config = this.tryGetModule("../config.json");
+        if (config && config.connectionStrings && config.connectionStrings[connectionString]) {
+            this.connectionString = config.connectionStrings[connectionString];
         }
-        var connectionObject = this.getConnection(pConnection);
-        if (connectionObject)
-            this.connection = connectionObject;
-        if (!connectionObject)
-            throw "Connection not found";
+        if (!this.connectionString)
+            throw "Connection String not specified";
+        var source = path.join(__dirname, "CRMBridge.cs");
+        var ref1 = path.join(__dirname, "bin/Microsoft.Crm.Sdk.Proxy.dll");
+        var ref2 = path.join(__dirname, "bin/Microsoft.Xrm.Client.dll");
+        var ref3 = path.join(__dirname, "bin/Microsoft.Xrm.Sdk.dll");
+        var ref4 = path.join("System.Runtime.Serialization.dll");
+        var createBridge = edge.func({
+            source: source,
+            references: [ref1, ref2, ref3, ref4]
+        });
+        this.crmBridge = createBridge(this.connectionString, true);
     }
-    CRMClient.prototype.getConnection = function (name) {
-        var returnValue = null;
-        var connections;
+    CRMClient.prototype.tryGetModule = function (moduleId) {
+        var result = null;
         try {
-            connections = require("../connections.json");
+            result = require(moduleId);
         }
         catch (e) { }
-        if (connections)
-            returnValue = connections[name];
-        return returnValue;
+        return result;
     };
-    CRMClient.prototype.getSoapEndpointUrl = function () {
-        return path.join(this.connection.url, this.SOAP_ENDPOINT);
+    CRMClient.prototype.WhoAmI = function () {
+        return this.crmBridge.WhoAmI(null, true);
     };
     CRMClient.prototype.retrieve = function (entityName, id, columns) {
-        var requestXml = SoapXmlHelper_1.SoapXmlHelper.getRetrieveRequest(id.getValue(), entityName, columns);
-        var url = this.getSoapEndpointUrl();
-        var response = HttpRequestUtil_1.HttpRequestUtil.httpPostRequestSync(url, requestXml);
-        return SoapXmlParser_1.SoapXmlParser.getRetrieveResult(response);
+        var result;
+        var retrieveResult = this.crmBridge.Retrieve({ entityName: entityName, id: id.getValue(), columns: columns }, true);
+        if (retrieveResult) {
+            result = {};
+            for (var i = 0; i < retrieveResult.length; i += 2) {
+                result[retrieveResult[i]] = retrieveResult[i + 1];
+            }
+        }
+        return result;
     };
     CRMClient.prototype.fetchAll = function (entityName) {
         return new DataTable_1.DataTable();

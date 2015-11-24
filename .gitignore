@@ -43,7 +43,9 @@ Temporary Items
 .apdisk
 
 
-connections.json
+config.json
 node_modules
 typings
 !typings/custom.d.ts
+*.js
+.vscode/*.*

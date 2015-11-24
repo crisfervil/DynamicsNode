@@ -1,0 +1,20 @@
+{
+  "name": "dynamicsintegration",
+  "version": "1.0.0",
+  "description": "Tool to move data between CRM and other systems",
+  "main": "app.js",
+  "dependencies": {
+    "edge": "^4.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Dynamics",
+    "CRM",
+    "XRM"
+  ],
+  "author": "crisfervil",
+  "license": "ISC"
+}

@@ -22,7 +22,8 @@
 			"runtimeArgs": ["--nolazy"],
 			// Environment variables passed to the program.
 			"env": {
-				"NODE_ENV": "development"
+				"NODE_ENV": "development",
+				"EDGE_CS_DEBUG":1
 			},
 			// Use JavaScript source maps (if they exist).
 			"sourceMaps": false,

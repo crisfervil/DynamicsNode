@@ -1,7 +1,7 @@
 export class Guid {
 
     constructor(private value?:string){
-      
+      // TODO: Validate GUID value
     }
 
     static newGuid() {
@@ -14,5 +14,4 @@ export class Guid {
     getValue(){
       return this.value;
     }
-
 }
