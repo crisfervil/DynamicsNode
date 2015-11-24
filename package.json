@@ -1,7 +1,7 @@
 {
   "name": "dynamicsintegration",
   "version": "1.0.0",
-  "description": "Tool to move data between CRM and other systems",
+  "description": "Tool to move data between Microsoft Dynamics CRM and other systems",
   "main": "app.js",
   "dependencies": {
     "edge": "^4.0.0"
