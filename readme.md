@@ -25,11 +25,8 @@ var who = crm.WhoAmI();
 var myUser = crm.retrieve("systemuser",new Guid(who),true);
 console.log(myUser);
 
-var account1 = crm.retrieve("account",new Guid("4C1ECDF4-633B-E211-9EB5-0050568A69E2"),["accountid","name","ownerid","createdon"]);
-console.log(account1);
-
-var account2 = crm.retrieve("account",new Guid("4C1ECDF4-633B-E211-9EB5-0050568A69E2"),true/*all columns*/);
-console.log(account2);
+var account = crm.retrieve("account",new Guid("4C1ECDF4-633B-E211-9EB5-0050568A69E2"),true/*all columns*/);
+console.log(account);
 ```
 
 
