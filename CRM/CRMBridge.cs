@@ -2,6 +2,8 @@ using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Client;
 using Microsoft.Xrm.Client.Services;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
+using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
@@ -28,6 +30,12 @@ using System.Threading.Tasks;
                     {
                         return bridge.Retrieve(i);
                     }
+                ),
+                Create = (Func<object, Task<object>>)(
+                    async (i) =>
+                    {
+                        return bridge.Create(i);
+                    }
                 )
             };
         }
@@ -50,21 +58,55 @@ using System.Threading.Tasks;
             return ((WhoAmIResponse)_orgService.Execute(new WhoAmIRequest())).UserId;
         }
 
+
+        public object Create(dynamic options)
+        {
+            //System.Diagnostics.Debugger.Break();
+            Guid createdId = Guid.Empty;
+
+            // validate parameters
+            if (options.entityName == null) throw new Exception("Entity Name not specified");
+            if (options.entityName.GetType() != typeof(string)) throw new Exception("Invalid Entity Name type");
+            if (string.IsNullOrWhiteSpace(options.entityName)) throw new Exception("Entity Name not specified");
+            if (options.values == null) throw new Exception("Values not specified");
+            if (options.values.GetType() != typeof(object[])) throw new Exception("Invalid Values type");
+
+            string entityName = options.entityName;
+            object[] values = options.values;
+
+            // convert the values to an entity type
+            var entity = Convert(values);
+            entity.LogicalName = entityName;
+
+            var attributes = GetAttributes(entityName);
+
+            return createdId;
+        }
+
+  
         public object Retrieve(dynamic options) {
 
-            System.Diagnostics.Debugger.Break();
+            //System.Diagnostics.Debugger.Break();
 
             object[,] result = null;
 
             // validate parameters
             if (options.id == null) throw new Exception("Id not specified");
-            
-            Guid id = new Guid(options.id);
-            ColumnSet columns;
+            if (options.id.GetType() != typeof(string)) throw new Exception("Invalid Id type");
+            if (options.columns == null) throw new Exception("Columns not specified");
+            if (options.columns.GetType() != typeof(object[]) && options.columns.GetType() != typeof(bool)) throw new Exception("Invalid Columns type");
+            if (options.entityName == null) throw new Exception("Entity Name not specified");
+            if (options.entityName.GetType() != typeof(string)) throw new Exception("Invalid Entity Name type");
+            if (string.IsNullOrWhiteSpace(options.entityName)) throw new Exception("Entity Name not specified");
 
+            string entityName = options.entityName;
+            Guid id = new Guid(options.id);
+            ColumnSet columns = new ColumnSet(true);
+
+            // convert the columns option to the right type
             if (options.columns.GetType() == typeof(bool))
             {
-                columns = new ColumnSet(true);
+                columns = new ColumnSet((bool)options.columns);
             }
             else if (options.columns.GetType() == typeof(object[]))
             {
@@ -72,18 +114,27 @@ using System.Threading.Tasks;
                 ((object[])options.columns).CopyTo(cols, 0);
                 columns = new ColumnSet(cols);
             }
-            else
-            {
-                columns = new ColumnSet();
-            }
 
             Entity entityRecord = null;
-            
-            entityRecord = _orgService.Retrieve(options.entityName, id, columns);
+            entityRecord = _orgService.Retrieve(entityName, id, columns);
+
             if (entityRecord != null) {
                 result = Convert(entityRecord);
             }
             return result;
+        }
+
+        private Entity Convert(object[] values)
+        {
+            var entity = new Entity();
+
+            for (int i = 0; i < values.Length; i+=2)
+            {
+                // TODO: Cast to the right data type
+                entity.Attributes.Add((string)values[i], values[i + 1]);
+            }
+
+            return entity;
         }
 
         private object[,] Convert(Entity entityRecord)
@@ -124,6 +175,21 @@ using System.Threading.Tasks;
             }
             return result;
         }
+
+
+        /// <summary>
+        /// Retrieves an entity's attributes.
+        /// </summary>
+        /// <param name="_entityName">entity's name</param>
+        /// <returns>Attribute Metadata for the specified entity</returns>
+        private AttributeMetadata[] GetAttributes(string _entityName)
+        {
+            RetrieveEntityRequest metaDataRequest = new RetrieveEntityRequest();
+            RetrieveEntityResponse metaDataResponse = new RetrieveEntityResponse();
+            metaDataRequest.EntityFilters = EntityFilters.Attributes;
+            metaDataRequest.LogicalName = _entityName;
+            metaDataResponse = (RetrieveEntityResponse)_orgService.Execute(metaDataRequest);
+
+            return metaDataResponse.EntityMetadata.Attributes;
+        }
     }
-
-
