@@ -2,16 +2,14 @@
 /// <reference path="../typings/custom.d.ts" />
 
 import {DataTable} from "../Data/DataTable";
-import {CRMConnection} from "./CRMConnection";
 import {Guid} from "./Guid";
 
 import path = require("path");
 import edge = require("edge");
 
-
 export class CRMClient {
 
-  crmBridge:any;
+  private crmBridge:any;
 
   constructor(private connectionString: string) {
 
@@ -27,13 +25,13 @@ export class CRMClient {
     var ref2 = path.join(__dirname,"bin/Microsoft.Xrm.Client.dll");
     var ref3 = path.join(__dirname,"bin/Microsoft.Xrm.Sdk.dll");
     var ref4 = path.join("System.Runtime.Serialization.dll");
-    
+
     var createBridge = edge.func({
       source: source,
       references: [ ref1, ref2, ref3, ref4 ]
     });
 
-    this.crmBridge = createBridge(this.connectionString,true); 
+    this.crmBridge = createBridge(this.connectionString,true);
   }
 
   private tryGetModule(moduleId: string) {
@@ -49,10 +47,24 @@ export class CRMClient {
     return this.crmBridge.WhoAmI(null,true);
   }
 
-  retrieve(entityName: string, id: Guid, columns?: string[]|boolean): any {
+  retrieve(entityName: string, id: string|Guid, columns?: string[]|boolean): any {
+    var idValue:string;
     var result;
-    var retrieveResult = this.crmBridge.Retrieve({entityName:entityName,id:id.getValue(),columns:columns},true);
-    
+
+    if(id instanceof Guid) {
+      idValue=id.getValue();
+    }
+    else{
+      idValue = id;
+    }
+
+    var params:any = {entityName:entityName,id:idValue,columns:true};
+    if(columns!==undefined) {
+      params.columns = columns;
+    }
+
+    var retrieveResult = this.crmBridge.Retrieve(params,true);
+
     // convert the result to a js object
     if (retrieveResult){
         result={};
@@ -61,17 +73,28 @@ export class CRMClient {
           result[retrieveResult[i]]=retrieveResult[i+1];
         }
     }
-    
+
     return result;
+  }
+
+  create(entityName: string, attributes: any): string {
+    var values = new Array<any>();
+
+    for(var prop in attributes){
+      values.push(prop);
+      values.push(attributes[prop]);
+    }
+
+    var params = {entityName:entityName,values:values};
+    var createdGuid = this.crmBridge.Create(params,true);
+    return createdGuid;
   }
 
   fetchAll(entityName: string): DataTable {
     return new DataTable();
   }
 
-  create(entityName: string, attributes: any): Guid {
-    return new Guid();
-  }
+
 
   //update(entityName:string,values:any):void;
   update(entityName: string, criteria: any, values?: any): void {

@@ -1,7 +1,5 @@
 import {CRMClient}  from "./CRM/CRMClient";
 import {DataTable}  from "./Data/DataTable";
-import {Guid}  from "./CRM/Guid";
-
 
 var crm = new CRMClient("default");
 //var crm = new CRMClient({url:"http://myserver.com", userName:"test", password:"test"});
@@ -12,24 +10,23 @@ process.env["EDGE_CS_DEBUG"] = 1;
 var who = crm.WhoAmI();
 console.log(who);
 
-var myUser = crm.retrieve("systemuser",new Guid(who),true);
+var myUser = crm.retrieve("systemuser",who);
 console.log(myUser);
 
-var account1 = crm.retrieve("account",new Guid("4C1ECDF4-633B-E211-9EB5-0050568A69E2"),["accountid","name","ownerid","createdon"]);
+var account1 = crm.retrieve("account","4C1ECDF4-633B-E211-9EB5-0050568A69E2",["accountid","name","ownerid","createdon"]);
 console.log(account1);
 
-var account2 = crm.retrieve("account",new Guid("4C1ECDF4-633B-E211-9EB5-0050568A69E2"),true);
+var account2 = crm.retrieve("account","4C1ECDF4-633B-E211-9EB5-0050568A69E2");
 console.log(account2);
 
-
-/*
 crm.create("account",{name:"test"});
 var guid = crm.create("account",[{name:"account1"},{name:"account2"}]);
-
 
 for(var i=0;i<10;i++){
   crm.create("account",{name:"account"+i});
 }
+
+/*
 
 var accounts = DataTable.load("accounts.xml");
 crm.create("account",accounts);

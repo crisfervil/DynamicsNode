@@ -49,3 +49,4 @@ typings
 !typings/custom.d.ts
 *.js
 .vscode
+npm-debug.log
