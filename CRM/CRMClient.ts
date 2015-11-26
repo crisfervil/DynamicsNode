@@ -11,9 +11,9 @@ export class CRMClient {
 
   private crmBridge:any;
 
-  constructor(private connectionString: string) {
-
-    var config = this.tryGetModule("../config.json");
+  constructor(private connectionString?: string) {
+    if(connectionString===undefined) connectionString="default";
+    var config = this.tryGetModule(path.join(process.cwd(),"config.json"));
     if(config&&config.connectionStrings&&config.connectionStrings[connectionString]){
       this.connectionString=config.connectionStrings[connectionString];
     }
@@ -21,9 +21,9 @@ export class CRMClient {
     if(!this.connectionString) throw "Connection String not specified";
 
     var source = path.join(__dirname,"CRMBridge.cs");
-    var ref1 = path.join(__dirname,"bin/Microsoft.Crm.Sdk.Proxy.dll");
-    var ref2 = path.join(__dirname,"bin/Microsoft.Xrm.Client.dll");
-    var ref3 = path.join(__dirname,"bin/Microsoft.Xrm.Sdk.dll");
+    var ref1 = path.join(__dirname,"bin/2011/Microsoft.Crm.Sdk.Proxy.dll");
+    var ref2 = path.join(__dirname,"bin/2011/Microsoft.Xrm.Client.dll");
+    var ref3 = path.join(__dirname,"bin/2011/Microsoft.Xrm.Sdk.dll");
     var ref4 = path.join("System.Runtime.Serialization.dll");
 
     var createBridge = edge.func({
@@ -68,12 +68,12 @@ export class CRMClient {
     // convert the result to a js object
     if (retrieveResult){
         result={};
-        for(var i=0;i<retrieveResult.length;i+=2)
+        for(var i=0;i<retrieveResult.length;i++)
         {
-          result[retrieveResult[i]]=retrieveResult[i+1];
+          var propValue = retrieveResult[i];
+          result[propValue[0]]=propValue[1];
         }
     }
-
     return result;
   }
 
@@ -104,11 +104,16 @@ export class CRMClient {
     this.crmBridge.Delete(params,true);
   }
 
-  fetchAll(entityName: string): DataTable {
-    return new DataTable();
+  retrieveAll(entityName: string): Array<any> {
+    var result = new Array<any>();
+
+    var params:any = {entityName:entityName};
+    var retrieveResult = this.crmBridge.Retrieve(params,true);
+
+    console.log(retrieveResult);
+
+    return result;
   }
-
-
 
   //update(entityName:string,values:any):void;
   update(entityName: string, criteria: any, values?: any): void {

@@ -27,7 +27,7 @@ delete("account",guid);
 
 for(var i=0;i<10;i++){
   guid = crm.create("account",{name:"test account "+i, description:"this is a test",AccountCategoryCode:1});
-  console.log("creaed account with id " + guid);
+  console.log("created account with id " + guid);
   delete("account",guid);
 }
 

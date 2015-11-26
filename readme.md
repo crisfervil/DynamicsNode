@@ -5,7 +5,7 @@ Dynamics integration is a set of tools build on top of node.js that allows you t
 # How to install
 
 ```
-$  npm install -g dynamicsintegration
+$  npm install dynamicsintegration
 ```
 
 Then, create a directory and start creating your scripts
@@ -14,7 +14,7 @@ Then, create a directory and start creating your scripts
 
 ``` javascript
 
-var CRMClient = require("./CRM/CRMClient");
+var CRMClient = new require("DynamicsIntegration").CRMClient;
 
 // Instantiate CRMClient using a valid CRM connection string
 // https://msdn.microsoft.com/en-us/library/gg695810.aspx
@@ -32,4 +32,10 @@ console.log(account);
 In order to run the script use node
 ```
 $ node myscript.js
+```
+# How to run tests
+Requires mocha to run the tests (https://mochajs.org/)
+
+```
+$  mocha --recursive
 ```

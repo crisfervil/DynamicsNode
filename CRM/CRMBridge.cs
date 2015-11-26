@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
 
-
     public class Startup
     {
         public async Task<object> Invoke(string connectionString)
@@ -54,7 +53,6 @@ using System.Threading.Tasks;
         public string MyProperty { get; set; }
 
         public CRMBridge(CrmConnection connection) {
-            MyProperty = "test";
             _connection = connection;
             _orgService = new OrganizationService(_connection);
         }
@@ -63,7 +61,6 @@ using System.Threading.Tasks;
         {
             return ((WhoAmIResponse)_orgService.Execute(new WhoAmIRequest())).UserId;
         }
-
 
         public object Delete(dynamic options)
         {
@@ -109,12 +106,12 @@ using System.Threading.Tasks;
             return createdId;
         }
 
-  
+
         public object Retrieve(dynamic options) {
 
             //System.Diagnostics.Debugger.Break();
 
-            object[,] result = null;
+            object[] result = null;
 
             // validate parameters
             if (options.id == null) throw new Exception("Id not specified");
@@ -142,10 +139,9 @@ using System.Threading.Tasks;
 
                 // normalize column names casing
                 for (int i = 0; i < cols.Length; i++) cols[i] = cols[i].ToLower();
-                
+
                 columns = new ColumnSet(cols);
             }
-
 
             Entity entityRecord = null;
             entityRecord = _orgService.Retrieve(entityName, id, columns);
@@ -154,6 +150,31 @@ using System.Threading.Tasks;
                 result = Convert(entityRecord);
             }
             return result;
+        }
+
+
+        public object RetrieveMultiple(string fetchXml)
+        {
+
+            //System.Diagnostics.Debugger.Break();
+            var result = new List<object>();
+
+            // validate parameters
+            if (fetchXml == null || string.IsNullOrWhiteSpace(fetchXml)) throw new Exception("fetchXml not specified");
+
+            var query = _orgService.FetchXmlToQueryExpression(fetchXml);
+            var foundRecords = _orgService.RetrieveMultiple(query);
+
+            if (foundRecords != null && foundRecords.Entities!=null && foundRecords.Entities.Count > 0) {
+                for (int i = 0; i < foundRecords.Entities.Count; i++)
+                {
+                    var record = foundRecords.Entities[i];
+                    var convertedRecord = Convert(record);
+                    result.Add(convertedRecord);
+                }
+            }
+
+            return result.ToArray();
         }
 
         private Entity Convert(string entityName, object[] values)
@@ -215,9 +236,9 @@ using System.Threading.Tasks;
             return (string)value;
         }
 
-        private object[,] Convert(Entity entityRecord)
+        private object[] Convert(Entity entityRecord)
         {
-            var values = new Dictionary<string, object>();
+            var values = new List<object>();
             string[] entityAttributes = new string[entityRecord.Attributes.Keys.Count];
             entityRecord.Attributes.Keys.CopyTo(entityAttributes, 0);
 
@@ -228,33 +249,23 @@ using System.Threading.Tasks;
                 if (attributeValue.GetType() == typeof(EntityReference))
                 {
                     var er = (EntityReference)attributeValue;
-                    values[attributeName] = er.Id;
-                    values[string.Format("{0}_name", attributeName)] = er.Name;
-                    values[string.Format("{0}_type", attributeName)] = er.LogicalName;
+                    values.Add(new object[] { attributeName, er.Id });
+                    values.Add(new object[] { string.Format("{0}_name", attributeName), er.Name });
+                    values.Add(new object[] { string.Format("{0}_type", attributeName), er.LogicalName });
                 }
                 else if (attributeValue.GetType() == typeof(OptionSetValue))
                 {
                     var os = (OptionSetValue)attributeValue;
-                    values[attributeName] = os.Value;
+                    values.Add(new object[] { attributeName, os.Value });
+                    // Add attribute text from metadata
                 }
                 else
                 {
-                    values[attributeName] = attributeValue;
+                    values.Add(new object[] { attributeName, attributeValue });
                 }
             }
-
-            var ndx = 0;
-            var result = new object[values.Count,2];
-            foreach (var item in values)
-            {
-                result[ndx,0] = item.Key;
-                result[ndx,1] = item.Value;
-                ndx++;
-            }
-            return result;
+            return values.ToArray();
         }
-
-
 
         private Dictionary<string, EntityMetadata> _metadataCache = new Dictionary<string, EntityMetadata>();
         private EntityMetadata GetMetadataFromCache(string entityName)
