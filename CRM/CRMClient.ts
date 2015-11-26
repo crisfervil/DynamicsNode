@@ -90,6 +90,20 @@ export class CRMClient {
     return createdGuid;
   }
 
+  delete(entityName: string, id: string|Guid):void{
+    var idValue:string;
+
+    if(id instanceof Guid) {
+      idValue=id.getValue();
+    }
+    else {
+      idValue = id;
+    }
+
+    var params:any = {entityName:entityName,id:idValue};
+    this.crmBridge.Delete(params,true);
+  }
+
   fetchAll(entityName: string): DataTable {
     return new DataTable();
   }

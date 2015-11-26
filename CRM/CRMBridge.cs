@@ -36,6 +36,12 @@ using System.Threading.Tasks;
                     {
                         return bridge.Create(i);
                     }
+                ),
+                Delete = (Func<object, Task<object>>)(
+                    async (i) =>
+                    {
+                        return bridge.Delete(i);
+                    }
                 )
             };
         }
@@ -59,6 +65,26 @@ using System.Threading.Tasks;
         }
 
 
+        public object Delete(dynamic options)
+        {
+            //System.Diagnostics.Debugger.Break();
+
+            // validate parameters
+            if (options.id == null) throw new Exception("Id not specified");
+            if (options.id.GetType() != typeof(string)) throw new Exception("Invalid Id type");
+            if (options.entityName == null) throw new Exception("Entity Name not specified");
+            if (options.entityName.GetType() != typeof(string)) throw new Exception("Invalid Entity Name type");
+            if (string.IsNullOrWhiteSpace(options.entityName)) throw new Exception("Entity Name not specified");
+
+            string entityName = options.entityName;
+            entityName = entityName.ToLower(); // normalize casing
+            Guid id = new Guid(options.id);
+
+            _orgService.Delete(entityName, id);
+
+            return null;
+        }
+
         public object Create(dynamic options)
         {
             //System.Diagnostics.Debugger.Break();
@@ -72,13 +98,13 @@ using System.Threading.Tasks;
             if (options.values.GetType() != typeof(object[])) throw new Exception("Invalid Values type");
 
             string entityName = options.entityName;
+            entityName = entityName.ToLower(); // normalize casing
             object[] values = options.values;
 
             // convert the values to an entity type
-            var entity = Convert(values);
-            entity.LogicalName = entityName;
+            var entity = Convert(entityName, values);
 
-            var attributes = GetAttributes(entityName);
+            createdId = _orgService.Create(entity);
 
             return createdId;
         }
@@ -100,6 +126,7 @@ using System.Threading.Tasks;
             if (string.IsNullOrWhiteSpace(options.entityName)) throw new Exception("Entity Name not specified");
 
             string entityName = options.entityName;
+            entityName = entityName.ToLower(); // normalize casing
             Guid id = new Guid(options.id);
             ColumnSet columns = new ColumnSet(true);
 
@@ -112,8 +139,13 @@ using System.Threading.Tasks;
             {
                 string[] cols = new string[options.columns.Length];
                 ((object[])options.columns).CopyTo(cols, 0);
+
+                // normalize column names casing
+                for (int i = 0; i < cols.Length; i++) cols[i] = cols[i].ToLower();
+                
                 columns = new ColumnSet(cols);
             }
+
 
             Entity entityRecord = null;
             entityRecord = _orgService.Retrieve(entityName, id, columns);
@@ -124,17 +156,63 @@ using System.Threading.Tasks;
             return result;
         }
 
-        private Entity Convert(object[] values)
+        private Entity Convert(string entityName, object[] values)
         {
-            var entity = new Entity();
+
+            var metadata = GetMetadataFromCache(entityName);
+            var entity = new Entity(entityName);
 
             for (int i = 0; i < values.Length; i+=2)
             {
-                // TODO: Cast to the right data type
-                entity.Attributes.Add((string)values[i], values[i + 1]);
+                string fieldName = (string)values[i];
+                fieldName = fieldName.ToLower();// Normalize casing in field names
+                object fieldValue = values[i + 1];
+                AttributeMetadata fieldMetadata = Array.Find(metadata.Attributes, x => string.Compare(x.LogicalName,fieldName)==0);
+
+                if (fieldMetadata != null)
+                {
+                    object fieldConvertedValue = Convert(fieldValue, fieldMetadata);
+                    entity.Attributes.Add(fieldName.ToLower(), fieldConvertedValue);
+                }
+                else
+                {
+                    Console.WriteLine("Warning** attribute {0} not found in entity {1}",fieldName,entityName);
+                }
             }
 
             return entity;
+        }
+
+        private object Convert(object fieldValue, AttributeMetadata fieldMetadata)
+        {
+            object convertedValue = null;
+
+            switch (fieldMetadata.AttributeType)
+            {
+                case AttributeTypeCode.Memo:
+                case AttributeTypeCode.String:
+                    convertedValue = ConvertToString(fieldValue);
+                    break;
+                case AttributeTypeCode.Picklist:
+                    convertedValue = ConvertToOptionSet(fieldValue);
+                    break;
+                default:
+                    Console.WriteLine("Warning** Could not convert this value type: {0}", fieldMetadata.AttributeType);
+                    break;
+            }
+
+
+            return convertedValue;
+        }
+
+        private OptionSetValue ConvertToOptionSet(object value)
+        {
+            return new OptionSetValue((int)value);
+        }
+
+        private string ConvertToString(object value)
+        {
+            return (string)value;
         }
 
         private object[,] Convert(Entity entityRecord)
@@ -177,19 +255,29 @@ using System.Threading.Tasks;
         }
 
 
+
+        private Dictionary<string, EntityMetadata> _metadataCache = new Dictionary<string, EntityMetadata>();
+        private EntityMetadata GetMetadataFromCache(string entityName)
+        {
+            if (!_metadataCache.ContainsKey(entityName)) {
+                _metadataCache.Add(entityName, GetMetadata(entityName));
+            }
+            return _metadataCache[entityName];
+        }
+
         /// <summary>
-        /// Retrieves an entity's attributes.
+        /// Retrieves an entity's metadata.
         /// </summary>
-        /// <param name="_entityName">entity's name</param>
+        /// <param name="entityName">entity's name</param>
         /// <returns>Attribute Metadata for the specified entity</returns>
-        private AttributeMetadata[] GetAttributes(string _entityName)
+        private EntityMetadata GetMetadata(string entityName)
         {
             RetrieveEntityRequest metaDataRequest = new RetrieveEntityRequest();
             RetrieveEntityResponse metaDataResponse = new RetrieveEntityResponse();
-            metaDataRequest.EntityFilters = EntityFilters.Attributes;
-            metaDataRequest.LogicalName = _entityName;
+            metaDataRequest.EntityFilters = EntityFilters.All;
+            metaDataRequest.LogicalName = entityName;
             metaDataResponse = (RetrieveEntityResponse)_orgService.Execute(metaDataRequest);
 
-            return metaDataResponse.EntityMetadata.Attributes;
+            return metaDataResponse.EntityMetadata;
         }
     }

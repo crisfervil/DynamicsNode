@@ -19,11 +19,16 @@ console.log(account1);
 var account2 = crm.retrieve("account","4C1ECDF4-633B-E211-9EB5-0050568A69E2");
 console.log(account2);
 
-crm.create("account",{name:"test"});
-var guid = crm.create("account",[{name:"account1"},{name:"account2"}]);
+var guid = crm.create("account",{name:"test account", description:"this is a test"});
+console.log("creaed account with id " + guid);
+delete("account",guid);
+
+//var guid = crm.create("account",[{name:"account1"},{name:"account2"}]);
 
 for(var i=0;i<10;i++){
-  crm.create("account",{name:"account"+i});
+  guid = crm.create("account",{name:"test account "+i, description:"this is a test",AccountCategoryCode:1});
+  console.log("creaed account with id " + guid);
+  delete("account",guid);
 }
 
 /*
