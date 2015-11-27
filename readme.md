@@ -4,13 +4,26 @@ Dynamics integration is a set of tools build on top of node.js that allows you t
 
 # How to install
 
+Create a new directory to store your scripts
+
+```
+$ mkdir MyScripts
+```
+
+Then cd into it
+```
+$ cd MyScripts
+```
+
+Install Dynamics Inegration
 ```
 $  npm install dynamicsintegration
 ```
-
-Then, create a directory and start creating your scripts
+Create a new myscript.js file and start adding code
 
 # How to use it
+
+Edit the newly created file and add the following code
 
 ``` javascript
 
@@ -28,10 +41,15 @@ var account = crm.retrieve("account","4C1ECDF4-633B-E211-9EB5-0050568A69E2");
 console.log(account);
 ```
 
+Replace the connection string for your CRM server values.
+
+More information about the connection string options: https://msdn.microsoft.com/en-us/library/gg695810.aspx
+
+Save the file and run the script.
 
 In order to run the script use node
 ```
-$ node myscript.js
+$ node myscript
 ```
 # How to run tests
 Requires mocha to run the tests (https://mochajs.org/)

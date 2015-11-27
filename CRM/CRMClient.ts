@@ -3,6 +3,7 @@
 
 import {DataTable} from "../Data/DataTable";
 import {Guid} from "./Guid";
+import {Fetch} from "./Fetch";
 
 import path = require("path");
 import edge = require("edge");
@@ -43,13 +44,26 @@ export class CRMClient {
     return result;
   }
 
+  private convert(propertiesArray:Array<any>){
+    var converted:any=null;
+    if (propertiesArray){
+        converted={};
+        for(var i=0;i<propertiesArray.length;i++)
+        {
+          var propValue = propertiesArray[i];
+          converted[propValue[0]]=propValue[1];
+        }
+    }
+    return converted;
+  }
+
+
   WhoAmI(){
     return this.crmBridge.WhoAmI(null,true);
   }
 
   retrieve(entityName: string, id: string|Guid, columns?: string[]|boolean): any {
     var idValue:string;
-    var result;
 
     if(id instanceof Guid) {
       idValue=id.getValue();
@@ -64,16 +78,31 @@ export class CRMClient {
     }
 
     var retrieveResult = this.crmBridge.Retrieve(params,true);
-
     // convert the result to a js object
-    if (retrieveResult){
-        result={};
-        for(var i=0;i<retrieveResult.length;i++)
-        {
-          var propValue = retrieveResult[i];
-          result[propValue[0]]=propValue[1];
-        }
+    var result = this.convert(retrieveResult);
+    return result;
+  }
+
+  retrieveMultiple(fetchXml: string): Array<any> {
+    var result = new Array<any>();
+
+    var retrieveResult = this.crmBridge.RetrieveMultiple(fetchXml,true);
+
+    for (let i = 0; i < retrieveResult.length; i++) {
+        var record = retrieveResult[i];
+        var convertedRecod = this.convert(record);
+        result.push(convertedRecod);
     }
+
+    return result;
+  }
+
+  retrieveAll(entityName: string): Array<any> {
+    var fetch = new Fetch();
+    fetch.entityName=entityName;
+    fetch.attributes.push("*");
+    var fetchXml = fetch.toString();
+    var result = this.retrieveMultiple(fetchXml);
     return result;
   }
 
@@ -102,17 +131,6 @@ export class CRMClient {
 
     var params:any = {entityName:entityName,id:idValue};
     this.crmBridge.Delete(params,true);
-  }
-
-  retrieveAll(entityName: string): Array<any> {
-    var result = new Array<any>();
-
-    var params:any = {entityName:entityName};
-    var retrieveResult = this.crmBridge.Retrieve(params,true);
-
-    console.log(retrieveResult);
-
-    return result;
   }
 
   //update(entityName:string,values:any):void;

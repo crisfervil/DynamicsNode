@@ -30,6 +30,12 @@ using System.Threading.Tasks;
                         return bridge.Retrieve(i);
                     }
                 ),
+                RetrieveMultiple = (Func<object, Task<object>>)(
+                    async (i) =>
+                    {
+                        return bridge.RetrieveMultiple((string)i);
+                    }
+                ),
                 Create = (Func<object, Task<object>>)(
                     async (i) =>
                     {
