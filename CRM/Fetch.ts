@@ -1,3 +1,7 @@
+/// <reference path="../typings/xml-writer.d.ts"/>
+
+import XMLWriter = require('xml-writer');
+
 export class Fetch{
 
   filter:Filter;
@@ -14,24 +18,29 @@ export class Fetch{
   }
 
   toString(){
-      var attributes = this.serializeAttributes(this.attributes);
-      var filterStr = this.serializeConditions(this.filter);
-      return `<fetch><entity name="${this.entityName.toLowerCase()}">${attributes}${filterStr}</entity></fetch>`;
+      var xw = new XMLWriter(true);
+      xw.startElement('fetch');
+      xw.startElement('entity');
+      xw.writeAttribute('name',this.entityName.toLowerCase());
+      this.serializeAttributes(this.attributes,xw);
+      this.serializeConditions(this.filter,xw);
+      xw.endDocument();
+      return xw.toString();
   }
 
-  private serializeAttributes(value:Array<string>):string
+  private serializeAttributes(value:Array<string>, writer:XmlWriter):void
   {
-    var result = new Array<string>();
-
     for(var i=0;i<value.length;i++){
       var attr = value[i].toLowerCase();
       if(attr=="*"){
-        result.push('<all-attributes/>');
-      }else{
-        result.push(`<attribute name="${attr}" />`);
+        writer.startElement("all-attributes");
       }
+      else{
+        writer.startElement("attribute");
+        writer.writeAttribute("name",attr);
+      }
+      writer.endElement();
     }
-    return result.join("");
   }
 
   private serializeValue(value):string{
@@ -39,7 +48,7 @@ export class Fetch{
     if(value!==null&&value!==undefined){
         if(value instanceof Date){
           var dateValue = <Date>value;
-          // TODO: Rebuild this awful code
+          // TODO: Refactor this awful code
           var pad2 = x=>String("00" + x).slice(-2);
           strValue = `${dateValue.getUTCFullYear()}-${pad2(dateValue.getUTCMonth())}-${pad2(dateValue.getUTCDate())} ${pad2(dateValue.getUTCHours())}:${pad2(dateValue.getUTCMinutes())}:${pad2(dateValue.getUTCSeconds())}`
         }
@@ -50,37 +59,37 @@ export class Fetch{
     return strValue;
   }
 
-  private serializeConditions(filter:Filter){
-      var strConditions=new Array<string>();
+  private serializeConditions(filter:Filter, writer:XmlWriter):void{
       if(filter&&filter.conditions&&filter.conditions.length>0){
+
+        var filterTypeName = FilterTypes[filter.filterType].toLowerCase();
+        writer.startElement("filter").writeAttribute("type",filterTypeName);
+
         for(var i=0;i<filter.conditions.length;i++){
           var filterCondition = filter.conditions[i];
           var operatorName = this.operatorNames[filterCondition.operator];
+          var attributeName = filterCondition.attribute.toLowerCase();
+
+          writer.startElement("condition")
+            .writeAttribute("attribute",attributeName)
+            .writeAttribute("operator",operatorName);
+
           if(filterCondition.values&&filterCondition.values.length>0) {
             if(filterCondition.values.length>1){
-              strConditions.push(`<condition attribute="${filterCondition.attribute}" operator="${operatorName}">`);
               for(var j=0;j<filterCondition.values.length;j++){
                 var strValue = this.serializeValue(filterCondition.values[j]);
-                strConditions.push(`<value>${strValue}</value>`);
+                writer.startElement("value").text(strValue).endElement();
               }
-              strConditions.push("</condition>");
             }
             else{
               var strValue = this.serializeValue(filterCondition.values[0]);
-              strConditions.push(`<condition attribute="${filterCondition.attribute}" operator="${operatorName}" value="${strValue}" />`);
+              writer.writeAttribute("value",strValue);
             }
-          }else
-          {
-            strConditions.push(`<condition attribute="${filterCondition.attribute}" operator="${operatorName}" />`);
           }
+          writer.endElement() // condition;
         }
+        writer.endElement() // filter;
       }
-      if(strConditions.length>0){
-        var filterTypeName = FilterTypes[filter.filterType].toLowerCase();
-        strConditions.unshift(`<filter type="${filterTypeName}">`);
-        strConditions.push("</filter>");
-      }
-      return strConditions.join("");
   }
 
 private operatorNames:string []=['eq',	'neq', 'gt',	'ge',	'le',	'lt',	'like',	'not-like',	'in',	'not-in',	'between',	'not-between',	'null',	'not-null'];
@@ -106,7 +115,12 @@ private operatorJsonNames:string []=['$eq',	'$neq', '$gt',	'$ge',	'$le',	'$lt',	
             var operatorName = this.operatorJsonNames[i];
             if(operatorName && propValue[operatorName]!=undefined) {
               propValue = propValue[operatorName];
-              filter.conditions.push(new Condition(propName,i,propValue));
+              if(Array.isArray(propValue)){
+                filter.conditions.push(new Condition(propName,i,propValue));
+              }
+              else{
+                filter.conditions.push(new Condition(propName,i,[propValue]));
+              }
               break;
             }
           }

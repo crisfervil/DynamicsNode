@@ -98,9 +98,7 @@ export class CRMClient {
   }
 
   retrieveAll(entityName: string): Array<any> {
-    var fetch = new Fetch();
-    fetch.entityName=entityName;
-    fetch.attributes.push("*");
+    var fetch = new Fetch(entityName,["*"]);
     var fetchXml = fetch.toString();
     var result = this.retrieveMultiple(fetchXml);
     return result;

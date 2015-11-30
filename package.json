@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "Tool to move data between Microsoft Dynamics CRM and other systems",
   "dependencies": {
-    "edge": "^4.0.0"
+    "edge": "^4.0.0",
+    "xml-writer": "^1.6.0"
   },
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --recursive"
   },
   "keywords": [
     "Dynamics",
