@@ -7,7 +7,7 @@ var crm = new CRMClient("default");
 console.log(process.env["EDGE_CS_DEBUG"]);
 process.env["EDGE_CS_DEBUG"] = 1;
 
-var who = crm.WhoAmI();
+var who = crm.whoAmI();
 console.log(who);
 
 var myUser = crm.retrieve("systemuser",who);

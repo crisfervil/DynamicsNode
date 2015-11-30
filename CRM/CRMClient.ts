@@ -58,7 +58,7 @@ export class CRMClient {
   }
 
 
-  WhoAmI(){
+  whoAmI(){
     return this.crmBridge.WhoAmI(null,true);
   }
 
@@ -83,8 +83,19 @@ export class CRMClient {
     return result;
   }
 
-  retrieveMultiple(fetchXml: string): Array<any> {
+  retrieveMultiple(fetchXml: string): Array<any>;
+  retrieveMultiple(entityName: string, conditions?, attributes?:boolean|string|string[]): Array<any> {
     var result = new Array<any>();
+
+    var fetchXml=entityName;
+    if(conditions!=undefined){
+      var fetch = new Fetch(entityName);
+      fetch.setFilter(conditions);
+      if(attributes!=undefined){
+        fetch.setAttributes(attributes);
+      }
+      fetchXml = fetch.toString();
+    }
 
     var retrieveResult = this.crmBridge.RetrieveMultiple(fetchXml,true);
 
@@ -131,9 +142,16 @@ export class CRMClient {
     this.crmBridge.Delete(params,true);
   }
 
-  //update(entityName:string,values:any):void;
-  update(entityName: string, criteria: any, values?: any): void {
+  update(entityName: string, attributes: any): void {
+    var values = new Array<any>();
 
+    for(var prop in attributes){
+      values.push(prop);
+      values.push(attributes[prop]);
+    }
+
+    var params:any = {entityName:entityName,values:values};
+    this.crmBridge.Update(params,true);
   }
 
 }

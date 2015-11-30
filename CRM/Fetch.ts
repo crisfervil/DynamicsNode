@@ -1,20 +1,12 @@
-/// <reference path="../typings/xml-writer.d.ts"/>
-
 import XMLWriter = require('xml-writer');
 
 export class Fetch{
 
   filter:Filter;
-  constructor(public entityName?:string,public attributes?:Array<string>,filterConditions?){
-      if(this.attributes==null) this.attributes=new Array<string>();
-      if(filterConditions){
-        if(filterConditions instanceof Filter){
-          this.filter=filterConditions;
-        }
-        else {
-          this.filter=this.convert(filterConditions);
-        }
-      }
+  public attributes:string[]=[];
+  constructor(public entityName?:string,attr?:string|boolean|string[],filterConditions?){
+      if(this.attributes!=undefined) this.setAttributes(attr);
+      if(filterConditions!=undefined) this.setFilter(filterConditions);
   }
 
   toString(){
@@ -40,6 +32,34 @@ export class Fetch{
         writer.writeAttribute("name",attr);
       }
       writer.endElement();
+    }
+  }
+
+  public setFilter(filterConditions){
+    if(filterConditions!=null){
+      if(filterConditions instanceof Filter){
+        this.filter=filterConditions;
+      }
+      else {
+        this.filter=this.convert(filterConditions);
+      }
+    }
+  }
+
+  public setAttributes(attributes:boolean|string|string[]){
+    if(attributes == null){
+      this.attributes = [];
+    }
+    else {
+      if(Array.isArray(attributes)){
+        this.attributes = attributes;
+      }
+      else if (typeof attributes == "string"){
+        this.attributes = [<string>attributes];
+      }
+      else if (typeof attributes == "boolean"){
+        this.attributes = ["*"];
+      }
     }
   }
 

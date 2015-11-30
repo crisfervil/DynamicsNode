@@ -42,6 +42,12 @@ using System.Threading.Tasks;
                         return bridge.Create(i);
                     }
                 ),
+                Update = (Func<object, Task<object>>)(
+                    async (i) =>
+                    {
+                        return bridge.Update(i);
+                    }
+                ),
                 Delete = (Func<object, Task<object>>)(
                     async (i) =>
                     {
@@ -110,6 +116,29 @@ using System.Threading.Tasks;
             createdId = _orgService.Create(entity);
 
             return createdId;
+        }
+
+        public object Update(dynamic options)
+        {
+            //System.Diagnostics.Debugger.Break();
+            Guid createdId = Guid.Empty;
+
+            // validate parameters
+            if (options.entityName == null) throw new Exception("Entity Name not specified");
+            if (options.entityName.GetType() != typeof(string)) throw new Exception("Invalid Entity Name type");
+            if (string.IsNullOrWhiteSpace(options.entityName)) throw new Exception("Entity Name not specified");
+            if (options.values == null) throw new Exception("Values not specified");
+            if (options.values.GetType() != typeof(object[])) throw new Exception("Invalid Values type");
+
+            string entityName = options.entityName;
+            entityName = entityName.ToLower(); // normalize casing
+            object[] values = options.values;
+
+            // convert the values to an entity type
+            var entity = Convert(entityName, values);
+            _orgService.Update(entity);
+
+            return null;    
         }
 
 
@@ -223,6 +252,9 @@ using System.Threading.Tasks;
                 case AttributeTypeCode.Picklist:
                     convertedValue = ConvertToOptionSet(fieldValue);
                     break;
+                case AttributeTypeCode.Uniqueidentifier:
+                    convertedValue = ConvertToUniqueidentifier(fieldValue);
+                    break;
                 default:
                     Console.WriteLine("Warning** Could not convert this value type: {0}", fieldMetadata.AttributeType);
                     break;
@@ -230,6 +262,11 @@ using System.Threading.Tasks;
 
 
             return convertedValue;
+        }
+
+        private Guid ConvertToUniqueidentifier(object value)
+        {
+            return Guid.Parse((string)value);
         }
 
         private OptionSetValue ConvertToOptionSet(object value)

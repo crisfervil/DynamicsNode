@@ -15,13 +15,34 @@ describe('Integration Tests', function () {
       crm.delete("account",guid);
   });
 
+  it('Updates an account',function (){
+      // Use different casing in entity and field names
+      var account:any = {name:"test account", description:"this is a test", AccountCategoryCode:1};
+      var guid = crm.create("acCount",account);
+      assert.ok(guid);
+      account.accountid=guid;
+      account.name = "updated account";
+      account.description = "updated description";
+      account.AccountCategoryCode = 2;
+      crm.update("account",account);
+
+      var updatedAccount = crm.retrieve("account",guid,["name","description","accountcategorycode"]);
+      assert.ok(updatedAccount);
+      assert.equal(updatedAccount.name,account.name);
+      assert.equal(updatedAccount.description,account.description);
+      assert.equal(updatedAccount.AccountCategoryCode,account.accountcategorycode);
+
+      // delete created record
+      crm.delete("account",guid);
+  });
+
   it('Knows Who I am',function (){
-      var who = crm.WhoAmI();
+      var who = crm.whoAmI();
       assert.ok(who);
   });
 
   it('Performs a simple retrieve',function (){
-      var who = crm.WhoAmI();
+      var who = crm.whoAmI();
       assert.ok(who);
       var myUser = crm.retrieve("systemuser",who);
       assert.ok(myUser);
@@ -38,7 +59,7 @@ describe('Integration Tests', function () {
   });
 
   it('Performs a retrieve with specific columns',function (){
-      var who = crm.WhoAmI();
+      var who = crm.whoAmI();
       assert.ok(who);
       // Use different casing in entity and field names
       var myUser = crm.retrieve("systemuser",who,["fullname","DomainName","internalemailaddress","systemuserid"]);
@@ -46,7 +67,7 @@ describe('Integration Tests', function () {
   });
 
   it('Performs a retrieve with all columns',function (){
-      var who = crm.WhoAmI();
+      var who = crm.whoAmI();
       assert.ok(who);
       // Use different casing in entity and field names
       var myUser = crm.retrieve("systemuser",who,true);
@@ -66,7 +87,7 @@ describe('Integration Tests', function () {
   });
 
   it('Performs a simple retrieve multiple',function (){
-    var who = crm.WhoAmI();
+    var who = crm.whoAmI();
     assert.ok(who);
     var fetch = new Fetch("SystemUser",["*"],{systemuserid:who});
     var fetchXml = fetch.toString();
