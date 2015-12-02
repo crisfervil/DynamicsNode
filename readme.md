@@ -2,8 +2,11 @@
 
 Dynamics integration is a set of tools build on top of node.js that allows you to quickly create scripts to move data between Microsoft Dynamics CRM and other systems
 
-# How to install
+# Requirements
+TBC
 
+# How to use it
+## Install
 Create a new directory to store your scripts
 
 ```
@@ -19,11 +22,9 @@ Install Dynamics Inegration
 ```
 $  npm install dynamicsintegration
 ```
-Create a new myscript.js file and start adding code
+## Start writing code
 
-# How to use it
-
-Edit the newly created file and add the following code
+Create a new js file named myscript.js and start adding code
 
 ``` javascript
 
@@ -244,7 +245,7 @@ Signature:
 ```typescript
 retrieveAll(entityName: string): Array<any>
 ```
-Is equivalent to call the retrieveMultimple method not specifying the conditions or attributes method
+Is equivalent to call the retrieveMultiple method not specifying the conditions or attributes method
 
 
 ## Create
@@ -270,7 +271,7 @@ As always, the names in the entity or attributes are case insensitive, so all th
 Updates a record in CRM.
 Signature:
 ``` typescript
-update(entityName: string, attributes: any): void
+update(entityName: string, attributes: any, conditions?): number
 ```
 
 
@@ -305,6 +306,11 @@ $ di export systemuser users.xml
 $ di import users.xml
 ```
 
+# Use it as an integration tests tool
+TBC
+
+## How to compile the code
+TBC
 
 # How to run tests
 Requires mocha to run the tests (https://mochajs.org/)
@@ -312,6 +318,7 @@ Requires mocha to run the tests (https://mochajs.org/)
 ```
 $  npm test
 ```
+
 # Backlog
 (Ordered by priority)
 
