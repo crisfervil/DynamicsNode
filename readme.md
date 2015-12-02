@@ -28,7 +28,7 @@ Create a new js file named myscript.js and start adding code
 
 ``` javascript
 
-var CRMClient = new require("DynamicsIntegration").CRMClient;
+var CRMClient = require("DynamicsIntegration").CRMClient;
 
 var crm = new CRMClient("Url=http://crm.contoso.com/xrmContoso");
 
