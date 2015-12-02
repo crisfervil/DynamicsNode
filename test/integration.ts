@@ -36,6 +36,25 @@ describe('Integration Tests', function () {
       crm.delete("account",guid);
   });
 
+  it('Updates an account using a criteria',function (){
+      // Use different casing in entity and field names
+      var specificName = "xxxtest accountxxx"
+      var account:any = {name:specificName, description:"this is a test", AccountCategoryCode:1};
+      var guid = crm.create("acCount",account);
+      assert.ok(guid);
+      var updateValues = {nAMe:"updated account",desCRiption:"updated description",AccountCategoryCode:2};
+      var affectedRecords = crm.update("account",updateValues,{name:specificName});
+      assert.equal(affectedRecords,1);
+      var updatedAccount = crm.retrieve("account",guid,["name","description","accountcategorycode"]);
+      assert.ok(updatedAccount);
+      assert.equal(updatedAccount.name,updateValues.nAMe);
+      assert.equal(updatedAccount.description,updateValues.desCRiption);
+      assert.equal(updatedAccount.accountcategorycode,updateValues.AccountCategoryCode);
+
+      // delete created record
+      crm.delete("account",guid);
+  });
+
   it('Knows Who I am',function (){
       var who = crm.whoAmI();
       assert.ok(who);
@@ -75,21 +94,24 @@ describe('Integration Tests', function () {
   });
 
   it('Performs a "retrieve all" of an entity',function (){
-      var records = crm.retrieveAll("sysTEMuser");// the entity name must be lowercased
+      //this.timeout(15000); // aplyies only to this test
+      var records = crm.retrieveAll("buSineSSunit");// the entity name must be lowercased
       assert.ok(records);
       assert.ok(records.length>0);
       for(var i=0;i<records.length;i++){
-        assert.ok(records[i].domainname!=undefined,`item#:${i}->${JSON.stringify(records[i])}`);
-        assert.ok(records[i].systemuserid);
-        assert.ok(records[i].businessunitid);
-        assert.ok(records[i].fullname);
+        assert.ok(records[i].businessunitid!=undefined,`item#:${i}->${JSON.stringify(records[i])}`);
+        assert.ok(records[i].organizationid);
+        assert.ok(records[i].organizationid_name);
+        assert.ok(records[i].organizationid_type);
+        assert.ok(records[i].name);
+        assert.ok(records[i].createdon);
       }
   });
 
   it('Performs a simple retrieve multiple',function (){
     var who = crm.whoAmI();
     assert.ok(who);
-    var fetch = new Fetch("SystemUser",["*"],{systemuserid:who});
+    var fetch = new Fetch("SystemUser","*",{systemuserid:who});
     var fetchXml = fetch.toString();
     // Use different casing in entity and field names
     var records = crm.retrieveMultiple(fetchXml);
@@ -100,5 +122,4 @@ describe('Integration Tests', function () {
     assert.ok(records[0].businessunitid);
     assert.ok(records[0].fullname);
   });
-
 });

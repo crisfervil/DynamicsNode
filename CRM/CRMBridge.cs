@@ -138,7 +138,7 @@ using System.Threading.Tasks;
             var entity = Convert(entityName, values);
             _orgService.Update(entity);
 
-            return null;    
+            return null;
         }
 
 
@@ -255,6 +255,9 @@ using System.Threading.Tasks;
                 case AttributeTypeCode.Uniqueidentifier:
                     convertedValue = ConvertToUniqueidentifier(fieldValue);
                     break;
+                case AttributeTypeCode.DateTime:
+                    convertedValue = ConvertToDateTime(fieldValue);
+                    break;
                 default:
                     Console.WriteLine("Warning** Could not convert this value type: {0}", fieldMetadata.AttributeType);
                     break;
@@ -262,6 +265,18 @@ using System.Threading.Tasks;
 
 
             return convertedValue;
+        }
+
+        private object ConvertToDateTime(object fieldValue)
+        {
+            if (fieldValue.GetType() == typeof(DateTime))
+            {
+                return fieldValue;
+            }
+            else
+            {
+                return DateTime.Parse((string)fieldValue);
+            }
         }
 
         private Guid ConvertToUniqueidentifier(object value)

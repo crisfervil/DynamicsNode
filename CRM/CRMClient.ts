@@ -62,7 +62,7 @@ export class CRMClient {
     return this.crmBridge.WhoAmI(null,true);
   }
 
-  retrieve(entityName: string, id: string|Guid, columns?: string[]|boolean): any {
+  retrieve(entityName: string, id: string|Guid, columns?: string|string[]|boolean): any {
     var idValue:string;
 
     if(id instanceof Guid) {
@@ -74,7 +74,14 @@ export class CRMClient {
 
     var params:any = {entityName:entityName,id:idValue,columns:true};
     if(columns!==undefined) {
-      params.columns = columns;
+      if(typeof columns == "string")
+      {
+        params.columns = [columns];
+      }
+      else
+      {
+        params.columns = columns;
+      }
     }
 
     var retrieveResult = this.crmBridge.Retrieve(params,true);
@@ -84,6 +91,7 @@ export class CRMClient {
   }
 
   retrieveMultiple(fetchXml: string): Array<any>;
+  retrieveMultiple(entityName: string, conditions?, attributes?:boolean|string|string[]): Array<any>;
   retrieveMultiple(entityName: string, conditions?, attributes?:boolean|string|string[]): Array<any> {
     var result = new Array<any>();
 
@@ -109,7 +117,7 @@ export class CRMClient {
   }
 
   retrieveAll(entityName: string): Array<any> {
-    var fetch = new Fetch(entityName,["*"]);
+    var fetch = new Fetch(entityName,"*");
     var fetchXml = fetch.toString();
     var result = this.retrieveMultiple(fetchXml);
     return result;
@@ -142,16 +150,45 @@ export class CRMClient {
     this.crmBridge.Delete(params,true);
   }
 
-  update(entityName: string, attributes: any): void {
+  update(entityName: string, attributes: any, conditions?): number {
+
+    var updatedRecordsCount=0;
     var values = new Array<any>();
 
+    // prepare values
     for(var prop in attributes){
-      values.push(prop);
+      var attrName = prop.toLowerCase();
+      values.push(attrName);
       values.push(attributes[prop]);
     }
 
-    var params:any = {entityName:entityName,values:values};
-    this.crmBridge.Update(params,true);
-  }
+    // get records GUIDS
+    if(conditions!=undefined){
+      // The id field of an entity is always the entity name + "id"
+      // TODO: Except for activities
+      var idField:string = `${entityName}id`.toLowerCase();
+      var foundRecords = this.retrieveMultiple(entityName,conditions,idField);
+      var idFieldIndex = values.indexOf(idField);
+      if(idFieldIndex<0) {
+          // Add the id field to the values array and save the attribute index
+          idFieldIndex = values.push(idField) - 1;
+          values.push(null);
+      }
+      for(var i=0;i<foundRecords.length;i++){
+        var foundRecordId=foundRecords[i][idField];
+        values[idFieldIndex+1]=foundRecordId;
+        var params:any = {entityName:entityName,values:values};
+        this.crmBridge.Update(params,true);
+      }
+      updatedRecordsCount=foundRecords.length;
+    }
+    else {
+      // the attributes parameter must contain the entity id on it
+      var params:any = {entityName:entityName,values:values};
+      this.crmBridge.Update(params,true);
+      updatedRecordsCount=1;
+    }
 
+    return updatedRecordsCount;
+  }
 }
