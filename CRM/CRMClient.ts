@@ -65,6 +65,8 @@ export class CRMClient {
   retrieve(entityName: string, id: string|Guid, columns?: string|string[]|boolean): any {
     var idValue:string;
 
+    // TODO: If the id doesn't exists, return null instead of throwing an exception
+
     if(id instanceof Guid) {
       idValue=id.getValue();
     }
@@ -136,18 +138,46 @@ export class CRMClient {
     return createdGuid;
   }
 
-  delete(entityName: string, id: string|Guid):void{
+  delete(entityName: string, idsOrConditions):number{
+    var ids:string[];
+    var recordsAffected = 0;
+
+    if(idsOrConditions instanceof Guid) {
+      ids=[idsOrConditions.getValue()];
+    }
+    else if (typeof idsOrConditions == "string") {
+      ids = [idsOrConditions];
+    }
+    else if (Array.isArray(ids)){
+      // TODO: check the value type of each item
+      ids = idsOrConditions;
+    }
+    else if (typeof idsOrConditions == "object" && !(idsOrConditions instanceof Date)) {
+      // Get the records that meet the specified criteria
+      // The id field of an entity is always the entity name + "id"
+      // TODO: Except for activities
+      var idField:string = `${entityName}id`.toLowerCase();
+      var foundRecords = this.retrieveMultiple(entityName,idsOrConditions,idField);
+      ids = [];
+      for(var i=0;i<foundRecords.length;i++){
+        ids.push(foundRecords[i][idField]);
+      }
+    }
+
+    recordsAffected = this.deleteMultiple(entityName,ids);
+    return recordsAffected;
+  }
+
+  private deleteMultiple(entityName: string, ids: string[]):number{
     var idValue:string;
+    var recordsAffected = 0;
 
-    if(id instanceof Guid) {
-      idValue=id.getValue();
+    for(var i=0;i<ids.length;i++){
+      var params:any = {entityName:entityName,id:ids[i]};
+      this.crmBridge.Delete(params,true);
+      recordsAffected++;
     }
-    else {
-      idValue = id;
-    }
-
-    var params:any = {entityName:entityName,id:idValue};
-    this.crmBridge.Delete(params,true);
+    return recordsAffected;
   }
 
   update(entityName: string, attributes: any, conditions?): number {

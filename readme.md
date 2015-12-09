@@ -1,9 +1,13 @@
 # Project description
 
-Dynamics integration is a set of tools build on top of node.js that allows you to quickly create scripts to move data between Microsoft Dynamics CRM and other systems
+Dynamics integration is a set of tools built on top of node.js that allows you to quickly create scripts to move data between Microsoft Dynamics CRM and other systems
 
 # Requirements
 TBC
+
+Requires [Node.js](nodejs.org)
+
+This tool is based on [Edge](https://github.com/tjanczuk/edge) and requires .NET Framework 4.5 to be installed.
 
 # How to use it
 ## Install
@@ -172,9 +176,9 @@ retrieveMultiple(entityName: string, conditions?, attributes?:boolean|string|str
 ```
 **fetchXml** is a *Fetch Xml* query to specify the records to be retrieved. More information in https://msdn.microsoft.com/en-us/library/gg328332.aspx
 
-**enityName** in case you don't want to write an xml to specify the records to retrieve, can use second overload for this method. The only mandatory parameter for this overload is the *entityName* that specifies the entity to be retrieved. If the attributes parameter is missing, the all the existing records of the specified entity will be retrieved. Is equivalent to write a Fetch Xml without any filter conditions.
+**entityName** in case you don't want to write an xml to specify the records to retrieve, can use second overload for this method. The only mandatory parameter for this overload is the *entityName* that specifies the entity to be retrieved. If the attributes parameter is missing, the all the existing records of the specified entity will be retrieved. Is equivalent to write a Fetch Xml without any filter conditions.
 
-**conditions** is a Javascript object that must contain a property for every filter to be applied. More info in the next chapter.
+**conditions** is a Javascript object that must contain a property for every filter to be applied. More info in [the next chapter](#conditions-object).
 
 **attributes** Same as in the retrieve method. Specifies the columns to be retrieved. Could be either a single column name or an array of columns names or a *true* value to indicate the all columns have to be retrieved. The last is the default value.
 
@@ -204,7 +208,7 @@ Retrieves all the records of the **account** entity where the account name is eq
 
 As in the retrieve method, each returned object will contain the name and type for *Optionset* and *Lookup* fields.
 
-## Conditions syntax
+## Conditions object
 There are two ways to specify when retrieving records from CRM. A Fetch Xml query, or a condition object.
 
 A condition object is a Javascript where every property represents a condition.
@@ -268,26 +272,72 @@ As always, the names in the entity or attributes are case insensitive, so all th
 
 
 ## Update
-Updates a record in CRM.
+Updates one or more records that meet the specified conditions and returns the number of updated records.
 Signature:
 ``` typescript
 update(entityName: string, attributes: any, conditions?): number
 ```
+Parameters:
 
+**entityName** the name of the entity to be updated
 
+**attributes** Javascript object with the values to apply to the records. The same as in the Create method.
 
-## Upsert
-TBC
+**conditions** [conditions object](#conditions-object) that must contain a property for every filter to be applied.
+
+Examples:
+``` javascript
+var affectedRecords = crm.update("account",{name:"contoso-updated"},{name:"contoso"})
+```
+Updates all the accounts which name is contoso, and set the attribute value to contoso-updated.
+
+``` javascript
+var affectedRecords = crm.update("account",{accountid:"6fefeb79-5447-e511-a5db-0050568a69e2",name:"contoso-updated"})
+```
+If you don't specify the conditions parameter, then you have to know the GUID if the record, and set it in the second parameter.
+
+In this example, only the account with the specified account id will be updated. If the specified record id exists, then affectedRecords should be equals to 1.
 
 ## Delete
-TBC
-
-Deletes a Record in CRM.
+Deletes one on more records in CRM, and returns the number of records affected.
 
 Signature:
 ``` typescript
-delete(entityName: string, id: string|Guid):void{
+delete(entityName: string, idsOrConditions):number
 ```
+Parameters:
+
+**entityName** the name of the entity to be updated.
+
+**idsOrConditions** can be either a Guid, a string, an array or a conditions object. If it is Guid will delete the record with the specified id. If it is a string, must be a GUID, and again, will delete the records matching the specified id. If the parameter is an array, its elements must be either a string or a Guid, and in each case, the records deleted will be the ones specified by those GUIDS. If it is a condition object, firs, all the matching records will be retrieved, and then deleted.
+
+Examples:
+``` javascript
+var affectedRecords = crm.delete("account","6fefeb79-5447-e511-a5db-0050568a69e2");
+```
+This will delete the account with the specified GUID.
+
+``` javascript
+var affectedRecords = crm.delete("account",new Guid("6fefeb79-5447-e511-a5db-0050568a69e2"));
+```
+The same as the previous example.
+
+``` javascript
+var affectedRecords = crm.delete("account",["6fefeb79-5447-e511-a5db-0050568a69e2","6fefeb79-5447-e511-a5db-0050568a69e2");
+```
+This will delete the two accounts with the specified ids.
+
+``` javascript
+var affectedRecords = crm.delete("account",{name:"contoso"});
+```
+This will delete all the accounts named contoso.
+
+TBC
+
+## Upsert
+Checks if the specified record exists, and if it does, then it updates, otherwise, it creates a new one with the specified values.
+
+TBC
 
 
 # Repl integration
@@ -306,10 +356,13 @@ $ di export systemuser users.xml
 $ di import users.xml
 ```
 
+# Supported CRM versions
+TBC
+
 # Use it as an integration tests tool
 TBC
 
-## How to compile the code
+# How to compile the code
 TBC
 
 # How to run tests
