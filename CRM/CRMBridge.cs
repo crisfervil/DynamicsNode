@@ -6,6 +6,7 @@ using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
+using System.Net;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using System.Threading.Tasks;
     {
         public async Task<object> Invoke(string connectionString)
         {
+            WebRequest.DefaultWebProxy = WebRequest.GetSystemWebProxy();
             // Establish a connection to the organization web service using CrmConnection.
             CrmConnection connection = CrmConnection.Parse(connectionString);
             CRMBridge bridge = new CRMBridge(connection);

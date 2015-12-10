@@ -12,7 +12,17 @@ export class CRMClient {
 
   private crmBridge:any;
 
-  constructor(private connectionString?: string) {
+  constructor(private connectionString?: string, version?:string) {
+
+    var versions = ["2011","2015"];
+
+    if(version===undefined){
+      // The default version is the last one
+      version = versions[versions.length-1];
+    }
+
+    if (versions.indexOf(version)==-1) throw `Version ${version} not supported`;
+
     if(connectionString===undefined) connectionString="default";
     var config = this.tryGetModule(path.join(process.cwd(),"config.json"));
     if(config&&config.connectionStrings&&config.connectionStrings[connectionString]){
@@ -22,9 +32,9 @@ export class CRMClient {
     if(!this.connectionString) throw "Connection String not specified";
 
     var source = path.join(__dirname,"CRMBridge.cs");
-    var ref1 = path.join(__dirname,"bin/2011/Microsoft.Crm.Sdk.Proxy.dll");
-    var ref2 = path.join(__dirname,"bin/2011/Microsoft.Xrm.Client.dll");
-    var ref3 = path.join(__dirname,"bin/2011/Microsoft.Xrm.Sdk.dll");
+    var ref1 = path.join(__dirname,`bin/${version}/Microsoft.Crm.Sdk.Proxy.dll`);
+    var ref2 = path.join(__dirname,`bin/${version}/Microsoft.Xrm.Client.dll`);
+    var ref3 = path.join(__dirname,`bin/${version}/Microsoft.Xrm.Sdk.dll`);
     var ref4 = path.join("System.Runtime.Serialization.dll");
 
     var createBridge = edge.func({
