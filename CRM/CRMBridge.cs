@@ -15,10 +15,10 @@ using System.Threading.Tasks;
     {
         public async Task<object> Invoke(string connectionString)
         {
-            WebRequest.DefaultWebProxy = WebRequest.GetSystemWebProxy();
-            // Establish a connection to the organization web service using CrmConnection.
-            CrmConnection connection = CrmConnection.Parse(connectionString);
-            CRMBridge bridge = new CRMBridge(connection);
+            //Console.WriteLine(connectionString);
+            //System.Diagnostics.Debugger.Break();
+            CRMBridge bridge = new CRMBridge(connectionString);
+            bridge.TestConnection();
             return new {
                 WhoAmI = (Func<object, Task<object>>)(
                     async (i) =>
@@ -61,19 +61,37 @@ using System.Threading.Tasks;
     }
 
     public class CRMBridge {
+
+        string _connectionString;
         CrmConnection _connection;
         OrganizationService _orgService;
 
-        public string MyProperty { get; set; }
-
-        public CRMBridge(CrmConnection connection) {
-            _connection = connection;
+        public CRMBridge(string connectionString) {
+            //Console.WriteLine(connectionString);
+            System.Diagnostics.Debugger.Break();
+            WebRequest.DefaultWebProxy = WebRequest.GetSystemWebProxy();
+            WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
+            _connectionString = connectionString;
+            // Establish a connection to the organization web service using CrmConnection.
+            _connection = CrmConnection.Parse(connectionString);
             _orgService = new OrganizationService(_connection);
         }
 
         public Guid WhoAmI()
         {
             return ((WhoAmIResponse)_orgService.Execute(new WhoAmIRequest())).UserId;
+        }
+
+        public void TestConnection()
+        {
+            try
+            {
+                WhoAmI();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(String.Format("Error trying to connect to Server: {0}\n{1}", ex.Message, ex.ToString()));
+            }
         }
 
         public object Delete(dynamic options)
@@ -98,7 +116,7 @@ using System.Threading.Tasks;
 
         public object Create(dynamic options)
         {
-            //System.Diagnostics.Debugger.Break();
+            System.Diagnostics.Debugger.Break();
             Guid createdId = Guid.Empty;
 
             // validate parameters

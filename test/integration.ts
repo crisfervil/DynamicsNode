@@ -29,7 +29,7 @@ if(config&&config.connectionStrings){
 
 function addTestsFor(connectionStringName:string, version:string):void {
   describe('Integration Tests: ' + version, function () {
-    this.timeout(10000); // Aplyies to all the suite
+    this.timeout(15000); // Aplyies to all the suite
     var crm = new CRMClient(connectionStringName,version); // Use the same instance of CRM cliente to improve performance
 
     it('Creates an account',function (){
@@ -99,7 +99,7 @@ function addTestsFor(connectionStringName:string, version:string):void {
         assert.ok(myUser.modifiedby_name);
         assert.ok(myUser.modifiedby_type);
         assert.ok(myUser.invitestatuscode);
-        assert.ok(myUser.preferredphonecode);
+        assert.ok(myUser.emailrouteraccessapproval,JSON.stringify(myUser));
     });
 
     it('Performs a retrieve with specific columns',function (){

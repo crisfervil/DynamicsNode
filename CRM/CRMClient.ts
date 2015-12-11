@@ -42,7 +42,13 @@ export class CRMClient {
       references: [ ref1, ref2, ref3, ref4 ]
     });
 
-    this.crmBridge = createBridge(this.connectionString,true);
+    try{
+      this.crmBridge = createBridge(this.connectionString,true);
+    }
+    catch(ex){
+      debugger;
+      console.log(ex);
+    }
   }
 
   private tryGetModule(moduleId: string) {
