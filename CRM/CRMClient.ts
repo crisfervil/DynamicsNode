@@ -46,7 +46,6 @@ export class CRMClient {
       this.crmBridge = createBridge(this.connectionString,true);
     }
     catch(ex){
-      debugger;
       console.log(ex);
     }
   }
@@ -87,7 +86,7 @@ export class CRMClient {
       idValue=id.getValue();
     }
     else{
-      idValue = id;
+      idValue = id.toString();
     }
 
     var params:any = {entityName:entityName,id:idValue,columns:true};

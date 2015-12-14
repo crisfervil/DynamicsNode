@@ -49,7 +49,7 @@ export class Guid {
     }
 
     static isGuid(value: string | Guid):boolean {
-        return value && (value instanceof Guid || Guid.validator.test(value));
+        return value && (value instanceof Guid || Guid.validator.test(value.toString()));
     };
 
     static create():Guid {

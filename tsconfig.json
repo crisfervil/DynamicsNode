@@ -17,9 +17,7 @@
     "filesGlob": [
         "**/*.ts",
         "**/*.tsx",
-        "!node_modules"
+        "!node_modules/"
     ],
-    "files": [
-
-    ]
+    "exclude": ["node_modules"]
 }
