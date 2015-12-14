@@ -17,18 +17,9 @@
     "filesGlob": [
         "**/*.ts",
         "**/*.tsx",
-        "!node_modules/**"
+        "!node_modules"
     ],
     "files": [
-        "CRM/BusinessEntity.ts",
-        "CRM/CRMClient.ts",
-        "CRM/CRMConnection.ts",
-        "CRM/Guid.ts",
-        "Data/DataTable.ts",
-        "examples.ts",
-        "typings/custom.d.ts",
-        "typings/es6-promise/es6-promise.d.ts",
-        "typings/node/node.d.ts",
-        "typings/tsd.d.ts"
+
     ]
 }

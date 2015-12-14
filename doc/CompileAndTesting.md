@@ -11,6 +11,10 @@ Install dependencies using npm
 ```
 $ npm install
 ```
+Install Typescript typings
+```
+$ tsd install
+```
 Finally, compile typescript code
 ```
 $ tsc -p .
