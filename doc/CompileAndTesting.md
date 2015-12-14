@@ -26,7 +26,7 @@ Requires mocha to run the tests (https://mochajs.org/)
 $  npm test
 ```
 ## Integration Tests
-In order to run the integration tests, first download the code as described in before.
+In order to run the integration tests, first clone and compile the code as described above.
 
 Then, you need create a config.json file in the root folder of DynamicsIntegration folder.
 
