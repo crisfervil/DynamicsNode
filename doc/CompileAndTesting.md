@@ -1,5 +1,20 @@
 # How to compile the code
-TBC
+First, get the latest version of the code from github, either using the clone button from the web, or using the command line.
+```
+$ git clone https://github.com/crisfervil/DynamicsIntegration.git
+```
+Then, cd into the cloned directory
+```
+$ cd DynamicsIntegration
+```
+Install dependencies using npm
+```
+$ npm install
+```
+Finally, compile typescript code
+```
+$ tsc -p .
+```
 
 # How to run tests
 Requires mocha to run the tests (https://mochajs.org/)
