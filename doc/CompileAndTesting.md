@@ -1,4 +1,10 @@
 # How to compile the code
+## Prerequisites
+Node. Install the latest version from: https://nodejs.org/
+
+Git is optional. Can be installed from https://desktop.github.com/
+
+## Steps
 First, get the latest version of the code from github, either using the clone button from the web, or using the command line.
 ```
 $ git clone https://github.com/crisfervil/DynamicsIntegration.git
