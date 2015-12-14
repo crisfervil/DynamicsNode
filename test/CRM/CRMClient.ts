@@ -5,7 +5,8 @@ import {CRMClient} from "../../CRM/CRMClient";
 describe('CRMClient', function () {
   it('Throws an exception with an invalid connection',function (){
     assert.throws(function(){
-      new CRMClient("asdasdasd");
+      var crm = new CRMClient("asdasdasd");
+      //crm.whoAmI();
     });
   });
 
