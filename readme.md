@@ -47,9 +47,12 @@ In order to run the script use node
 $ node myscript
 ```
 
-**Further information:** [API](doc/api.md)
+**Further information:** [API](doc/Api.md)
 
-**How to compile and test the code:** [Compile](doc/compileandtesting.md)
+**How to compile and test the code:** [Compile](doc/CompileAndTesting.md)
+
+**Use it as a command line tool:** [Compile](doc/CommandsAndRepl.md)
+
 
 # Requirements
 TBC
@@ -61,7 +64,7 @@ This tool is based on [Edge](https://github.com/tjanczuk/edge) and requires .NET
 # Supported CRM versions
 Tested in CRM 2013 and CRM Online so far.
 
-Volunteers to run the integration tests in other versions are welcome :)
+Volunteers to run the integration tests on other versions are more than welcome :)
 
 
 # Use it as an integration tests tool
