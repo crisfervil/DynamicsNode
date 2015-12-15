@@ -1,0 +1,8 @@
+config.json
+node_modules
+typings/*
+*.ts
+*.d.ts
+.vscode
+npm-debug.log
+test/

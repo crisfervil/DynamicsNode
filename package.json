@@ -1,6 +1,6 @@
 {
   "name": "dynamicsintegration",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Tool to move data between Microsoft Dynamics CRM and other systems",
   "repository" :
     { "type" : "git",

@@ -32,7 +32,7 @@ var who = crm.whoAmI();
 var myUser = crm.retrieve("systemuser",who);
 console.log(myUser);
 
-var mybu = crm.retrieve("businessunit",{businessunitid:myUser.businessunitid});
+var mybu = crm.retrieve("businessunit",myUser.businessunitid);
 console.log(mybu);
 ```
 
@@ -78,7 +78,7 @@ TBC
 (Ordered by priority)
 
 * *Improve documentation (Work In Progress)*
-* Upload npm package
+* ~~Upload npm package~~
 * Add DataTable functions
 * ~~Add different Crm versions support~~
 * ~~Improve integration tests~~
