@@ -41,6 +41,7 @@ var contacts = DataTable.load("contacts.xml");
 //crm.create("contacts",contacts.rows);
 
 //crm.fetchAll("accounts").save("accounts.xml");
+
 //crm.fetchAll("accounts").save("accounts.json");
 
 crm.update("account",{accountid:"2ad7a34f-11db-4910-8f1c-397b1352f0e3",name:"updated"});

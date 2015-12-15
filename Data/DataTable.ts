@@ -4,11 +4,11 @@ import fs = require("fs");
 
 export class DataTable
 {
-  rows:Array<Object>=[];
+  rows:Array<any>=[];
 
 
-  constructor(rows?:Object[]){
-    if(rows!==undefined){
+  constructor(rows?:Array<any>){
+  if(rows!==undefined){
       this.rows=rows;
     }
   }

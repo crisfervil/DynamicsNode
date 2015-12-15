@@ -1,6 +1,7 @@
 /// <reference path="../typings/tsd.d.ts"/>
 import {CRMClient} from "../CRM/CRMClient";
 import {Fetch} from "../CRM/Fetch";
+import {Guid} from "../CRM/Guid";
 import assert = require("assert");
 import path = require("path");
 
@@ -102,6 +103,20 @@ function addTestsFor(connectionStringName:string, version:string):void {
         assert.ok(myUser.emailrouteraccessapproval,JSON.stringify(myUser));
     });
 
+    it('Performs a retrieve that doesnt returns any records',function (){
+
+      var record = crm.retrieve("account",{name:"#^*^%^@*"});
+      assert.equal(record,null);
+
+    });
+
+    it('Performs a retrieve that doesnt returns any records using a GUID',function (){
+
+      var record = crm.retrieve("account", Guid.create());
+      assert.equal(record,null);
+
+    });
+
     it('Performs a retrieve with specific columns',function (){
         var who = crm.whoAmI();
         assert.ok(who);
@@ -122,14 +137,14 @@ function addTestsFor(connectionStringName:string, version:string):void {
         //this.timeout(15000); // aplyies only to this test
         var records = crm.retrieveAll("buSineSSunit");// the entity name must be lowercased
         assert.ok(records);
-        assert.ok(records.length>0);
-        for(var i=0;i<records.length;i++){
-          assert.ok(records[i].businessunitid!=undefined,`item#:${i}->${JSON.stringify(records[i])}`);
-          assert.ok(records[i].organizationid);
-          assert.ok(records[i].organizationid_name);
-          assert.ok(records[i].organizationid_type);
-          assert.ok(records[i].name);
-          assert.ok(records[i].createdon);
+        assert.ok(records.rows.length>0);
+        for(var i=0;i<records.rows.length;i++){
+          assert.ok(records.rows[i].businessunitid!=undefined,`item#:${i}->${JSON.stringify(records[i])}`);
+          assert.ok(records.rows[i].organizationid);
+          assert.ok(records.rows[i].organizationid_name);
+          assert.ok(records.rows[i].organizationid_type);
+          assert.ok(records.rows[i].name);
+          assert.ok(records.rows[i].createdon);
         }
     });
 
@@ -141,11 +156,11 @@ function addTestsFor(connectionStringName:string, version:string):void {
       // Use different casing in entity and field names
       var records = crm.retrieveMultiple(fetchXml);
       assert.ok(records);
-      assert.ok(records.length==1);
-      assert.ok(records[0].domainname!=undefined,`${JSON.stringify(records[0])}`);
-      assert.ok(records[0].systemuserid);
-      assert.ok(records[0].businessunitid);
-      assert.ok(records[0].fullname);
+      assert.ok(records.rows.length==1);
+      assert.ok(records.rows[0].domainname!=undefined,`${JSON.stringify(records[0])}`);
+      assert.ok(records.rows[0].systemuserid);
+      assert.ok(records.rows[0].businessunitid);
+      assert.ok(records.rows[0].fullname);
     });
   });
 }

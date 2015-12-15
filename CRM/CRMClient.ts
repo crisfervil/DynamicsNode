@@ -67,44 +67,74 @@ export class CRMClient {
     return converted;
   }
 
-
   whoAmI(){
     return this.crmBridge.WhoAmI(null,true);
   }
 
-  retrieve(entityName: string, id: string|Guid, columns?: string|string[]|boolean): any {
+  retrieve(entityName: string, idOrConditions: string|Guid|Object, columns?: string|string[]|boolean) {
     var idValue:string;
+    var result:any;
 
-    // TODO: If the id doesn't exists, return null instead of throwing an exception
-
-    if(id instanceof Guid) {
-      idValue=id.getValue();
+    if(idOrConditions instanceof Guid) {
+      idValue=idOrConditions.getValue();
+    }
+    else if (typeof idOrConditions === "string" || idOrConditions instanceof String){
+      idValue = <string>idOrConditions;
+    }
+    else if (typeof idOrConditions === "object") {
+      // Assume a conditions objet was passed
+      // Get the records that meet the specified criteria
+      // The id field of an entity is always the entity name + "id"
+      // TODO: Except for activities
+      var idField:string = `${entityName}id`.toLowerCase();
+      var foundRecords = this.retrieveMultiple(entityName,idOrConditions,idField);
+      if(foundRecords.rows!==null){
+        if (foundRecords.rows.length>1) throw new Error("Too many records found matching the specified criteria");
+        if(foundRecords.rows.length>0){
+          idValue = foundRecords.rows[0][idField];
+        }
+      }
     }
     else{
-      idValue = id.toString();
+      throw new Error("invalid idOrConditions type value");
     }
 
-    var params:any = {entityName:entityName,id:idValue,columns:true};
-    if(columns!==undefined) {
-      if(typeof columns == "string")
-      {
-        params.columns = [columns];
+    if(idValue){
+      var params:any = {entityName:entityName,id:idValue,columns:true};
+      if(columns!==undefined) {
+        if(typeof columns == "string")
+        {
+          params.columns = [columns];
+        }
+        else
+        {
+          params.columns = columns;
+        }
       }
-      else
-      {
-        params.columns = columns;
+      var retrieveResult;
+      try{
+        retrieveResult = this.crmBridge.Retrieve(params,true);
+      }
+      catch (ex){
+        var rethrow = false;
+        if(ex.Detail&&ex.Detail.InnerFault&&ex.Detail.InnerFault.Message){
+          // Record with specified Id doesn't exists
+          var msg = `${entityName} With Id = ${idValue.toLowerCase().replace("{","").replace("}","")} Does Not Exist`;
+          if(ex.Detail.InnerFault.Message!=msg) rethrow = true;
+        }
+        if(rethrow) throw ex;
+      }
+      // convert the result to a js object
+      if(retrieveResult!=null){
+        result = this.convert(retrieveResult);
       }
     }
-
-    var retrieveResult = this.crmBridge.Retrieve(params,true);
-    // convert the result to a js object
-    var result = this.convert(retrieveResult);
     return result;
   }
 
-  retrieveMultiple(fetchXml: string): Array<any>;
-  retrieveMultiple(entityName: string, conditions?, attributes?:boolean|string|string[]): Array<any>;
-  retrieveMultiple(entityName: string, conditions?, attributes?:boolean|string|string[]): Array<any> {
+  retrieveMultiple(fetchXml: string): DataTable;
+  retrieveMultiple(entityName: string, conditions?, attributes?:boolean|string|string[]): DataTable;
+  retrieveMultiple(entityName: string, conditions?, attributes?:boolean|string|string[]): DataTable {
     var result = new Array<any>();
 
     var fetchXml=entityName;
@@ -125,10 +155,11 @@ export class CRMClient {
         result.push(convertedRecod);
     }
 
-    return result;
+    var dt = new DataTable(result);
+    return dt;
   }
 
-  retrieveAll(entityName: string): Array<any> {
+  retrieveAll(entityName: string): DataTable {
     var fetch = new Fetch(entityName,"*");
     var fetchXml = fetch.toString();
     var result = this.retrieveMultiple(fetchXml);
@@ -169,8 +200,8 @@ export class CRMClient {
       var idField:string = `${entityName}id`.toLowerCase();
       var foundRecords = this.retrieveMultiple(entityName,idsOrConditions,idField);
       ids = [];
-      for(var i=0;i<foundRecords.length;i++){
-        ids.push(foundRecords[i][idField]);
+      for(var i=0;i<foundRecords.rows.length;i++){
+        ids.push(foundRecords.rows[i][idField]);
       }
     }
 
@@ -214,13 +245,13 @@ export class CRMClient {
           idFieldIndex = values.push(idField) - 1;
           values.push(null);
       }
-      for(var i=0;i<foundRecords.length;i++){
-        var foundRecordId=foundRecords[i][idField];
+      for(var i=0;i<foundRecords.rows.length;i++){
+        var foundRecordId=foundRecords.rows[i][idField];
         values[idFieldIndex+1]=foundRecordId;
         var params:any = {entityName:entityName,values:values};
         this.crmBridge.Update(params,true);
       }
-      updatedRecordsCount=foundRecords.length;
+      updatedRecordsCount=foundRecords.rows.length;
     }
     else {
       // the attributes parameter must contain the entity id on it

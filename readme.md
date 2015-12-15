@@ -32,6 +32,9 @@ var who = crm.whoAmI();
 var myUser = crm.retrieve("systemuser",who);
 console.log(myUser);
 
+var anotherUser = crm.retrieve("systemyser",{fullname:"John Doe"});
+console.log(anotherUser);
+
 var mybu = crm.retrieve("businessunit",myUser.businessunitid);
 console.log(mybu);
 ```
@@ -47,7 +50,7 @@ In order to run the script use node
 $ node myscript
 ```
 
-**Further information:** [API](doc/Api.md)
+**Further information:** [API](doc/api.md)
 
 **How to compile and test the code:** [Compile](doc/CompileAndTesting.md)
 
@@ -87,3 +90,4 @@ TBC
 * Add import/expport commands
 * Add functions to work with solutions
 * Add support for missing operators in condition objects
+* Add integration tests for activities
