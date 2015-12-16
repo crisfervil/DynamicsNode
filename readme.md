@@ -52,9 +52,9 @@ $ node myscript
 
 **Further information:** [API](doc/api.md)
 
-**How to compile and test the code:** [Compile](doc/CompileAndTesting.md)
+**How to compile and test the code:** [Compile and Testing](doc/CompileAndTesting.md)
 
-**Use it as a command line tool:** [Compile](doc/CommandsAndRepl.md)
+**Use it as a command line tool:** [Commands and Repl](doc/CommandsAndRepl.md)
 
 
 # Requirements

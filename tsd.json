@@ -10,6 +10,9 @@
     },
     "mocha/mocha.d.ts": {
       "commit": "36c6ce86fb64bafb28ec95dc78c6b98228b45c8d"
+    },
+    "xml2js/xml2js.d.ts": {
+      "commit": "11322524f8db9cdb921427cad84cd22fe2d4f965"
     }
   }
 }

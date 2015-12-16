@@ -2,21 +2,22 @@
   "name": "dynamicsintegration",
   "version": "0.0.3",
   "description": "Tool to move data between Microsoft Dynamics CRM and other systems",
-  "repository" :
-    { "type" : "git",
-      "url" : "https://github.com/crisfervil/DynamicsIntegration.git"
-    },
-  "bugs":
-    { "url" : "https://github.com/crisfervil/DynamicsIntegration/project/issues"
-    },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crisfervil/DynamicsIntegration.git"
+  },
+  "bugs": {
+    "url": "https://github.com/crisfervil/DynamicsIntegration/project/issues"
+  },
   "author": {
-    "name":"Cristhian Fernandez",
-    "url":"https://github.com/crisfervil"
+    "name": "Cristhian Fernandez",
+    "url": "https://github.com/crisfervil"
   },
   "license": "MIT",
   "dependencies": {
     "edge": "^4.0.0",
-    "xml-writer": "^1.6.0"
+    "xml-writer": "^1.6.0",
+    "xml2js": "^0.4.15"
   },
   "devDependencies": {
     "mocha": "^2.3.4",

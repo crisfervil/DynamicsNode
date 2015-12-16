@@ -2,9 +2,16 @@
 import {CRMClient} from "../CRM/CRMClient";
 import {Fetch} from "../CRM/Fetch";
 import {Guid} from "../CRM/Guid";
+import {DataTable} from "../Data/DataTable";
 import assert = require("assert");
 import path = require("path");
+import fs = require("fs");
 
+
+before(function(){
+  // create temp dir if doesn't exist
+  if(!fs.existsSync("tmp")) fs.mkdirSync("tmp");
+});
 
 function tryGetModule(moduleId: string) {
   var result = null;
@@ -161,6 +168,16 @@ function addTestsFor(connectionStringName:string, version:string):void {
       assert.ok(records.rows[0].systemuserid);
       assert.ok(records.rows[0].businessunitid);
       assert.ok(records.rows[0].fullname);
+    });
+
+
+    it("Export and import users to a File",function(){
+      var fileName = `tmp/users-${version}.xml`;
+
+      var users = crm.retrieveAll("systemuser");
+      users.save(fileName);
+      var users2 = DataTable.load(fileName);
+      assert.deepEqual(users,users2);
     });
   });
 }
