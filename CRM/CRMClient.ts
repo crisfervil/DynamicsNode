@@ -210,7 +210,6 @@ export class CRMClient {
   }
 
   private deleteMultiple(entityName: string, ids: string[]):number{
-    var idValue:string;
     var recordsAffected = 0;
 
     for(var i=0;i<ids.length;i++){

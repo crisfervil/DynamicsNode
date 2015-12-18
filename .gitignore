@@ -48,6 +48,8 @@ node_modules
 typings/*
 !typings/custom.d.ts
 *.js
+*.d.ts
+*.js.map
 .vscode
 npm-debug.log
 tmp

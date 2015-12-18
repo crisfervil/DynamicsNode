@@ -2,7 +2,8 @@ config.json
 node_modules
 typings/*
 *.ts
-*.d.ts
+!*.d.ts
+*.js.map
 .vscode
 npm-debug.log
 test/

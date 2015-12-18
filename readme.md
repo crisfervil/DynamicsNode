@@ -87,7 +87,7 @@ TBC
 * ~~Improve integration tests~~
 * Add test coverage reports
 * Add SQL support
-* Add import/expport commands
+* Add import/export commands
 * Add functions to work with solutions
 * Add support for missing operators in condition objects
 * Add integration tests for activities

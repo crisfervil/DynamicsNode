@@ -37,7 +37,7 @@ describe("Data",function(){
       d1.save(fileName);
 
       var d2 = DataTable.load(fileName);
-      assert.deepEqual(d1,d2, JSON.stringify(d2,null,4));
+      assert.deepEqual(d2,d1, JSON.stringify(d2,null,4));
 
     });
 
@@ -49,11 +49,11 @@ describe("Data",function(){
       var d1 = new DataTable();
       d1.rows.push({prop1: Guid.create().toString(),prop2:"value2&"}); // use xml not permitted values
       d1.rows.push({prop1:true,prop2:"val\tue2\n"}); // use xml not permitted values
-      d1.rows.push({prop1:false,prop2:new Date(), prop3:12, prop4:12.5});
+      d1.rows.push({prop1:false,property2:new Date(), prop3:12, prop4:12.5});
       d1.save(fileName);
 
       var d2 = DataTable.load(fileName);
-      assert.deepEqual(d1,d2, JSON.stringify(d2,null,4));
+      assert.deepEqual(d2,d1, JSON.stringify(d2,null,4));
     });
   });
 });

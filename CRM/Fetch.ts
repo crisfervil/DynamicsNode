@@ -150,8 +150,8 @@ private operatorJsonNames:string []=['$eq',	'$neq', '$gt',	'$ge',	'$le',	'$lt',	
   }
 }
 
-enum FilterTypes {And,Or}
-class Filter {
+export enum FilterTypes {And,Or}
+export class Filter {
   constructor(public conditions?:Array<Condition>,public filterType?:FilterTypes){
     if(this.conditions==null) this.conditions = new Array<Condition>();
     if(this.filterType==null) this.filterType = FilterTypes.And;
@@ -159,8 +159,8 @@ class Filter {
 }
 
 // https://msdn.microsoft.com/en-us/library/gg309405.aspx
-enum Operators {Equal,NotEqual,GreaterThan,GreaterEqual,LessEqual,LessThan,Like, NotLike, In,NotIn,Between,NotBetween, Null,NotNull }
-class Condition {
+export enum Operators {Equal,NotEqual,GreaterThan,GreaterEqual,LessEqual,LessThan,Like, NotLike, In,NotIn,Between,NotBetween, Null,NotNull }
+export class Condition {
   constructor(public attribute?:string,public operator?:Operators,public values?:Array<any>){
   }
 }
