@@ -3,7 +3,6 @@ import fs = require("fs");
 import XMLWriter = require('xml-writer');
 import xml2js = require('xml2js');
 
-
 export class DataTable
 {
   rows:Array<any>=[];
@@ -25,6 +24,8 @@ export class DataTable
     var ext = path.extname(fileName);
     if(ext!=null) ext=ext.toLowerCase();
     if(ext==".json"){
+      // add type information
+      this.addTypeInfo(this);
       strValue = JSON.stringify(this,null,4);
     }
     else if (ext==".xml"){
@@ -38,6 +39,28 @@ export class DataTable
     }
   }
 
+  private addTypeInfo(data:DataTable){
+    for(var i=0;i<data.rows.length;i++){
+      var currentRowItem=data.rows[i];
+      for(var propName in currentRowItem) {
+        var typeName;
+        var currentValue = currentRowItem[propName];
+        if(currentValue instanceof Date){
+          typeName="date";
+        }
+        else if(typeof currentValue === "number"){
+          typeName="number";
+        }
+        else if(typeof currentValue === "boolean"){
+          typeName="boolean";
+        }
+        if(typeName){
+          currentRowItem["$"+propName+"_type"] = typeName;
+        }
+      }
+    }
+  }
+
   /** The path is relative to process.cwd() */
   static load(fileName:string):DataTable
   {
@@ -48,7 +71,7 @@ export class DataTable
     var strContent = fs.readFileSync(fileName,"utf8");
 
     if(ext==".json") {
-      dt = JSON.parse(strContent,this.dateReviver);
+      dt = JSON.parse(strContent,this.JSONDataReviver);
       if(dt&&dt.rows===undefined) throw "The parsed file doesn't look like a DataTable";
     }
     else if (ext == ".xml"){
@@ -104,9 +127,13 @@ export class DataTable
     return result;
   }
 
-  private static dateReviver(key, str) {
+  private static JSONDataReviver(key, str) {
     var result:any=str;
-    if (typeof str === 'string' || str instanceof String) {
+    console.log(str)
+    if(str==""){
+      result=undefined;
+    }
+    else if (typeof str === 'string' || str instanceof String) {
       var parsedValue = DataTable.parseDates(str);
       if(parsedValue!==null){
         result = parsedValue;

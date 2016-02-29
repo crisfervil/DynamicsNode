@@ -13,12 +13,48 @@
         "noLib": false,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
-        "listFiles":true
+        "listFiles": true
     },
     "filesGlob": [
         "**/*.ts",
         "**/*.tsx",
         "!node_modules/"
     ],
-    "exclude": ["node_modules"]
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "CRM/CRMClient.d.ts",
+        "CRM/CRMClient.ts",
+        "CRM/Fetch.d.ts",
+        "CRM/Fetch.ts",
+        "CRM/Guid.d.ts",
+        "CRM/Guid.ts",
+        "Data/DataTable.d.ts",
+        "Data/DataTable.ts",
+        "DynamicsIntegration.d.ts",
+        "examples.d.ts",
+        "examples.ts",
+        "index.d.ts",
+        "index.ts",
+        "test/CRM/CRMClient.d.ts",
+        "test/CRM/CRMClient.ts",
+        "test/CRM/Fetch.d.ts",
+        "test/CRM/Fetch.ts",
+        "test/CRM/Guid.d.ts",
+        "test/CRM/Guid.ts",
+        "test/Data/DataTable.d.ts",
+        "test/Data/DataTable.ts",
+        "test/integration.d.ts",
+        "test/integration.ts",
+        "typings/custom.d.ts",
+        "typings/es6-promise/es6-promise.d.ts",
+        "typings/mocha/mocha.d.ts",
+        "typings/node/node.d.ts",
+        "typings/tsd.d.ts",
+        "typings/xml2js/xml2js.d.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
 }

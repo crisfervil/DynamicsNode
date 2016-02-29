@@ -64,6 +64,8 @@ Requires [Node.js](nodejs.org)
 
 This tool is based on [Edge](https://github.com/tjanczuk/edge) and requires .NET Framework 4.5 to be installed.
 
+It has been tested in Windows environments only, but can potentially work in Linux too using Mono.
+
 # Supported CRM versions
 Tested in CRM 2013 and CRM Online so far.
 
