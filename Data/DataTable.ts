@@ -24,8 +24,6 @@ export class DataTable
     var ext = path.extname(fileName);
     if(ext!=null) ext=ext.toLowerCase();
     if(ext==".json"){
-      // add type information
-      this.addTypeInfo(this);
       strValue = JSON.stringify(this,null,4);
     }
     else if (ext==".xml"){
@@ -36,28 +34,6 @@ export class DataTable
     }
     if(strValue!=null){
       fs.writeFileSync(fileName,strValue);
-    }
-  }
-
-  private addTypeInfo(data:DataTable){
-    for(var i=0;i<data.rows.length;i++){
-      var currentRowItem=data.rows[i];
-      for(var propName in currentRowItem) {
-        var typeName;
-        var currentValue = currentRowItem[propName];
-        if(currentValue instanceof Date){
-          typeName="date";
-        }
-        else if(typeof currentValue === "number"){
-          typeName="number";
-        }
-        else if(typeof currentValue === "boolean"){
-          typeName="boolean";
-        }
-        if(typeName){
-          currentRowItem["$"+propName+"_type"] = typeName;
-        }
-      }
     }
   }
 
@@ -129,11 +105,7 @@ export class DataTable
 
   private static JSONDataReviver(key, str) {
     var result:any=str;
-    console.log(str)
-    if(str==""){
-      result=undefined;
-    }
-    else if (typeof str === 'string' || str instanceof String) {
+    if (typeof str === 'string' || str instanceof String) {
       var parsedValue = DataTable.parseDates(str);
       if(parsedValue!==null){
         result = parsedValue;

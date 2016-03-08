@@ -1,13 +1,13 @@
 {
-  "name": "dynamicsintegration",
-  "version": "0.0.5",
-  "description": "Tool to move data between Microsoft Dynamics CRM and other systems",
+  "name": "dynamicsnode",
+  "version": "0.0.1",
+  "description": "Tool to create simple scripts to interact with Dynamics CRM using Node.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/crisfervil/DynamicsIntegration.git"
+    "url": "https://github.com/crisfervil/DynamicsNode.git"
   },
   "bugs": {
-    "url": "https://github.com/crisfervil/DynamicsIntegration/project/issues"
+    "url": "https://github.com/crisfervil/DynamicsNode/project/issues"
   },
   "author": {
     "name": "Cristhian Fernandez",
@@ -15,14 +15,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "edge": "^4.0.0",
+    "edge": "^5.0.0",
     "xml-writer": "^1.6.0",
-    "xml2js": "^0.4.15"
+    "xml2js": "^0.4.16"
   },
   "devDependencies": {
     "mocha": "^2.3.4",
     "tsc": "^1.20150623.0",
-    "tsd": "^0.6.5"
+    "typings": "^0.7.4"
   },
   "scripts": {
     "test": "mocha --recursive"

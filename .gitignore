@@ -45,7 +45,7 @@ Temporary Items
 
 config.json
 node_modules
-typings/*
+typings/**
 !typings/custom.d.ts
 *.js
 *.d.ts
@@ -53,3 +53,5 @@ typings/*
 .vscode
 npm-debug.log
 tmp
+#imdone tasks
+.imdone/

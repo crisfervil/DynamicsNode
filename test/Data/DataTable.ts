@@ -1,4 +1,4 @@
-/// <reference path="../../typings/tsd.d.ts"/>
+/// <reference path="../../typings/main.d.ts"/>
 
 import {DataTable} from "../../Data/DataTable";
 import {Guid} from "../../CRM/Guid";
@@ -34,7 +34,7 @@ describe("Data",function(){
       var d1 = new DataTable();
       d1.rows.push({prop1: Guid.create().toString(),prop2:"value2&"}); // use xml not permitted values
       d1.rows.push({prop1:true,prop2:"val\tue2\n",prop3:""}); // use xml not permitted values
-      d1.rows.push({prop1:false,prop2:new Date(), prop3:12, prop4:12.5});
+      d1.rows.push({prop1:false,/*prop2:new Date(), */prop3:12, prop4:12.5});
       d1.save(fileName);
 
       var d2 = DataTable.load(fileName);
@@ -50,7 +50,7 @@ describe("Data",function(){
       var d1 = new DataTable();
       d1.rows.push({prop1: Guid.create().toString(),prop2:"value2&"}); // use xml not permitted values
       d1.rows.push({prop1:true,prop2:"val\tue2\n"}); // use xml not permitted values
-      d1.rows.push({prop1:false,prop2:new Date(), prop3:12, prop4:12.5});
+      d1.rows.push({prop1:false,/*prop2:new Date(),*/ prop3:12, prop4:12.5});
       d1.save(fileName);
 
       var d2 = DataTable.load(fileName);

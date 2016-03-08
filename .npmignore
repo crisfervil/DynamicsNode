@@ -7,3 +7,4 @@ typings/*
 .vscode
 npm-debug.log
 test/
+typings/

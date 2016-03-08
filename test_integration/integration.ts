@@ -1,4 +1,4 @@
-/// <reference path="../typings/tsd.d.ts"/>
+/// <reference path="../typings/main.d.ts"/>
 import {CRMClient} from "../CRM/CRMClient";
 import {Fetch} from "../CRM/Fetch";
 import {Guid} from "../CRM/Guid";
