@@ -1,6 +1,6 @@
-/// <reference path="../../typings/main.d.ts"/>
+/// <reference path="../typings/main.d.ts"/>
 import assert = require("assert");
-import {CRMClient} from "../../CRM/CRMClient";
+import {CRMClient} from "../src/CRMClient";
 
 describe('CRMClient', function () {
   it('Throws an exception with an invalid connection',function (){

@@ -1,8 +1,8 @@
 /// <reference path="../typings/main.d.ts"/>
-import {CRMClient} from "../CRM/CRMClient";
-import {Fetch} from "../CRM/Fetch";
-import {Guid} from "../CRM/Guid";
-import {DataTable} from "../Data/DataTable";
+import {CRMClient} from "../src/CRMClient";
+import {Fetch} from "../src/Fetch";
+import {Guid} from "../src/Guid";
+import {DataTable} from "../src/DataTable";
 import assert = require("assert");
 import path = require("path");
 import fs = require("fs");

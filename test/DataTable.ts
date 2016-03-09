@@ -1,13 +1,13 @@
-/// <reference path="../../typings/main.d.ts"/>
+/// <reference path="../typings/main.d.ts"/>
 
-import {DataTable} from "../../Data/DataTable";
-import {Guid} from "../../CRM/Guid";
+import {DataTable} from "../src/DataTable";
+import {Guid} from "../src/Guid";
 import assert = require("assert");
 import fs = require("fs");
 
 before(function(){
   // create temp dir if doesn't exist
-  if(!fs.existsSync("tmp")) fs.mkdirSync("tmp");
+  if(!fs.existsSync("test/tmp")) fs.mkdirSync("test/tmp");
 });
 
 
@@ -28,7 +28,7 @@ describe("Data",function(){
 
     it("Loads and read JSON data",function(){
 
-      var fileName="tmp/test.json";
+      var fileName="test/tmp/test.json";
 
       // TODO: add different data types
       var d1 = new DataTable();
@@ -44,7 +44,7 @@ describe("Data",function(){
 
     it("Loads and reads XML data",function(){
 
-      var fileName="tmp/test.xml";
+      var fileName="test/tmp/test.xml";
 
       // TODO: add different data types
       var d1 = new DataTable();

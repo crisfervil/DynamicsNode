@@ -1,10 +1,11 @@
 config.json
 node_modules
-typings/*
+test
+test_integration
+typings
 *.ts
-!*.d.ts
+*.d.ts
+!dynamicsnode.d.ts
 *.js.map
 .vscode
 npm-debug.log
-test/
-typings/

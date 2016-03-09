@@ -1,7 +1,7 @@
-/// <reference path="../../typings/main.d.ts"/>
+/// <reference path="../typings/main.d.ts"/>
 
 
-import {Fetch} from "../../CRM/Fetch";
+import {Fetch} from "../src/Fetch";
 import assert = require("assert");
 
 

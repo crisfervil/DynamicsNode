@@ -1,6 +1,6 @@
-/// <reference path="../../typings/main.d.ts"/>
+/// <reference path="../typings/main.d.ts"/>
 import assert = require("assert");
-import {Guid} from "../../CRM/Guid";
+import {Guid} from "../src/Guid";
 
 describe('Guid', function () {
   it('Creates an instance of non empty Guid',function(){

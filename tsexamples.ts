@@ -1,5 +1,5 @@
-import {CRMClient}  from "./CRM/CRMClient";
-import {DataTable}  from "./Data/DataTable";
+import {CRMClient}  from "./src/CRMClient";
+import {DataTable}  from "./src/DataTable";
 
 //var crm = new CRMClient("default");
 var crm = new CRMClient("Url=http://crm.contoso.com/xrmContoso");
