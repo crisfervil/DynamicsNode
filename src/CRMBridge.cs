@@ -68,7 +68,7 @@ using System.Threading.Tasks;
 
         public CRMBridge(string connectionString) {
             //Console.WriteLine(connectionString);
-            System.Diagnostics.Debugger.Break();
+            //System.Diagnostics.Debugger.Break();
             WebRequest.DefaultWebProxy = WebRequest.GetSystemWebProxy();
             WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
             _connectionString = connectionString;
@@ -116,7 +116,7 @@ using System.Threading.Tasks;
 
         public object Create(dynamic options)
         {
-            System.Diagnostics.Debugger.Break();
+            //System.Diagnostics.Debugger.Break();
             Guid createdId = Guid.Empty;
 
             // validate parameters
@@ -231,6 +231,22 @@ using System.Threading.Tasks;
 
             return result.ToArray();
         }
+        
+        public object GetEntityMetadata(string entityName)
+        {
+
+            //System.Diagnostics.Debugger.Break();
+            var result = new List<object>();
+
+            // validate parameters
+            if (entityName == null || string.IsNullOrWhiteSpace(entityName)) throw new Exception("entityName not specified");
+
+            
+            var metadata = GetMetadataFromCache(entityName);
+            //result = Convert(metadata);
+            
+            return result.ToArray();
+        }        
 
         private Entity Convert(string entityName, object[] values)
         {
@@ -270,13 +286,16 @@ using System.Threading.Tasks;
                     convertedValue = ConvertToString(fieldValue);
                     break;
                 case AttributeTypeCode.Picklist:
-                    convertedValue = ConvertToOptionSet(fieldValue);
+                    convertedValue = ConvertToOptionSet(fieldValue, fieldMetadata);
                     break;
                 case AttributeTypeCode.Uniqueidentifier:
                     convertedValue = ConvertToUniqueidentifier(fieldValue);
                     break;
                 case AttributeTypeCode.DateTime:
                     convertedValue = ConvertToDateTime(fieldValue);
+                    break;
+                case AttributeTypeCode.Lookup:
+                    convertedValue = ConvertToLookup(fieldValue,fieldMetadata);
                     break;
                 default:
                     Console.WriteLine("Warning** Could not convert this value type: {0}", fieldMetadata.AttributeType);
@@ -285,6 +304,40 @@ using System.Threading.Tasks;
 
 
             return convertedValue;
+        }
+
+        private EntityReference ConvertToLookup(object fieldValue, AttributeMetadata fieldMetadata)
+        {
+            EntityReference lookupValue;
+
+            var lookupMetadata = (LookupAttributeMetadata)fieldMetadata;
+            if (lookupMetadata.Targets.Length > 1) throw new Exception("Too many targets");
+            
+            string targetEntityName = lookupMetadata.Targets[0];
+
+            Guid guidValue;
+
+            if (Guid.TryParse((string)fieldValue, out guidValue))
+            {
+                // Is a Guid
+            }
+            else
+            {
+                // Is a text, or something else, so we have to get its Id
+
+                EntityMetadata targetEntityMetadata = GetMetadataFromCache(targetEntityName);
+                var primaryNameAttribute = targetEntityMetadata.PrimaryNameAttribute;
+                var targetEntityIdFieldName = targetEntityMetadata.PrimaryIdAttribute;
+                QueryExpression qry = new QueryExpression(targetEntityName);
+                qry.Criteria.AddCondition(new ConditionExpression(primaryNameAttribute, ConditionOperator.Equal, fieldValue));
+                var lookupRecords = _orgService.RetrieveMultiple(qry);
+                if (lookupRecords.Entities.Count == 0) throw new Exception("no records found");
+                if (lookupRecords.Entities.Count > 1) throw new Exception("more than one record found");
+                guidValue = (Guid)lookupRecords.Entities[0].Attributes[targetEntityIdFieldName];
+
+            }
+            lookupValue = new EntityReference(targetEntityName, guidValue);
+            return lookupValue;
         }
 
         private object ConvertToDateTime(object fieldValue)
@@ -304,9 +357,34 @@ using System.Threading.Tasks;
             return Guid.Parse((string)value);
         }
 
-        private OptionSetValue ConvertToOptionSet(object value)
+        private OptionSetValue ConvertToOptionSet(object value, AttributeMetadata fieldMetadata)
         {
-            return new OptionSetValue((int)value);
+            OptionSetValue optionsetValue;
+            int intValue=default(int);
+
+            if (value.GetType() == typeof(int))
+            {
+                intValue = (int)value;
+            }
+            else 
+            {
+                var found = false;
+                // try to get the optionset value from a string
+                PicklistAttributeMetadata optionsetMetadata = (PicklistAttributeMetadata)fieldMetadata;
+                foreach (var optionMetadata in optionsetMetadata.OptionSet.Options)
+                {
+                    if (optionMetadata.Label.UserLocalizedLabel.Label == (string)value) 
+                    {
+                        intValue = optionMetadata.Value.Value;
+                        found = true;
+                        break;
+                    }                    
+                }
+                if (!found) throw new Exception("Optionset value nor found");
+            }
+
+            optionsetValue = new OptionSetValue(intValue);
+            return optionsetValue;
         }
 
         private string ConvertToString(object value)
@@ -362,10 +440,9 @@ using System.Threading.Tasks;
         private EntityMetadata GetMetadata(string entityName)
         {
             RetrieveEntityRequest metaDataRequest = new RetrieveEntityRequest();
-            RetrieveEntityResponse metaDataResponse = new RetrieveEntityResponse();
             metaDataRequest.EntityFilters = EntityFilters.All;
             metaDataRequest.LogicalName = entityName;
-            metaDataResponse = (RetrieveEntityResponse)_orgService.Execute(metaDataRequest);
+            RetrieveEntityResponse metaDataResponse = (RetrieveEntityResponse)_orgService.Execute(metaDataRequest);
 
             return metaDataResponse.EntityMetadata;
         }

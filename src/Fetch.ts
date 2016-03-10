@@ -42,7 +42,7 @@ export class Fetch{
       }
       else {
         this.filter=this.convert(filterConditions);
-      }
+    }
     }
   }
 
@@ -95,7 +95,7 @@ export class Fetch{
             .writeAttribute("operator",operatorName);
 
           if(filterCondition.values&&filterCondition.values.length>0) {
-            if(filterCondition.values.length>1){
+            if(filterCondition.operator==Operators.In || filterCondition.operator==Operators.NotIn || filterCondition.values.length>1){
               for(var j=0;j<filterCondition.values.length;j++){
                 var strValue = this.serializeValue(filterCondition.values[j]);
                 writer.startElement("value").text(strValue).endElement();

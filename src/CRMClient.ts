@@ -261,4 +261,32 @@ export class CRMClient {
 
     return updatedRecordsCount;
   }
+  
+    getIdField(entityName:string):string{
+        // TODO: Improve this
+        return entityName+"id";
+    }
+  
+    createOrUpdate(entityName: string, attributes, matchFields:string[]): void {
+        var idField = this.getIdField(entityName);
+        var conditions={};
+        for (var i = 0; i < matchFields.length; i++) {
+            var matchField = matchFields[i];
+            if(attributes[matchField]!==undefined&&attributes[matchField]!==null){
+                conditions[matchField]=attributes[matchField];
+            }
+        }
+
+        // check if the record exists
+        var foundRecord = this.retrieve(entityName,conditions,idField);
+        if(foundRecord){
+            // The record exists. Update it
+            attributes[idField]=foundRecord[idField];
+            this.update(entityName,attributes);
+        }
+        else{
+            // The record doesn't exists. Create it
+            this.create(entityName,attributes);
+        }
+    }
 }

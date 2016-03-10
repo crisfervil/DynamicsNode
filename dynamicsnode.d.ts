@@ -96,6 +96,7 @@ declare module 'DynamicsNode' {
         delete(entityName: string, idsOrConditions: any): number;
         private deleteMultiple(entityName, ids);
         update(entityName: string, attributes: any, conditions?: any): number;
+        createOrUpdate(entityName: string, attributes, matchFields:string[]): void;
     }    
     
 }

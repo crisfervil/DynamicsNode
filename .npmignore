@@ -3,6 +3,8 @@ node_modules
 test
 test_integration
 typings
+tmp
+doc
 *.ts
 *.d.ts
 !dynamicsnode.d.ts

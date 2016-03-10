@@ -15,7 +15,11 @@ export class DataTable
 
   lookup(columnName:string, updater: (row:any)=>any):void
   {
-    // TODO: Implement this
+    for (var i = 0; i < this.rows.length; i++) {
+        var currentRow = this.rows[i];
+        var value = updater(currentRow);
+        currentRow[columnName]=value;
+    }
   }
 
   /** The path is relative to process.cwd() */
