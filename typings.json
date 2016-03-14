@@ -2,6 +2,6 @@
   "ambientDependencies": {
     "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#36c6ce86fb64bafb28ec95dc78c6b98228b45c8d",
     "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#48c1e3c1d6baefa4f1a126f188c27c4fefd36bff",
-    "xml2js": "github:DefinitelyTyped/DefinitelyTyped/xml2js/xml2js.d.ts#11322524f8db9cdb921427cad84cd22fe2d4f965"
+    "xml2js": "github:DefinitelyTyped/DefinitelyTyped/xml2js/xml2js.d.ts#7304e0770d53762f89af7fcf14517d5f45a04cc2"
   }
 }
