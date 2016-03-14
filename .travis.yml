@@ -3,3 +3,5 @@ node_js:
   - "node"
   - "stable"
 before_script: npm build
+mono:
+  - latest
