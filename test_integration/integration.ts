@@ -10,7 +10,7 @@ import fs = require("fs");
 
 before(function(){
   // create temp dir if doesn't exist
-  if(!fs.existsSync("test/tmp")) fs.mkdirSync("tmp");
+  if(!fs.existsSync("test_integration/tmp")) fs.mkdirSync("test_integration/tmp");
 });
 
 function tryGetModule(moduleId: string) {
@@ -39,6 +39,13 @@ function addTestsFor(connectionStringName:string, version:string):void {
   describe('Integration Tests: ' + version, function () {
     this.timeout(15000); // Aplyies to all the suite
     var crm = new CRMClient(connectionStringName,version); // Use the same instance of CRM cliente to improve performance
+
+    it('Throws an exception with an invalid connection',function (){
+        assert.throws(function(){
+        var crm1 = new CRMClient("asdasd");
+        //crm.whoAmI();
+        });
+    });
 
     it('Creates an account',function (){
         // Use different casing in entity and field names
@@ -172,7 +179,7 @@ function addTestsFor(connectionStringName:string, version:string):void {
 
 
     it("Export and import users to a File",function(){
-      var fileName = `tmp/users-${version}.xml`;
+      var fileName = `test_integration/tmp/users-${version}.xml`;
 
       var users = crm.retrieveAll("systemuser");
       users.save(fileName);

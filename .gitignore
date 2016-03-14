@@ -45,6 +45,7 @@ Temporary Items
 
 config.json
 node_modules
+coverage
 typings/**
 !typings/custom.d.ts
 *.js

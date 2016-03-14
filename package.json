@@ -20,12 +20,14 @@
     "xml2js": "^0.4.16"
   },
   "devDependencies": {
+    "istanbul": "^0.4.2",
     "mocha": "^2.3.4",
     "tsc": "^1.20150623.0",
     "typings": "^0.7.4"
   },
   "scripts": {
-    "test": "mocha --recursive"
+    "test": "mocha --recursive",
+    "cover": "istanbul cover node_modules\\mocha\\bin\\_mocha -- --recursive"
   },
   "keywords": [
     "Dynamics",
