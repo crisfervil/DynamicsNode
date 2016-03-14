@@ -7,10 +7,10 @@ export class DataTable
 {
   rows:Array<any>=[];
 
-  constructor(rows?:Array<any>){
-  if(rows!==undefined){
-      this.rows=rows;
-    }
+  constructor(public name?:string, rows?:Array<any>) {
+    if(rows!==undefined){
+        this.rows=rows;
+        }
   }
 
   lookup(columnName:string, updater: (row:any)=>any):void
@@ -125,7 +125,7 @@ export class DataTable
       var parser = new xml2js.Parser({async:false,explicitArray:false, valueProcessors:[DataTable.parseValue]});
       parser.parseString(xmlContent,function (err, result) {
         if(result&&result.DataTable&&result.DataTable.row){
-          dt = new DataTable(result.DataTable.row);
+            dt = new DataTable(result.DataTable.$.name, result.DataTable.row);
         }
       });
     }
@@ -138,6 +138,7 @@ export class DataTable
     if(DataTable!=null){
       var xw = new XMLWriter(true);
       xw.startElement('DataTable');
+      if(this.name) xw.writeAttribute("name",this.name);
       //xw.startElement('rows');
       for(var i=0;i<data.rows.length;i++){
         xw.startElement('row');
@@ -167,5 +168,4 @@ export class DataTable
     }
     return result;
   }
-
 }

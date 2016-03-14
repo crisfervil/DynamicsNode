@@ -155,7 +155,7 @@ export class CRMClient {
         result.push(convertedRecod);
     }
 
-    var dt = new DataTable(result);
+    var dt = new DataTable(entityName, result);
     return dt;
   }
 

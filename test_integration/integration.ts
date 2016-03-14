@@ -10,7 +10,7 @@ import fs = require("fs");
 
 before(function(){
   // create temp dir if doesn't exist
-  if(!fs.existsSync("tmp")) fs.mkdirSync("tmp");
+  if(!fs.existsSync("test/tmp")) fs.mkdirSync("tmp");
 });
 
 function tryGetModule(moduleId: string) {
