@@ -2,6 +2,6 @@ language: node_js
 node_js:
   - "node"
   - "stable"
-before_script: npm build
+before_script: npm run build
 mono:
   - latest
