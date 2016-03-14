@@ -9,4 +9,20 @@ describe('CRMClient', function () {
       //crm.whoAmI();
     });
   });
+
+  it('Tells who I am',function (){
+    
+    var expected = "test";
+    
+    var testBridge = {
+        WhoAmI: (params,callback)=>expected
+    }
+    
+    var crm = new CRMClient("test",testBridge);
+    
+    var actual = crm.whoAmI();
+    assert.equal(actual,expected);
+    
+  });
+
 });
