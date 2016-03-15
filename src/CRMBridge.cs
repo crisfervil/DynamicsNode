@@ -60,15 +60,15 @@ using System.Threading.Tasks;
         }
     }
 
-    public class CRMBridge {
 
+    public class CrmService:IOrganizationService
+    {
         string _connectionString;
         CrmConnection _connection;
         OrganizationService _orgService;
 
-        public CRMBridge(string connectionString) {
-            //Console.WriteLine(connectionString);
-            //System.Diagnostics.Debugger.Break();
+        public CrmService(string connectionString)
+        {
             WebRequest.DefaultWebProxy = WebRequest.GetSystemWebProxy();
             WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
             _connectionString = connectionString;
@@ -77,9 +77,60 @@ using System.Threading.Tasks;
             _orgService = new OrganizationService(_connection);
         }
 
+        public OrganizationResponse Execute(OrganizationRequest request)
+        {
+            return _orgService.Execute(request);
+        }
+
+        public void Delete(string entityName, Guid id)
+        {
+            _orgService.Delete(entityName, id);
+        }
+
+        public void Associate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Guid Create(Entity entity)
+        {
+            return _orgService.Create(entity);
+        }
+
+        public void Disassociate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Entity Retrieve(string entityName, Guid id, ColumnSet columnSet)
+        {
+            return _orgService.Retrieve(entityName, id, columnSet);
+        }
+
+        public EntityCollection RetrieveMultiple(QueryBase query)
+        {
+            return _orgService.RetrieveMultiple(query);
+        }
+
+        public void Update(Entity entity)
+        {
+            _orgService.Update(entity);
+        }
+    }
+
+    public class CRMBridge {
+
+        private IOrganizationService _service;
+
+        public CRMBridge(string connectionString) {
+            //Console.WriteLine(connectionString);
+            //System.Diagnostics.Debugger.Break();
+            _service = new CrmService(connectionString);
+        }
+
         public Guid WhoAmI()
         {
-            return ((WhoAmIResponse)_orgService.Execute(new WhoAmIRequest())).UserId;
+            return ((WhoAmIResponse)_service.Execute(new WhoAmIRequest())).UserId;
         }
 
         public void TestConnection()
@@ -109,7 +160,7 @@ using System.Threading.Tasks;
             entityName = entityName.ToLower(); // normalize casing
             Guid id = new Guid(options.id);
 
-            _orgService.Delete(entityName, id);
+            _service.Delete(entityName, id);
 
             return null;
         }
@@ -133,7 +184,7 @@ using System.Threading.Tasks;
             // convert the values to an entity type
             var entity = Convert(entityName, values);
 
-            createdId = _orgService.Create(entity);
+            createdId = _service.Create(entity);
 
             return createdId;
         }
@@ -156,7 +207,7 @@ using System.Threading.Tasks;
 
             // convert the values to an entity type
             var entity = Convert(entityName, values);
-            _orgService.Update(entity);
+            _service.Update(entity);
 
             return null;
         }
@@ -199,7 +250,7 @@ using System.Threading.Tasks;
             }
 
             Entity entityRecord = null;
-            entityRecord = _orgService.Retrieve(entityName, id, columns);
+            entityRecord = _service.Retrieve(entityName, id, columns);
 
             if (entityRecord != null) {
                 result = Convert(entityRecord);
@@ -207,6 +258,12 @@ using System.Threading.Tasks;
             return result;
         }
 
+
+        private QueryExpression FetchXmlToQueryExpression(string fetchXml) 
+        {
+            return ((FetchXmlToQueryExpressionResponse)_service.Execute(new FetchXmlToQueryExpressionRequest() { FetchXml = fetchXml })).Query;
+        
+        }
 
         public object RetrieveMultiple(string fetchXml)
         {
@@ -217,8 +274,8 @@ using System.Threading.Tasks;
             // validate parameters
             if (fetchXml == null || string.IsNullOrWhiteSpace(fetchXml)) throw new Exception("fetchXml not specified");
 
-            var query = _orgService.FetchXmlToQueryExpression(fetchXml);
-            var foundRecords = _orgService.RetrieveMultiple(query);
+            var query = FetchXmlToQueryExpression(fetchXml);
+            var foundRecords = _service.RetrieveMultiple(query);
 
             if (foundRecords != null && foundRecords.Entities!=null && foundRecords.Entities.Count > 0) {
                 for (int i = 0; i < foundRecords.Entities.Count; i++)
@@ -330,7 +387,7 @@ using System.Threading.Tasks;
                 var targetEntityIdFieldName = targetEntityMetadata.PrimaryIdAttribute;
                 QueryExpression qry = new QueryExpression(targetEntityName);
                 qry.Criteria.AddCondition(new ConditionExpression(primaryNameAttribute, ConditionOperator.Equal, fieldValue));
-                var lookupRecords = _orgService.RetrieveMultiple(qry);
+                var lookupRecords = _service.RetrieveMultiple(qry);
                 if (lookupRecords.Entities.Count == 0) throw new Exception("no records found");
                 if (lookupRecords.Entities.Count > 1) throw new Exception("more than one record found");
                 guidValue = (Guid)lookupRecords.Entities[0].Attributes[targetEntityIdFieldName];
@@ -442,7 +499,7 @@ using System.Threading.Tasks;
             RetrieveEntityRequest metaDataRequest = new RetrieveEntityRequest();
             metaDataRequest.EntityFilters = EntityFilters.All;
             metaDataRequest.LogicalName = entityName;
-            RetrieveEntityResponse metaDataResponse = (RetrieveEntityResponse)_orgService.Execute(metaDataRequest);
+            RetrieveEntityResponse metaDataResponse = (RetrieveEntityResponse)_service.Execute(metaDataRequest);
 
             return metaDataResponse.EntityMetadata;
         }

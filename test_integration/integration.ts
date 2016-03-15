@@ -38,7 +38,7 @@ if(config&&config.connectionStrings){
 function addTestsFor(connectionStringName:string, version:string):void {
   describe('Integration Tests: ' + version, function () {
     this.timeout(15000); // Aplyies to all the suite
-    var crm = new CRMClient(connectionStringName,version); // Use the same instance of CRM cliente to improve performance
+    var crm = new CRMClient(connectionStringName); // Use the same instance of CRM cliente to improve performance
 
     it('Throws an exception with an invalid connection',function (){
         assert.throws(function(){
