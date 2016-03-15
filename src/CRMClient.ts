@@ -8,6 +8,11 @@ import {Fetch} from "./Fetch";
 import path = require("path");
 import edge = require("edge");
 
+/**
+ * @class Allows to access to CRM functions.
+ * @param {string} connectionString Optional. A valid connection string or connection string name
+ * @param {object} bridge Internal Use Only. Allows to specify a .net bridge
+ */
 export class CRMClient {
 
   private crmBridge:any;
