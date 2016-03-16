@@ -1,4 +1,4 @@
-# Project description [![Build Status](https://travis-ci.org/crisfervil/DynamicsNode.svg?branch=master)](https://travis-ci.org/crisfervil/DynamicsNode)
+# Project description [![Build Status](https://travis-ci.org/crisfervil/DynamicsNode.svg?branch=master)](https://travis-ci.org/crisfervil/DynamicsNode)[![npm](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com/package/dynamicsnode)
 
 Dynamics integration is a set of tools built on top of node.js that allows you to quickly create scripts to move data between Microsoft Dynamics CRM and other systems
 
