@@ -33,7 +33,7 @@ var who = crm.whoAmI();
 var myUser = crm.retrieve("systemuser",who);
 console.log(myUser);
 
-// retrieve an user named John Doe
+// retrieve a user named John Doe
 var anotherUser = crm.retrieve("systemyser",{fullname:"John Doe"});
 console.log(anotherUser);
 
