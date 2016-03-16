@@ -23,9 +23,6 @@ export class CRMClient {
       this.connectionString=config.connectionStrings[connectionString];
     }
 
-    if(!this.connectionString) throw "Connection String not specified";
-
-    // create default bridge if no one was specified
     this._crmBridge = this.getBridge(fakeBridge);
   }
 
@@ -169,11 +166,18 @@ export class CRMClient {
   }
 
   create(entityName: string, attributes: any): string {
+      
+    // perform some validations
+    if(!entityName) throw "Entity name not specified";
+    if(!attributes) throw "Attributes not specified";
+    
+    entityName = entityName.toLocaleLowerCase(); // normalize casing
+    
     var values = new Array<any>();
 
     for(var prop in attributes){
-      values.push(prop);
-      values.push(attributes[prop]);
+        values.push(prop.toLocaleLowerCase()); // normalize casing
+        values.push(attributes[prop]);
     }
 
     var params = {entityName:entityName,values:values};

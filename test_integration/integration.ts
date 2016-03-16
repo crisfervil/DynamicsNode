@@ -178,7 +178,7 @@ function addTestsFor(connectionStringName:string, version:string):void {
     });
 
 
-    it("Export and import users to a File",function(){
+    it.skip("Export and import users to a File",function(){
       var fileName = `test_integration/tmp/users-${version}.xml`;
 
       var users = crm.retrieveAll("systemuser");

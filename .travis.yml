@@ -1,6 +1,7 @@
 language: node_js
 node_js:
   - "node"
+  - "0.12"
 before_script: npm run build
 install:
  - sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF

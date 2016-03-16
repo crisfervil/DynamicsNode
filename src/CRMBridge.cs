@@ -10,6 +10,7 @@ using System.Net;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
+using System.Reflection;
 
     public class Startup
     {
@@ -182,15 +183,7 @@ using System.Threading.Tasks;
             //System.Diagnostics.Debugger.Break();
             Guid createdId = Guid.Empty;
 
-            // validate parameters
-            if (options.entityName == null) throw new Exception("Entity Name not specified");
-            if (options.entityName.GetType() != typeof(string)) throw new Exception("Invalid Entity Name type");
-            if (string.IsNullOrWhiteSpace(options.entityName)) throw new Exception("Entity Name not specified");
-            if (options.values == null) throw new Exception("Values not specified");
-            if (options.values.GetType() != typeof(object[])) throw new Exception("Invalid Values type");
-
             string entityName = options.entityName;
-            entityName = entityName.ToLower(); // normalize casing
             object[] values = options.values;
 
             // convert the values to an entity type
@@ -350,10 +343,6 @@ using System.Threading.Tasks;
 
             switch (fieldMetadata.AttributeType)
             {
-                case AttributeTypeCode.Memo:
-                case AttributeTypeCode.String:
-                    convertedValue = ConvertToString(fieldValue);
-                    break;
                 case AttributeTypeCode.Picklist:
                     convertedValue = ConvertToOptionSet(fieldValue, fieldMetadata);
                     break;
@@ -367,7 +356,8 @@ using System.Threading.Tasks;
                     convertedValue = ConvertToLookup(fieldValue,fieldMetadata);
                     break;
                 default:
-                    Console.WriteLine("Warning** Could not convert this value type: {0}", fieldMetadata.AttributeType);
+                    // No conversion needed
+                    convertedValue = fieldValue;
                     break;
             }
 
@@ -456,11 +446,6 @@ using System.Threading.Tasks;
             return optionsetValue;
         }
 
-        private string ConvertToString(object value)
-        {
-            return (string)value;
-        }
-
         private object[] Convert(Entity entityRecord)
         {
             var values = new List<object>();
@@ -532,21 +517,33 @@ using System.Threading.Tasks;
 
         public OrganizationResponse Execute(OrganizationRequest request)
         {
+            OrganizationResponse res = null;
             if (request.GetType() == typeof(WhoAmIRequest))
             {
                 if (_connectionString == "INCORRECT_CONNECTION_STRING") throw new Exception("incorrect connection string");
-                return new WhoAmIResponse() { };
+                res = new WhoAmIResponse();
+                res["UserId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
             }
-            throw new NotImplementedException();
-        }
-
-
-        public void Associate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
-        {
-            throw new NotImplementedException();
+            else if (request.GetType() == typeof(RetrieveEntityRequest))
+            {
+                var em = new EntityMetadata() { SchemaName="myEntity" };
+                AttributeMetadata attr1 = (AttributeMetadata)typeof(AttributeMetadata).GetConstructor(BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.Instance, null, new Type[] { typeof(AttributeTypeCode), typeof(string) }, null)
+                                            .Invoke(new Object[] { AttributeTypeCode.Integer, "prop1" });
+                attr1.LogicalName = "prop1";
+                var attrs = new AttributeMetadata[] { attr1 };
+                em.GetType().GetProperty("Attributes").SetValue(em, attrs);
+                res = new RetrieveEntityResponse();
+                res["EntityMetadata"] = em;
+            }
+            return res;
         }
 
         public Guid Create(Entity entity)
+        {
+            return Guid.Empty;
+        }
+
+        public void Associate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
         {
             throw new NotImplementedException();
         }
