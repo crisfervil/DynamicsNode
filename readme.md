@@ -82,12 +82,12 @@ TBC
 # Backlog
 (Ordered by priority)
 
-- [ ] *Improve documentation (Work In Progress)*
-- [x] ~~Upload npm package~~
+- [ ] *Improve documentation (work In progress)*
 - [ ] *Add DataTable functions (work in progress)*
-* ~~Improve integration tests~~
-* Add test coverage reports
-* Add import/export commands
-* Add functions to work with solutions
-* Add support for missing operators in condition objects
-* Add integration tests for activities
+* [ ] *Improve testeability and integration tests (work in progress)* 
+* [ ] *Add test coverage reports (work in progress)*
+* [ ] Add import/export commands
+* [ ] Add functions to work with solutions
+* [ ] Add support for missing operators in condition objects
+* [ ] Add integration tests for activities
+- [x] ~~Upload npm package~~
