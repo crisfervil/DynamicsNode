@@ -13,11 +13,15 @@ using System.Threading.Tasks;
 
     public class Startup
     {
-        public async Task<object> Invoke(string connectionString)
+        public async Task<object> Invoke(dynamic options)
         {
             //Console.WriteLine(connectionString);
-            //System.Diagnostics.Debugger.Break();
-            CRMBridge bridge = new CRMBridge(connectionString);
+            System.Diagnostics.Debugger.Break();
+
+            string connectionString = options.connectionString;
+            bool useFake = options.useFake;
+
+            CRMBridge bridge = new CRMBridge(connectionString, useFake);
             bridge.TestConnection();
             return new {
                 WhoAmI = (Func<object, Task<object>>)(
@@ -122,10 +126,18 @@ using System.Threading.Tasks;
 
         private IOrganizationService _service;
 
-        public CRMBridge(string connectionString) {
+        public CRMBridge(string connectionString,bool useFake)
+        {
             //Console.WriteLine(connectionString);
             //System.Diagnostics.Debugger.Break();
-            _service = new CrmService(connectionString);
+            if (useFake)
+            {
+                _service = new FakeService(connectionString);
+            }
+            else
+            {
+                _service = new CrmService(connectionString);
+            }
         }
 
         public Guid WhoAmI()
@@ -502,5 +514,65 @@ using System.Threading.Tasks;
             RetrieveEntityResponse metaDataResponse = (RetrieveEntityResponse)_service.Execute(metaDataRequest);
 
             return metaDataResponse.EntityMetadata;
+        }
+    }
+
+
+    /// <summary>
+    /// Fake CRM connection for testing purposes
+    /// </summary>
+    public class FakeService : IOrganizationService
+    {
+
+        private string _connectionString;
+        public FakeService(string connectionString) 
+        {
+            _connectionString = connectionString;
+        }
+
+        public OrganizationResponse Execute(OrganizationRequest request)
+        {
+            if (request.GetType() == typeof(WhoAmIRequest))
+            {
+                if (_connectionString == "INCORRECT_CONNECTION_STRING") throw new Exception("incorrect connection string");
+                return new WhoAmIResponse() { };
+            }
+            throw new NotImplementedException();
+        }
+
+
+        public void Associate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Guid Create(Entity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Delete(string entityName, Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Disassociate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Entity Retrieve(string entityName, Guid id, ColumnSet columnSet)
+        {
+            throw new NotImplementedException();
+        }
+
+        public EntityCollection RetrieveMultiple(QueryBase query)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Update(Entity entity)
+        {
+            throw new NotImplementedException();
         }
     }

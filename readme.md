@@ -3,7 +3,7 @@
 
 Dynamics Node is a library built on node.js that allows you to quickly create scripts to interact with Microsoft Dynamics CRM using javascript.
 
-The main goal of Dynamics Node is to make you very productive when it comes to automate small tasks in Dynamics CRM. Just create a js file, add a few lines to it and execute it.
+The main goal of Dynamics Node is to make you very productive when it comes to automate small tasks in Dynamics CRM. Just create a js file, add a few lines and execute it.
 
 No more .net console application with all the boiler plate just for create one record. Go productive!
 

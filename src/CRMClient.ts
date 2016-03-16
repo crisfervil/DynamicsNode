@@ -11,15 +11,13 @@ import edge = require("edge");
 /**
  * @class Allows to access to CRM functions.
  * @param {string} connectionString Optional. A valid connection string or connection string name
- * @param {object} bridge Internal Use Only. Allows to specify a .net bridge
  */
 export class CRMClient {
 
-  private crmBridge:any;
+  private _crmBridge:any;
 
-  constructor(public connectionString?: string, bridge?) {
+  constructor(public connectionString:string="default", fakeBridge:boolean=false) {
 
-    if(connectionString===undefined) connectionString="default";
     var config = this.tryGetModule(path.join(process.cwd(),"config.json"));
     if(config&&config.connectionStrings&&config.connectionStrings[connectionString]){
       this.connectionString=config.connectionStrings[connectionString];
@@ -28,16 +26,11 @@ export class CRMClient {
     if(!this.connectionString) throw "Connection String not specified";
 
     // create default bridge if no one was specified
-    if(bridge===undefined)  {
-        this.crmBridge = this.getDefaultBridge();
-    }
-    else {
-        this.crmBridge=bridge;
-    }
+    this._crmBridge = this.getBridge(fakeBridge);
   }
 
 
-  private getDefaultBridge(){
+  private getBridge(fakeBridge:boolean){
 
     var source = path.join(__dirname,"CRMBridge.cs");
     var ref1 = path.join(__dirname,"bin/Microsoft.Crm.Sdk.Proxy.dll");
@@ -50,7 +43,7 @@ export class CRMClient {
         references: [ ref1, ref2, ref3, ref4 ]
     });
 
-    var bridge = createBridge(this.connectionString,true);
+    var bridge = createBridge({connectionString:this.connectionString,useFake:fakeBridge},true);
     return bridge;
   }
 
@@ -77,7 +70,7 @@ export class CRMClient {
   }
 
   whoAmI(){
-    return this.crmBridge.WhoAmI(null,true);
+    return this._crmBridge.WhoAmI(null,true);
   }
 
   retrieve(entityName: string, idOrConditions: string|Guid|Object, columns?: string|string[]|boolean) {
@@ -122,7 +115,7 @@ export class CRMClient {
       }
       var retrieveResult;
       try{
-        retrieveResult = this.crmBridge.Retrieve(params,true);
+        retrieveResult = this._crmBridge.Retrieve(params,true);
       }
       catch (ex){
         var rethrow = false;
@@ -156,7 +149,7 @@ export class CRMClient {
       fetchXml = fetch.toString();
     }
 
-    var retrieveResult = this.crmBridge.RetrieveMultiple(fetchXml,true);
+    var retrieveResult = this._crmBridge.RetrieveMultiple(fetchXml,true);
 
     for (let i = 0; i < retrieveResult.length; i++) {
         var record = retrieveResult[i];
@@ -184,7 +177,7 @@ export class CRMClient {
     }
 
     var params = {entityName:entityName,values:values};
-    var createdGuid = this.crmBridge.Create(params,true);
+    var createdGuid = this._crmBridge.Create(params,true);
     return createdGuid;
   }
 
@@ -223,7 +216,7 @@ export class CRMClient {
 
     for(var i=0;i<ids.length;i++){
       var params:any = {entityName:entityName,id:ids[i]};
-      this.crmBridge.Delete(params,true);
+      this._crmBridge.Delete(params,true);
       recordsAffected++;
     }
     return recordsAffected;
@@ -257,14 +250,14 @@ export class CRMClient {
         var foundRecordId=foundRecords.rows[i][idField];
         values[idFieldIndex+1]=foundRecordId;
         var params:any = {entityName:entityName,values:values};
-        this.crmBridge.Update(params,true);
+        this._crmBridge.Update(params,true);
       }
       updatedRecordsCount=foundRecords.rows.length;
     }
     else {
       // the attributes parameter must contain the entity id on it
       var params:any = {entityName:entityName,values:values};
-      this.crmBridge.Update(params,true);
+      this._crmBridge.Update(params,true);
       updatedRecordsCount=1;
     }
 
