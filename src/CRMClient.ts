@@ -70,15 +70,39 @@ export class CRMClient {
     return this._crmBridge.WhoAmI(null,true);
   }
 
-  retrieve(entityName: string, idOrConditions: string|Guid|Object, columns?: string|string[]|boolean) {
+  retrieve(entityName: string, idOrConditions: string|Guid|Object, pColumns?: string|string[]|boolean) {
     var idValue:string;
     var result:any;
-
+    var columns:any;
+    
+    if(!entityName) throw "Entity name not specified";
+    if(!idOrConditions) throw "Id or Conditions not specified";
+    
+    entityName = entityName.toLocaleLowerCase(); // normalize casing
+    
+    // validate columns
+    if(pColumns===undefined) {
+        columns = true; // default value
+    }
+    else {
+        columns = pColumns;
+        if(typeof pColumns == "string"){
+            columns = [pColumns];
+        }
+        
+        if (Array.isArray(columns)){
+            for (var i = 0; i < columns.length; i++) {
+                columns[i]=columns[i].toLocaleLowerCase(); // normalize casing;
+            }
+        }
+    }
+   
     if(idOrConditions instanceof Guid) {
       idValue=idOrConditions.getValue();
     }
     else if (typeof idOrConditions === "string" || idOrConditions instanceof String){
       idValue = <string>idOrConditions;
+      if(!Guid.isGuid(idValue)) throw "Invalid GUID value";
     }
     else if (typeof idOrConditions === "object") {
       // Assume a conditions objet was passed
@@ -99,17 +123,7 @@ export class CRMClient {
     }
 
     if(idValue){
-      var params:any = {entityName:entityName,id:idValue,columns:true};
-      if(columns!==undefined) {
-        if(typeof columns == "string")
-        {
-          params.columns = [columns];
-        }
-        else
-        {
-          params.columns = columns;
-        }
-      }
+      var params:any = {entityName:entityName,id:idValue,columns:columns};
       var retrieveResult;
       try{
         retrieveResult = this._crmBridge.Retrieve(params,true);
@@ -189,14 +203,23 @@ export class CRMClient {
     var ids:string[];
     var recordsAffected = 0;
 
+    if(!entityName) throw "Entity name not specified";
+    entityName = entityName.toLowerCase(); // normalize casing
+
     if(idsOrConditions instanceof Guid) {
       ids=[idsOrConditions.getValue()];
     }
     else if (typeof idsOrConditions == "string") {
+      if(!Guid.isGuid(idsOrConditions)) throw "Invalid GUID value";
       ids = [idsOrConditions];
     }
     else if (Array.isArray(ids)){
-      // TODO: check the value type of each item
+      for(var i=0;i<ids.length;i++){
+          var item:any = ids[i];
+          if(!(item instanceof Guid) || Guid.isGuid(item)) {
+              throw "Invalid GUID";
+          }
+      }
       ids = idsOrConditions;
     }
     else if (typeof idsOrConditions == "object" && !(idsOrConditions instanceof Date)) {
@@ -231,9 +254,12 @@ export class CRMClient {
     var updatedRecordsCount=0;
     var values = new Array<any>();
 
+    if(!entityName) throw "Entity name not specified";
+    entityName = entityName.toLowerCase(); // normalize casing
+
     // prepare values
     for(var prop in attributes){
-      var attrName = prop.toLowerCase();
+      var attrName = prop.toLowerCase(); // normalize casing
       values.push(attrName);
       values.push(attributes[prop]);
     }
@@ -264,6 +290,7 @@ export class CRMClient {
       this._crmBridge.Update(params,true);
       updatedRecordsCount=1;
     }
+    
 
     return updatedRecordsCount;
   }

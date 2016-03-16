@@ -29,6 +29,23 @@ describe('CRMClient', function () {
     assert.equal(actual,expected);
   });
   
+  it('Deletes a record',function (){
+    
+    var expected = 1;
+    var crm = new CRMClient("my connection string",true);
+    
+    var actual = crm.delete("myEntity","73174763-ed0e-4aeb-b02a-9f6dc078260a");
+    assert.equal(actual,expected);
+  });
   
-
+  it('Updates a record',function (){
+    
+    var expected = 1;
+    var crm = new CRMClient("my connection string",true);
+    
+    var record = {prop1:123};
+    var actual = crm.update("myEntity",record);
+    assert.equal(actual,expected);
+  });  
+  
 });

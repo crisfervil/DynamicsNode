@@ -16,9 +16,6 @@ using System.Reflection;
     {
         public async Task<object> Invoke(dynamic options)
         {
-            //Console.WriteLine(connectionString);
-            System.Diagnostics.Debugger.Break();
-
             string connectionString = options.connectionString;
             bool useFake = options.useFake;
 
@@ -129,8 +126,6 @@ using System.Reflection;
 
         public CRMBridge(string connectionString,bool useFake)
         {
-            //Console.WriteLine(connectionString);
-            //System.Diagnostics.Debugger.Break();
             if (useFake)
             {
                 _service = new FakeService(connectionString);
@@ -160,17 +155,7 @@ using System.Reflection;
 
         public object Delete(dynamic options)
         {
-            //System.Diagnostics.Debugger.Break();
-
-            // validate parameters
-            if (options.id == null) throw new Exception("Id not specified");
-            if (options.id.GetType() != typeof(string)) throw new Exception("Invalid Id type");
-            if (options.entityName == null) throw new Exception("Entity Name not specified");
-            if (options.entityName.GetType() != typeof(string)) throw new Exception("Invalid Entity Name type");
-            if (string.IsNullOrWhiteSpace(options.entityName)) throw new Exception("Entity Name not specified");
-
             string entityName = options.entityName;
-            entityName = entityName.ToLower(); // normalize casing
             Guid id = new Guid(options.id);
 
             _service.Delete(entityName, id);
@@ -180,7 +165,6 @@ using System.Reflection;
 
         public object Create(dynamic options)
         {
-            //System.Diagnostics.Debugger.Break();
             Guid createdId = Guid.Empty;
 
             string entityName = options.entityName;
@@ -196,18 +180,7 @@ using System.Reflection;
 
         public object Update(dynamic options)
         {
-            //System.Diagnostics.Debugger.Break();
-            Guid createdId = Guid.Empty;
-
-            // validate parameters
-            if (options.entityName == null) throw new Exception("Entity Name not specified");
-            if (options.entityName.GetType() != typeof(string)) throw new Exception("Invalid Entity Name type");
-            if (string.IsNullOrWhiteSpace(options.entityName)) throw new Exception("Entity Name not specified");
-            if (options.values == null) throw new Exception("Values not specified");
-            if (options.values.GetType() != typeof(object[])) throw new Exception("Invalid Values type");
-
             string entityName = options.entityName;
-            entityName = entityName.ToLower(); // normalize casing
             object[] values = options.values;
 
             // convert the values to an entity type
@@ -218,23 +191,11 @@ using System.Reflection;
         }
 
 
-        public object Retrieve(dynamic options) {
-
-            //System.Diagnostics.Debugger.Break();
-
+        public object Retrieve(dynamic options) 
+        {
             object[] result = null;
 
-            // validate parameters
-            if (options.id == null) throw new Exception("Id not specified");
-            if (options.id.GetType() != typeof(string)) throw new Exception("Invalid Id type");
-            if (options.columns == null) throw new Exception("Columns not specified");
-            if (options.columns.GetType() != typeof(object[]) && options.columns.GetType() != typeof(bool)) throw new Exception("Invalid Columns type");
-            if (options.entityName == null) throw new Exception("Entity Name not specified");
-            if (options.entityName.GetType() != typeof(string)) throw new Exception("Invalid Entity Name type");
-            if (string.IsNullOrWhiteSpace(options.entityName)) throw new Exception("Entity Name not specified");
-
             string entityName = options.entityName;
-            entityName = entityName.ToLower(); // normalize casing
             Guid id = new Guid(options.id);
             ColumnSet columns = new ColumnSet(true);
 
@@ -243,13 +204,10 @@ using System.Reflection;
             {
                 columns = new ColumnSet((bool)options.columns);
             }
-            else if (options.columns.GetType() == typeof(object[]))
+            else
             {
                 string[] cols = new string[options.columns.Length];
                 ((object[])options.columns).CopyTo(cols, 0);
-
-                // normalize column names casing
-                for (int i = 0; i < cols.Length; i++) cols[i] = cols[i].ToLower();
 
                 columns = new ColumnSet(cols);
             }
@@ -272,8 +230,6 @@ using System.Reflection;
 
         public object RetrieveMultiple(string fetchXml)
         {
-
-            //System.Diagnostics.Debugger.Break();
             var result = new List<object>();
 
             // validate parameters
@@ -296,8 +252,6 @@ using System.Reflection;
         
         public object GetEntityMetadata(string entityName)
         {
-
-            //System.Diagnostics.Debugger.Break();
             var result = new List<object>();
 
             // validate parameters
@@ -550,7 +504,6 @@ using System.Reflection;
 
         public void Delete(string entityName, Guid id)
         {
-            throw new NotImplementedException();
         }
 
         public void Disassociate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
@@ -570,6 +523,5 @@ using System.Reflection;
 
         public void Update(Entity entity)
         {
-            throw new NotImplementedException();
         }
     }
