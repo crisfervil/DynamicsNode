@@ -14,9 +14,9 @@ Create a new directory to store your scripts and cd into it
 $ mkdir MyScripts && cd MyScripts
 ```
 
-Install Dynamics Integration
+Install Dynamics Node
 ```
-$  npm install dynamicsintegration
+$  npm install dynamicsnode
 ```
 ## Writing code
 
@@ -67,7 +67,7 @@ This tool is based on [Edge](https://github.com/tjanczuk/edge) and requires .NET
 It has been tested in Windows environments only, but could potentially work in Linux too using Mono.
 
 # Supported CRM versions
-Tested in CRM 2013 and CRM Online so far.
+Tested on CRM 2011, 2011 and CRM Online so far.
 
 Volunteers to run the integration tests on other versions are more than welcome :)
 
