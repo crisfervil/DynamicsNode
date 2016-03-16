@@ -26,7 +26,7 @@ Create a new js file named myscript.js and start adding code
 
 var dn = require("DynamicsNode");
 
-var crm = new dn.CRMClient("Url=http://crm.contoso.com/xrmContoso");
+var crm = new dn.CRMClient("Url=http://crm.contoso.com/xrmContoso"); // update this with your CRM url
 
 // retrieve the current user
 var who = crm.whoAmI();
@@ -38,8 +38,6 @@ var anotherUser = crm.retrieve("systemyser",{fullname:"John Doe"});
 console.log(anotherUser);
 
 ```
-
-Replace the connection string with your CRM server values.
 
 Save the file and run the script.
 
