@@ -24,26 +24,22 @@ function tryGetModule(moduleId: string) {
 
 var config = tryGetModule(path.join(process.cwd(),"config.json"));
 if(config&&config.connectionStrings){
-  var versions = ["2011","2013","2015"];
-  for (var i=0;i<versions.length;i++){
-      var version = versions[i];
-      var connectionStringName = "IntegrationTests" + version;
-      var connectionString = config.connectionStrings[connectionStringName];
-      if (connectionString){
-        addTestsFor(connectionStringName, version);
-      }
-  }
+    for(var conn in config.connectionStrings){
+        if ((<string>conn).indexOf("IntegrationTest")==0) // if the connection string name begins with IntegrationTest
+        {
+            addTestsFor(conn, config.connectionStrings[conn]);
+        }
+    }
 }
 
-function addTestsFor(connectionStringName:string, version:string):void {
-  describe('Integration Tests: ' + version, function () {
+function addTestsFor(connectionStringName:string, connectionStringValue:string):void {
+  describe(`Integration tests: ${connectionStringName}`, function () {
     this.timeout(15000); // Aplyies to all the suite
-    var crm = new CRMClient(connectionStringName); // Use the same instance of CRM cliente to improve performance
+    var crm = new CRMClient(connectionStringValue); // Use the same instance of CRM cliente to improve performance
 
     it('Throws an exception with an invalid connection',function (){
         assert.throws(function(){
         var crm1 = new CRMClient("asdasd");
-        //crm.whoAmI();
         });
     });
 
@@ -176,10 +172,32 @@ function addTestsFor(connectionStringName:string, version:string):void {
       assert.ok(records.rows[0].businessunitid);
       assert.ok(records.rows[0].fullname);
     });
+    
+    it('Performs a retrieve all',function (){
+        // retrieve all the leads
+        var leads = crm.retrieveAll("lead");
+        assert.ok(leads);
+        assert.ok(leads.rows.length>0);
+    });    
 
+    it('Associates and Disassociates a lead and an contact',function (){
+        // retrieve any lead
+        var leads = crm.retrieveMultiple("lead",null,"leadid");
+        var lead = leads.rows[0];
+        
+        // retrieve any contact
+        var contacts = crm.retrieveMultiple("contact",null,"contactid");
+        var contact = contacts.rows[0];
+        
+        // associate them
+        crm.associate("contact",contact.contactid,"contactleads_association","lead",lead.leadid);
+        
+        // delete association
+        crm.disassociate("contact",contact.contactid,"contactleads_association","lead",lead.leadid);
+    });
 
     it.skip("Export and import users to a File",function(){
-      var fileName = `test_integration/tmp/users-${version}.xml`;
+      var fileName = `test_integration/tmp/users-${connectionStringName}.xml`;
 
       var users = crm.retrieveAll("systemuser");
       users.save(fileName);

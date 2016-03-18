@@ -57,7 +57,21 @@ using System.Reflection;
                     {
                         return bridge.Delete(i);
                     }
+                ),
+                Associate = (Func<object, Task<object>>)(
+                    async (i) =>
+                    {
+                        return bridge.Associate(i);
+                    }
+                ),
+                Disassociate = (Func<object, Task<object>>)(
+                    async (i) =>
+                    {
+                        return bridge.Disassociate(i);
+                    }
                 )
+
+
             };
         }
     }
@@ -91,7 +105,7 @@ using System.Reflection;
 
         public void Associate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
         {
-            throw new NotImplementedException();
+            _orgService.Associate(entityName,entityId,relationship,relatedEntities);
         }
 
         public Guid Create(Entity entity)
@@ -101,7 +115,7 @@ using System.Reflection;
 
         public void Disassociate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
         {
-            throw new NotImplementedException();
+            _orgService.Disassociate(entityName, entityId, relationship, relatedEntities);
         }
 
         public Entity Retrieve(string entityName, Guid id, ColumnSet columnSet)
@@ -248,6 +262,38 @@ using System.Reflection;
             }
 
             return result.ToArray();
+        }
+
+        public object Associate(dynamic options)
+        {
+            string entityName = options.entityName;
+            Guid entityId = new Guid(options.entityId);
+            Relationship relationship = new Relationship(options.relationship);
+            var relatedEntitiesList = new List<EntityReference>();
+            foreach (var rel in options.relatedEntities)
+            {
+                relatedEntitiesList.Add(new EntityReference(rel.entityName, new Guid(rel.entityId)));
+            }
+            EntityReferenceCollection relatedEntities = new EntityReferenceCollection(relatedEntitiesList);
+            _service.Associate(entityName, entityId, relationship, relatedEntities);
+
+            return null;
+        }
+
+        public object Disassociate(dynamic options)
+        {
+            string entityName = options.entityName;
+            Guid entityId = new Guid(options.entityId);
+            Relationship relationship = new Relationship(options.relationship);
+            var relatedEntitiesList = new List<EntityReference>();
+            foreach (var rel in options.relatedEntities)
+            {
+                relatedEntitiesList.Add(new EntityReference(rel.entityName, new Guid(rel.entityId)));
+            }
+            EntityReferenceCollection relatedEntities = new EntityReferenceCollection(relatedEntitiesList);
+            _service.Disassociate(entityName, entityId, relationship, relatedEntities);
+
+            return null;
         }
         
         public object GetEntityMetadata(string entityName)
@@ -499,7 +545,6 @@ using System.Reflection;
 
         public void Associate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
         {
-            throw new NotImplementedException();
         }
 
         public void Delete(string entityName, Guid id)
@@ -508,7 +553,6 @@ using System.Reflection;
 
         public void Disassociate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
         {
-            throw new NotImplementedException();
         }
 
         public Entity Retrieve(string entityName, Guid id, ColumnSet columnSet)

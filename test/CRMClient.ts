@@ -1,6 +1,7 @@
 /// <reference path="../typings/main.d.ts"/>
 import assert = require("assert");
 import {CRMClient} from "../src/CRMClient";
+import {Guid} from "../src/Guid";
 
 describe('CRMClient', function () {
   it('Throws an exception with an invalid connection',function (){
@@ -47,5 +48,15 @@ describe('CRMClient', function () {
     var actual = crm.update("myEntity",record);
     assert.equal(actual,expected);
   });  
+
+  it('Associates two records',function (){   
+    var crm = new CRMClient("my connection string",true);
+    crm.associate("myEntity",Guid.create(),"my_relationship", "myEntity",Guid.create());
+  });
+  
+  it('Disassociates two records',function (){   
+    var crm = new CRMClient("my connection string",true);
+    crm.disassociate("myEntity",Guid.create(),"my_relationship", "myEntity",Guid.create());
+  });
   
 });
