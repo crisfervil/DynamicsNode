@@ -196,6 +196,28 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         crm.disassociate("contact",contact.contactid,"contactleads_association","lead",lead.leadid);
     });
 
+    it('Associates and Disassociates a lead and an contact using a DataTable',function (){
+        // retrieve any lead
+        var leads = crm.retrieveMultiple("lead",null,"leadid");
+        var lead = leads.rows[0];
+        
+        // retrieve any contact
+        var contacts = crm.retrieveMultiple("contact",null,"contactid");
+        var contact = contacts.rows[0];
+        
+        // Create the datatable
+        var dt = new DataTable("contactleads_association");
+        var row = {from:{type:"contact",value:"contact.contactid"},to:{type:"lead",value:lead.leadid}};
+        dt.rows.push(row);
+        
+        // associate them
+        crm.associateData(dt);
+        
+        // delete association
+        crm.disassociateData(dt);
+    });
+
+
     it.skip("Export and import users to a File",function(){
       var fileName = `test_integration/tmp/users-${connectionStringName}.xml`;
 

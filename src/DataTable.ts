@@ -1,7 +1,7 @@
 import path = require("path");
 import fs = require("fs");
 import XMLWriter = require('xml-writer');
-import xml2js = require('xml2js');
+import et = require('elementtree');
 
 export class DataTable {
     rows: Array<any> = [];
@@ -114,25 +114,50 @@ export class DataTable {
         }
         return result;
     };
-
+    
     private static parseXml(xmlContent: string): DataTable {
-        var dt: DataTable;
-
-        if (xmlContent !== undefined && xmlContent != null) {
-            var attr = (name:string)=>{
-                console.log(name);
-                return name;
-            };
-            
-            var parser = new xml2js.Parser({ async: false, explicitArray: false, valueProcessors: [DataTable.parseValue], mergeAttrs:true, tagNameProcessors:[attr] });
-            parser.parseString(xmlContent, function(err, result) {
-                if (result && result.DataTable && result.DataTable.row) {
-                    dt = new DataTable(result.DataTable.$.name, result.DataTable.row);
-                }
-            });
+        var dt = new DataTable();
+        var etree = et.parse(xmlContent);
+        var rootElement = etree.getroot();
+        
+        var attrName = rootElement.attrib["name"];
+        if(attrName) dt.name = attrName;
+        
+        var rowElements = rootElement.getchildren();
+        for(var i=0;i<rowElements.length;i++){
+            var rowElement = rowElements[i];
+            var rowItem = {};
+            var rowFieldElements = rowElement.getchildren();
+            for(var j=0;j<rowFieldElements.length;j++){
+                var rowFieldElement = rowFieldElements[j];
+                var fieldName = rowFieldElement.tag;
+                var fieldValue = rowFieldElement.text;
+                var fieldType = rowFieldElement.attrib["type"];
+                var parsedValue = DataTable.parseXmlValue(fieldValue);
+                if(fieldType){
+                    parsedValue = {type:fieldType,value:parsedValue};
+                } 
+                rowItem[fieldName] = parsedValue;
+            }
+            dt.rows.push(rowItem);
         }
-
+        
         return dt;
+    }
+
+    private static parseXmlValue(strValue:string){
+        var result:any=strValue;
+        var parsedValue = DataTable.parseBooleans(strValue);
+        if (parsedValue === null) {
+            parsedValue = DataTable.parseNumbers(strValue);
+        }
+        if (parsedValue === null) {
+            parsedValue = DataTable.parseDates(strValue);
+        }
+        if (parsedValue !== null) {
+            result = parsedValue;
+        }
+        return result;
     }
 
     private serializeXml(data: DataTable): string {

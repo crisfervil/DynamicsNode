@@ -367,6 +367,13 @@ export class CRMClient {
         this._crmBridge.Associate(params, true);
     }
 
+    disassociateData(data:DataTable){  
+        for (var i = 0; i < data.rows.length; i++) {
+            var row = data.rows[i];
+            this.disassociate(row.from.type,row.from.value,data.name,row.to.type,row.to.value);
+        }
+    }
+
     disassociate(fromEntityName: string, fromEntityId: string | Guid, relationshipName: string, toEntityName: string, toEntityId: string | Guid) {
         
         // perform some validations

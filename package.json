@@ -16,8 +16,8 @@
   "license": "MIT",
   "dependencies": {
     "edge": "^5.0.0",
-    "xml-writer": "^1.6.0",
-    "xml2js": "^0.4.16"
+    "elementtree": "^0.1.6",
+    "xml-writer": "^1.6.0"
   },
   "devDependencies": {
     "istanbul": "^0.4.2",
