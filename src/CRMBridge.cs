@@ -8,7 +8,6 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Net;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Threading.Tasks;
 using System.Reflection;
 
@@ -94,7 +93,7 @@ using System.Reflection;
             WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
             _connectionString = connectionString;
             // Establish a connection to the organization web service using CrmConnection.
-            _connection = CrmConnection.Parse(connectionString);
+            _connection = Microsoft.Xrm.Client.CrmConnection.Parse(_connectionString);
             _orgService = new OrganizationService(_connection);
         }
 
