@@ -60,7 +60,17 @@ export class CRMClient {
             converted = {};
             for (var i = 0; i < propertiesArray.length; i++) {
                 var propValue = propertiesArray[i];
-                converted[propValue[0]] = propValue[1];
+                if(propValue[1] instanceof Array){
+                    var convertedValues=[];
+                    for (var j = 0; i < propValue[1].length; i++) {
+                        var arrayItem = propValue[1][j];
+                        convertedValues.push(this.convert(arrayItem));
+                    }
+                    converted[propValue[0]] = convertedValues;
+                }
+                else{
+                    converted[propValue[0]] = propValue[1];
+                }
             }
         }
         return converted;
@@ -403,5 +413,12 @@ export class CRMClient {
 
         var params = { entityName: fromEntityName, entityId: fromId, relationship: relationshipName, relatedEntities: [{ entityName: toEntityName, entityId: toId }] };
         this._crmBridge.Disassociate(params, true);
+    }
+    
+    getEntityMetadata(entityName:string){
+        var params = { entityName: entityName };
+        var metadata = this._crmBridge.GetEntityMetadata(params, true);
+        var convertedValue = this.convert(metadata);
+        return convertedValue;
     }
 }

@@ -58,5 +58,10 @@ describe('CRMClient', function () {
     var crm = new CRMClient("my connection string",true);
     crm.disassociate("myEntity",Guid.create(),"my_relationship", "myEntity",Guid.create());
   });
-  
+
+  it('Gets entity metadata',function (){   
+    var crm = new CRMClient("my connection string",true);
+    crm.getEntityMetadata("myEntity");
+  });
+
 });

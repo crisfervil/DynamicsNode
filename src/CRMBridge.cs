@@ -69,6 +69,13 @@ using System.Reflection;
                     {
                         return bridge.Disassociate(i);
                     }
+                ),
+                GetEntityMetadata = (Func<object, Task<object>>)(
+                    async (i) =>
+                    {
+                        var value = bridge.GetEntityMetadata(i);
+                        return value;
+                    }
                 )
             };
         }
@@ -202,7 +209,6 @@ using System.Reflection;
             return null;
         }
 
-
         public object Retrieve(dynamic options) 
         {
             object[] result = null;
@@ -232,7 +238,6 @@ using System.Reflection;
             }
             return result;
         }
-
 
         private QueryExpression FetchXmlToQueryExpression(string fetchXml) 
         {
@@ -294,18 +299,15 @@ using System.Reflection;
             return null;
         }
         
-        public object GetEntityMetadata(string entityName)
+        public object GetEntityMetadata(dynamic options)
         {
-            var result = new List<object>();
+            object[] result;
 
-            // validate parameters
-            if (entityName == null || string.IsNullOrWhiteSpace(entityName)) throw new Exception("entityName not specified");
-
-            
+            var entityName = options.entityName;
             var metadata = GetMetadataFromCache(entityName);
-            //result = Convert(metadata);
+            result = Convert(metadata);
             
-            return result.ToArray();
+            return result;
         }        
 
         private Entity Convert(string entityName, object[] values)
@@ -475,6 +477,42 @@ using System.Reflection;
             return values.ToArray();
         }
 
+        private object[] Convert(object value)
+        {
+            var converted = new List<object>();
+            var objectType = value.GetType();
+
+            var objectProps = objectType.GetProperties();
+
+            foreach (var prop in objectProps)
+            {
+                var propValue = prop.GetValue(value, null);
+                if (propValue != null)
+                {
+                    if (prop.PropertyType == typeof(string) ||
+                        prop.PropertyType == typeof(int) ||
+                        prop.PropertyType == typeof(bool?))
+                    {
+                        converted.Add(new object[] { prop.Name, propValue });
+                    }
+                    else if (prop.PropertyType.IsArray)
+                    {
+                        Array propValueArray = (Array)propValue;
+                        var convertedPropValueItems = new List<object>();
+                        foreach (var propValueItem in propValueArray)
+                        {
+                            var convertedValueItem = Convert(propValueItem);
+                            convertedPropValueItems.Add(convertedValueItem);
+                        }
+                        converted.Add(new object[] { prop.Name, convertedPropValueItems.ToArray() });
+                    }
+                }
+            }
+
+            var convertedArray = converted.ToArray();
+            return convertedArray;
+        }
+
         private Dictionary<string, EntityMetadata> _metadataCache = new Dictionary<string, EntityMetadata>();
         private EntityMetadata GetMetadataFromCache(string entityName)
         {
@@ -506,7 +544,6 @@ using System.Reflection;
     /// </summary>
     public class FakeService : IOrganizationService
     {
-
         private string _connectionString;
         public FakeService(string connectionString) 
         {

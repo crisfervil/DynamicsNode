@@ -217,6 +217,11 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         crm.disassociateData(dt);
     });
 
+    it('Gets entity metadata',function (){   
+        var metadata = crm.getEntityMetadata("account");
+        assert.ok(metadata,JSON.stringify(metadata));
+    });
+
 
     it.skip("Export and import users to a File",function(){
       var fileName = `test_integration/tmp/users-${connectionStringName}.xml`;
