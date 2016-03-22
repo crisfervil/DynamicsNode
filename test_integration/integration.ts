@@ -207,7 +207,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         
         // Create the datatable
         var dt = new DataTable("contactleads_association");
-        var row = {from:{type:"contact",value:"contact.contactid"},to:{type:"lead",value:lead.leadid}};
+        var row = {from:{type:"contact",value:contact.contactid},to:{type:"lead",value:lead.leadid}};
         dt.rows.push(row);
         
         // associate them
