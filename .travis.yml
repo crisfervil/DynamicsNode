@@ -20,6 +20,11 @@ install:
   - sudo apt-get update
   - sudo apt-get install mono-devel
   - npm install -g grunt-cli
+  - npm install -g codecov
   - npm install
  
 before_script: npm run build
+
+script:
+  - npm run cover  
+  - codecov
