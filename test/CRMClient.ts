@@ -61,7 +61,8 @@ describe('CRMClient', function () {
 
   it('Gets entity metadata',function (){   
     var crm = new CRMClient("my connection string",true);
-    crm.getEntityMetadata("myEntity");
+    var metadata = crm.getEntityMetadata("myEntity");
+    assert.ok(metadata,JSON.stringify(metadata));
   });
 
 });

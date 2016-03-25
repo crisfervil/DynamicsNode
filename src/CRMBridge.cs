@@ -500,7 +500,12 @@ using System.Reflection;
                         var convertedPropValueItems = new List<object>();
                         foreach (var propValueItem in propValueArray)
                         {
-                            var convertedValueItem = Convert(propValueItem);
+                            var convertedValueItem = propValueItem;
+                            if (!propValueItem.GetType().IsPrimitive&&
+                                propValueItem.GetType()!=typeof(string))
+                            {
+                                convertedValueItem = Convert(propValueItem);
+                            }
                             convertedPropValueItems.Add(convertedValueItem);
                         }
                         converted.Add(new object[] { prop.Name, convertedPropValueItems.ToArray() });
