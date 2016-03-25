@@ -63,7 +63,7 @@ This tool is based on [Edge](https://github.com/tjanczuk/edge) and requires .NET
 It has been tested in Windows environments only, but could potentially work in Linux too using Mono.
 
 # Supported CRM versions
-Tested on CRM 2011, 2011 and CRM Online so far.
+Tested on CRM 2011, 2013 and CRM Online so far.
 
 Volunteers to run the integration tests on other versions are more than welcome :)
 
@@ -81,9 +81,9 @@ TBC
 - [ ] *Improve documentation (work In progress)*
 - [ ] *Add DataTable functions (work in progress)*
 * [ ] *Improve testeability and integration tests (work in progress)* 
-* [ ] *Add test coverage reports (work in progress)*
 * [ ] Add import/export commands
 * [ ] Add functions to work with solutions
 * [ ] Add support for missing operators in condition objects
 * [ ] Add integration tests for activities
+* [x] ~~Add test coverage reports~~
 - [x] ~~Upload npm package~~
