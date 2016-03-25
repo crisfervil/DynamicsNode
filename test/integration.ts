@@ -10,7 +10,7 @@ import fs = require("fs");
 
 before(function(){
   // create temp dir if doesn't exist
-  if(!fs.existsSync("test_integration/tmp")) fs.mkdirSync("test_integration/tmp");
+  if(!fs.existsSync("test/tmp")) fs.mkdirSync("test/tmp");
 });
 
 function tryGetModule(moduleId: string) {
@@ -22,6 +22,12 @@ function tryGetModule(moduleId: string) {
   return result;
 }
 
+// add tests for connection string in environment variable
+if(process.env.INTEGRATION_TESTS_CONN_STRING){
+    addTestsFor("ENV_VARIABLE", process.env.INTEGRATION_TESTS_CONN_STRING);
+}
+
+// add tests for connection string in config.json
 var config = tryGetModule(path.join(process.cwd(),"config.json"));
 if(config&&config.connectionStrings){
     for(var conn in config.connectionStrings){
@@ -224,7 +230,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
 
 
     it.skip("Export and import users to a File",function(){
-      var fileName = `test_integration/tmp/users-${connectionStringName}.xml`;
+      var fileName = `test/tmp/users-${connectionStringName}.xml`;
 
       var users = crm.retrieveAll("systemuser");
       users.save(fileName);
