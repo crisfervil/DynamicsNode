@@ -23,10 +23,11 @@ $  npm install dynamicsnode
 Create a new js file named myscript.js and start adding code
 
 ``` javascript
+/// <reference path="node_modules/dynamicsnode/dynamicsnode.d.ts" />
 
 var dn = require("DynamicsNode");
 
-var crm = new dn.CRMClient("Url=http://crm.contoso.com/xrmContoso"); // update this with your CRM url
+var crm = new dn.CRMClient("Url=http://crm.contoso.com/xrmContoso"); // update this with your CRM url and credentials if needed
 
 // retrieve the current user
 var who = crm.whoAmI();
