@@ -11,3 +11,7 @@ doc
 *.js.map
 .vscode
 npm-debug.log
+.travis.yml
+.npmignore
+.gitattributes
+tsconfig.json
