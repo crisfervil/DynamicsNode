@@ -1,4 +1,3 @@
-/// <reference path="../typings/main.d.ts"/>
 import {CRMClient} from "../src/CRMClient";
 import {Fetch} from "../src/Fetch";
 import {Guid} from "../src/Guid";

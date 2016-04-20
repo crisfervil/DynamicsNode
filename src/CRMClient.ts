@@ -1,5 +1,3 @@
-/// <reference path="../typings/main.d.ts" />
-/// <reference path="../typings/custom.d.ts" />
 
 import {DataTable} from "./DataTable";
 import {Guid} from "./Guid";

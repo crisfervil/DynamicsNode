@@ -1,6 +1,3 @@
-/// <reference path="../typings/main.d.ts"/>
-
-
 import {Fetch} from "../src/Fetch";
 import assert = require("assert");
 

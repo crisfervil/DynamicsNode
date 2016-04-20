@@ -1,5 +1,3 @@
-/// <reference path="../typings/main.d.ts"/>
-
 import {DataTable} from "../src/DataTable";
 import {Guid} from "../src/Guid";
 import assert = require("assert");
