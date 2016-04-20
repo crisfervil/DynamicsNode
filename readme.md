@@ -81,6 +81,7 @@ TBC
 - [ ] *Improve documentation (work In progress)*
 - [ ] *Add DataTable functions (work in progress)*
 * [ ] *Improve testeability and integration tests (work in progress)* 
+* [ ] Add d.ts file to Typings repository 
 * [ ] Add import/export commands
 * [ ] Add functions to work with solutions
 * [ ] Add support for missing operators in condition objects

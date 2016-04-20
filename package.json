@@ -28,7 +28,7 @@
   },
   "scripts": {
     "test": "mocha --recursive",
-    "integration-test": "mocha test_integration --recursive",
+    "integration-test": "mocha test/integration",
     "build": "typings install && tsc -p .",
     "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive",
     "doc": "jsdoc src/ -r -d doc"
