@@ -97,6 +97,8 @@ declare module 'DynamicsNode' {
         private deleteMultiple(entityName, ids);
         update(entityName: string, attributes: any, conditions?: any): number;
         createOrUpdate(entityName: string, attributes, matchFields:string[]): void;
+        associate(entityName: string, fromEntityId: string | Guid, relationshipName: string, toEntityName: string, toEntityId: string | Guid): void;
+        disassociate(entityName: string, fromEntityId: string | Guid, relationshipName: string, toEntityName: string, toEntityId: string | Guid): void;
     }    
     
 }
