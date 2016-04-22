@@ -6,7 +6,6 @@ import {Fetch} from "./Fetch";
 import path = require("path");
 import edge = require("edge");
 
-
 /**
  * @class Allows to access to CRM functions.
  * @param {string} connectionString Optional. A valid connection string or connection string name
@@ -33,10 +32,11 @@ export class CRMClient {
         var ref2 = path.join(__dirname, "bin/Microsoft.Xrm.Client.dll");
         var ref3 = path.join(__dirname, "bin/Microsoft.Xrm.Sdk.dll");
         var ref4 = path.join("System.Runtime.Serialization.dll");
+        var ref5 = path.join(__dirname, "bin/Newtonsoft.Json.dll");
 
         var createBridge = edge.func({
             source: source,
-            references: [ref1, ref2, ref3, ref4]
+            references: [ref1, ref2, ref3, ref4, ref5]
         });
 
         var bridge = createBridge({ connectionString: this.connectionString, useFake: fakeBridge }, true);
@@ -415,8 +415,10 @@ export class CRMClient {
     
     getEntityMetadata(entityName:string){
         var params = { entityName: entityName };
-        var metadata = this._crmBridge.GetEntityMetadata(params, true);
-        var convertedValue = this.convert(metadata);
-        return convertedValue;
+        var metadataStr = this._crmBridge.GetEntityMetadata(params, true);
+        var metadata = JSON.parse(metadataStr);
+        //var convertedValue = this.convert(metadata);
+        //return convertedValue;
+        return metadata;
     }
 }

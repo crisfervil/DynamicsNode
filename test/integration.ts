@@ -222,11 +222,12 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         crm.disassociateData(dt);
     });
 
-    it('Gets entity metadata',function (){   
+    it('Gets entity metadata',function (){
         var metadata = crm.getEntityMetadata("account");
+        // save the data to review it later
+        fs.writeFile("test/tmp/metadata.json", JSON.stringify(metadata,null,4));
         assert.ok(metadata,JSON.stringify(metadata));
     });
-
 
     it.skip("Export and import users to a File",function(){
       var fileName = `test/tmp/users-${connectionStringName}.xml`;

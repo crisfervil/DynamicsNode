@@ -59,3 +59,5 @@ tmp
 .imdone/
 doc/**
 !doc/*.md
+src/bin/*.xml
+src/bin/*.pdb
