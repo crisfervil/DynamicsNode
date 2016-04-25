@@ -31,7 +31,7 @@ describe('Fetch', function () {
   });
   it('Serializes a complex Fetch',function(){
       // the entity name and column names must be lowercased
-      var fetch = new Fetch("tEst",["*"],{attr:"myValue",aTTr2:{$neq:22},attr3:{$in:["value1","value2"]},attr4:new Date(1982,2,17),ATtr5:false,attr6:["value1",false],attr7:null});
+      var fetch = new Fetch("tEst",["*"],{attr:"myValue",aTTr2:{$neq:22},attr3:{$in:["value1","value2"]},attr4:new Date(Date.UTC(1982,2,17)),ATtr5:false,attr6:["value1",false],attr7:null});
       var expected =
 `<fetch>
     <entity name="test">
