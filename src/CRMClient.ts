@@ -2,6 +2,7 @@
 import {DataTable} from "./DataTable";
 import {Guid} from "./Guid";
 import {Fetch} from "./Fetch";
+import {Dictionary} from "./Dictionary";
 
 import path = require("path");
 import edge = require("edge");
@@ -13,6 +14,7 @@ import edge = require("edge");
 export class CRMClient {
 
     private _crmBridge: any;
+    private _metadataCache=new Dictionary();
 
     constructor(public connectionString: string = "default", fakeBridge: boolean = false) {
 
@@ -414,11 +416,28 @@ export class CRMClient {
     }
     
     getEntityMetadata(entityName:string){
+        var ndx = this._metadataCache.indexOf(entityName);
+        var metadata = null;
+        if(ndx>-1){
+            metadata = this._metadataCache.getValue(ndx);
+        }
+        else {
+            metadata= this.getEntityMetadataFromCrm(entityName);
+            this._metadataCache.push(entityName,metadata);
+        }
+        return metadata;
+    }
+    
+    private getEntityMetadataFromCrm(entityName:string){
         var params = { entityName: entityName };
         var metadataStr = this._crmBridge.GetEntityMetadata(params, true);
         var metadata = JSON.parse(metadataStr);
-        //var convertedValue = this.convert(metadata);
-        //return convertedValue;
         return metadata;
+    }
+    
+    export (entityName:string, fileName:string){
+        var metadata = this.getEntityMetadata(entityName);
+        var data = this.retrieveMultiple(entityName);
+        data.save(fileName);
     }
 }

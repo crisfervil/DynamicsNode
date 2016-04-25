@@ -227,6 +227,8 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         // save the data to review it later
         fs.writeFile("test/tmp/metadata.json", JSON.stringify(metadata,null,4));
         assert.ok(metadata,JSON.stringify(metadata));
+        assert.equal(metadata.SchemaName,"Account");
+        assert.equal(metadata.PrimaryIdAttribute,"accountid");
     });
 
     it.skip("Export and import users to a File",function(){

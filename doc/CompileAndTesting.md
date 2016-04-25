@@ -1,8 +1,6 @@
 # How to compile the code
 ## Prerequisites
-Node. Install the latest version from: https://nodejs.org/
-
-Git is optional. Can be installed from https://desktop.github.com/
+In order to build the TypeScript compiler, ensure that you have [Git](https://git-scm.com/downloads) and [Node.js](https://nodejs.org) installed.
 
 ## Steps
 First, get the latest version of the code from Github, either using the clone button from the web, or using the command line.
