@@ -1,13 +1,18 @@
 # Commands
 Commands are a way to use Dynamics Node from command line. 
 
+In order to use those commands, you have to install DynamicsNode in global mode. 
+
+To install DynamicsNode in global mode use the following command.
+```
+$  npm install -g dynamicsnode
+```
+
 
 ## Export
 Exports the data of the specified entity to the specified file using the specified connection. 
 
-In order to use this command, you have to install DynamicsNode in global mode. 
-
-If you have already done so, open your command prompt and type the following command:
+Usage:
 
 ```
 $ dynamicsnode export account accounts.xml CRMOnline
@@ -15,7 +20,7 @@ $ dynamicsnode export account accounts.xml CRMOnline
 
 This will export all the existing accounts to the accounts.xml file.
 
-You can specify either an xml or json file.
+You can specify either an xml or a json file.
 
 CRMOnline is the connection string or the connection name to use. 
 
