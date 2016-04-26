@@ -437,7 +437,7 @@ export class CRMClient {
     
     export (entityName:string, fileName:string){
         var metadata = this.getEntityMetadata(entityName);
-        var data = this.retrieveMultiple(entityName);
+        var data = this.retrieveMultiple(entityName,{});
         data.save(fileName);
     }
 }

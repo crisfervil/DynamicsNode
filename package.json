@@ -37,5 +37,8 @@
     "Dynamics",
     "CRM",
     "XRM"
-  ]
+  ],
+  "bin": {
+    "dynamicsnode": "bin/commands.js"
+  }
 }

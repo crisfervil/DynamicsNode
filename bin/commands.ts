@@ -1,3 +1,5 @@
+import {CRMClient} from "../src/CRMClient";
+
 function showHelp() {
     console.log("USE: dn help");
     console.log("Shows this help");
@@ -11,6 +13,15 @@ function wrongParameters() {
 }
 
 function exp(entityName:string,filePath:string,connectionName:string) {
+    try{
+        var crm = new CRMClient(connectionName);
+        crm.export(entityName,filePath);
+    }
+    catch(ex){
+        console.log("Error:");
+        if(ex.Message) console.log(ex.Message);
+        else console.log(ex);    
+    }
     
 }
 
@@ -25,7 +36,7 @@ if (cmdLineArgs.length > 1) {
         case "export":
             var entityName=cmdLineArgs[3],filePath=cmdLineArgs[4], connectionName=cmdLineArgs[5];
             if(!entityName||!filePath||!connectionName||cmdLineArgs.length>6) wrongParameters();
-            exp(entityName,filePath,connectionName);
+            else exp(entityName,filePath,connectionName);
             break;
         default:
             wrongParameters();

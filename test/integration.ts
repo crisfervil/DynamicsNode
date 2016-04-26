@@ -231,6 +231,16 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         assert.equal(metadata.PrimaryIdAttribute,"accountid");
     });
 
+    it('Exports accounts in xml format',function (){
+        var fileName = `test/tmp/accounts-${connectionStringName}.xml`;
+        crm.export("account",fileName);
+        // Try to load exported data
+        var data = DataTable.load(fileName);
+        assert.ok(data,JSON.stringify(data));
+        assert.ok(data.rows.length>0,JSON.stringify(data));
+    });
+
+
     it.skip("Export and import users to a File",function(){
       var fileName = `test/tmp/users-${connectionStringName}.xml`;
 
