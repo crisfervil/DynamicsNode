@@ -15,9 +15,9 @@ $ dynamicsnode export account accounts.xml CRMOnline
 
 This will export all the existing accounts to the accounts.xml file.
 
-CRMOnline is the connection string or the connection name to use. 
-
 You can specify either an xml or json file.
+
+CRMOnline is the connection string or the connection name to use. 
 
 In order to reference connections using a name, create a file config.json at the root of your scripts folder.
 
@@ -31,6 +31,7 @@ The config.json must have the following format:
 	}
 }
 ```
+Each name inside connectionStrings is a name you can use in your export command.
 
 ## Import
 ```
