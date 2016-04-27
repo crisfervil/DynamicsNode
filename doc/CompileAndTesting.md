@@ -25,6 +25,21 @@ Use the default npm command for testing.
 ```
 $  npm test
 ```
+# Debug
+In order to see debug information in console, type following command:
+```
+set DEBUG=dynamicsnode 
+```
+You should see debug information like this:
+```
+  dynamicsnode Exporting account to accounts.xml +0ms
+  dynamicsnode Getting metadata... +0ms
+  dynamicsnode Getting data... +1s
+  dynamicsnode Saving... +531ms
+  dynamicsnode done! +32ms
+  
+```
+
 ## Integration Tests
 In order to run the integration tests, first clone and compile the code as described above.
 

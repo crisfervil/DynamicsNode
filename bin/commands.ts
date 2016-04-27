@@ -1,3 +1,5 @@
+//#! /usr/bin/env node
+
 import {CRMClient} from "../src/CRMClient";
 
 function showHelp() {

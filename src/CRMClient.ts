@@ -6,6 +6,7 @@ import {Dictionary} from "./Dictionary";
 
 import path = require("path");
 import edge = require("edge");
+var debug = require("debug")("dynamicsnode");
 
 /**
  * @class Allows to access to CRM functions.
@@ -436,8 +437,19 @@ export class CRMClient {
     }
     
     export (entityName:string, fileName:string){
+        
+        debug(`Exporting ${entityName} to ${fileName}`);
+        
+        // perform some validations
+        if (!entityName) throw "Entity name not specified";
+        entityName = entityName.toLowerCase(); // normalize casing
+                
+        debug("Getting metadata...");
         var metadata = this.getEntityMetadata(entityName);
+        debug("Getting data...");
         var data = this.retrieveMultiple(entityName,{});
+        debug("Saving...");
         data.save(fileName);
+        debug("done!");
     }
 }

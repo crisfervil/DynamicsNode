@@ -15,6 +15,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "debug": "^2.2.0",
     "edge": "^5.0.0",
     "elementtree": "^0.1.6",
     "xml-writer": "^1.6.0"
@@ -23,8 +24,8 @@
     "istanbul": "^0.4.2",
     "jsdoc": "^3.4.0",
     "mocha": "^2.3.4",
-    "typescript": "^1.8.7",
-    "typings": "^0.7.4"
+    "typings": "^0.8.1",
+    "typescript": "^1.8.7"
   },
   "scripts": {
     "test": "mocha --recursive",
