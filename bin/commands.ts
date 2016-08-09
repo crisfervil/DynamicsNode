@@ -1,18 +1,24 @@
-//#! /usr/bin/env node
+//#!/usr/bin/env node
 
 import {CRMClient} from "../src/CRMClient";
+import yargs = require("yargs");
 
-function showHelp() {
-    console.log("USE: dn help");
-    console.log("Shows this help");
-    console.log("USE: dn export entityName filePath connection");
-    console.log("Exports the records of the specified entity to the specified file using the connection with the specified name");
-}
+console.log("initializing...");
+// configure command line options
+var argv = yargs
+    .usage('Usage: $0 <command> [options]')
+    .option("connection",{
+        alias:"c",
+        describe:"name of the connection in the connections string file"
+    })
+    .option("entity",{
+        alias:"e",
+        describe:"name of the entity to be imported/exported"
+    })
+    .command("export <connection> <entity> <file>","exports data from CRM into a file")
+    .demand("command")
+    .argv;
 
-function wrongParameters() {
-    console.log("Wrong parameters");
-    showHelp();
-}
 
 function exp(entityName:string,filePath:string,connectionName:string) {
     try{
@@ -24,9 +30,9 @@ function exp(entityName:string,filePath:string,connectionName:string) {
         if(ex.Message) console.log(ex.Message);
         else console.log(ex);    
     }
-    
 }
 
+/*
 var cmdLineArgs = process.argv;
 
 if (cmdLineArgs.length > 1) {
@@ -46,4 +52,4 @@ if (cmdLineArgs.length > 1) {
 }
 else {
     wrongParameters();
-}
+}*/

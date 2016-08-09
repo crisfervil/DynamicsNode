@@ -5,5 +5,8 @@
   },
   "dependencies": {
     "debug": "registry:npm/debug#2.0.0+20160211003958"
+  },
+  "globalDependencies": {
+    "yargs": "registry:dt/yargs#0.0.0+20160808125142"
   }
 }
