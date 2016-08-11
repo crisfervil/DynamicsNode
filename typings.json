@@ -1,12 +1,10 @@
 {
-  "ambientDependencies": {
-    "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#36c6ce86fb64bafb28ec95dc78c6b98228b45c8d",
-    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#48c1e3c1d6baefa4f1a126f188c27c4fefd36bff"
+  "globalDependencies": {
+    "mocha": "registry:dt/mocha#2.2.5+20160720003353",
+    "node": "registry:dt/node#6.0.0+20160807145350",
+    "yargs": "registry:dt/yargs#0.0.0+20160808125142"
   },
   "dependencies": {
-    "debug": "registry:npm/debug#2.0.0+20160211003958"
-  },
-  "globalDependencies": {
-    "yargs": "registry:dt/yargs#0.0.0+20160808125142"
+    "debug": "registry:npm/debug#2.0.0+20160723033700"
   }
 }
