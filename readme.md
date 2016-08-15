@@ -55,11 +55,11 @@ $ node myscript
 
 
 # Requirements
-TBC
-
 Requires [Node.js](nodejs.org)
 
 This tool is based on [Edge](https://github.com/tjanczuk/edge) and requires .NET Framework 4.5 to be installed.
+
+Due to Edge requirements, you can use only node up to the v5.1.0. If you want to use later versions of node, you have to compile edge manually, following the instructions available in: https://github.com/tjanczuk/edge
 
 It has been tested in Windows environments only, but could potentially work in Linux too using Mono.
 
@@ -67,13 +67,6 @@ It has been tested in Windows environments only, but could potentially work in L
 Tested on CRM 2011, 2013 and CRM Online so far.
 
 Volunteers to run the integration tests on other versions are more than welcome :)
-
-
-# Use it as an integration tests tool
-TBC
-
-# Use it as work load test tool
-TBC
 
 
 # Backlog
