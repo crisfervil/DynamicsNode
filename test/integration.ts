@@ -185,6 +185,23 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         assert.ok(leads.rows.length>0);
     });    
 
+    it('Creates an incident associated to an account',function (){
+
+        // Gets any account in the system
+        var accounts = crm.retrieveMultiple("account",{});
+        // If there aren't any accounts in the system, this test will fail
+        var accountId = accounts.rows[0].accountid;
+
+        var caseGuid = crm.create("incident",{title:"test", customerid:{id:accountId,type:"account"}});
+
+        assert.ok(caseGuid); // case created ok
+
+        // delete created case
+        crm.delete("incident",caseGuid);
+
+    });    
+
+
     it('Associates and Disassociates a lead and an contact',function (){
         // retrieve any lead
         var leads = crm.retrieveMultiple("lead",null,"leadid");
@@ -239,7 +256,6 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         assert.ok(data,JSON.stringify(data));
         assert.ok(data.rows.length>0,JSON.stringify(data));
     });
-
 
     it.skip("Export and import users to a File",function(){
       var fileName = `test/tmp/users-${connectionStringName}.xml`;

@@ -349,6 +349,9 @@ public class CRMBridge
             case AttributeTypeCode.Uniqueidentifier:
                 convertedValue = ConvertToUniqueidentifier(fieldValue);
                 break;
+            case AttributeTypeCode.Customer:
+                convertedValue = ConvertToCustomer(fieldValue);
+                break;
             case AttributeTypeCode.DateTime:
                 convertedValue = ConvertToDateTime(fieldValue);
                 break;
@@ -415,6 +418,15 @@ public class CRMBridge
     {
         return Guid.Parse((string)value);
     }
+
+    private EntityReference ConvertToCustomer(dynamic value)
+    {
+        string id = (string)value.id;
+        var guid = new Guid(id);
+        string customerType = value.type;
+        return new EntityReference(customerType,guid);
+    }
+
 
     private OptionSetValue ConvertToOptionSet(object value, AttributeMetadata fieldMetadata)
     {

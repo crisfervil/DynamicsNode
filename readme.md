@@ -35,7 +35,7 @@ var myUser = crm.retrieve("systemuser",who);
 console.log(myUser);
 
 // retrieve a user named John Doe
-var anotherUser = crm.retrieve("systemyser",{fullname:"John Doe"});
+var anotherUser = crm.retrieve("systemuser",{fullname:"John Doe"});
 console.log(anotherUser);
 
 ```
