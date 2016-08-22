@@ -61,3 +61,4 @@ doc/**
 !doc/*.md
 src/bin/*.xml
 src/bin/*.pdb
+.nyc_output
