@@ -22,7 +22,7 @@
     "yargs": "^4.6.0"
   },
   "devDependencies": {
-    "istanbul": "^0.4.2",
+    "istanbul": "^0.4.5",
     "jsdoc": "^3.4.0",
     "mocha": "^2.3.4",
     "typescript": "^1.8.7",
@@ -32,7 +32,7 @@
     "test": "mocha --recursive",
     "integration-test": "mocha test/integration",
     "build": "typings install && tsc -p .",
-    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive -R spec ./node_modules/.bin/codecov",
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec ./node_modules/.bin/codecov --recursive",
     "doc": "jsdoc src/ -r -d doc"
   },
   "keywords": [
