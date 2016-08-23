@@ -33,7 +33,7 @@
     "test": "mocha --recursive",
     "integration-test": "mocha test/integration",
     "build": "typings install && tsc -p .",
-    "cover": "nyc mocha && nyc report --reporter=json",
+    "cover": "nyc mocha && nyc report --reporter=json && codecov -f coverage/*.json",
     "doc": "jsdoc src/ -r -d doc"
   },
   "keywords": [
