@@ -32,7 +32,7 @@
   "scripts": {
     "test": "mocha --recursive",
     "integration-test": "mocha test/integration",
-    "build": "typings install && tsc -p .",
+    "build": "typings install && tsc -p . --sourcemap",
     "cover": "nyc mocha && nyc report --reporter=json && codecov -f coverage/*.json",
     "doc": "jsdoc src/ -r -d doc"
   },
