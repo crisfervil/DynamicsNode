@@ -438,7 +438,7 @@ export class CRMClient {
     
     export (entityName:string, fileName:string){
         
-        debug(`Exporting ${entityName} to ${fileName}`);
+        debug(`Exporting ${entityName} to ${fileName}...`);
         
         // perform some validations
         if (!entityName) throw "Entity name not specified";
@@ -452,4 +452,22 @@ export class CRMClient {
         data.save(fileName);
         debug("done!");
     }
+
+    import (fileName:string){
+        
+        debug(`Importing ${fileName}...`);
+        
+        debug("Loading data table...");
+        var dt = DataTable.load(fileName);
+
+
+        debug("Getting metadata...");
+        var metadata = this.getEntityMetadata(dt.name);
+
+        debug("Importing...");
+        // TBC
+
+        debug("done!");
+    }
+
 }
