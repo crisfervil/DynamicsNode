@@ -3,27 +3,39 @@
 import {CRMClient} from "../src/CRMClient";
 import yargs = require("yargs");
 
-console.log("initializing...");
 // configure command line options
 var argv = yargs
     .usage('Usage: $0 <command> [options]')
-    .option("connection",{
-        alias:"c",
-        describe:"name of the connection in the connections string file"
+    .command("export [options]","exports data from CRM into a file", {
+        entity:{ alias:"e", description:"Name of the entity to export", demand:true, requiresArg:true},
+        file:{ alias:"f", description:"Name of the file to create with the results. Only .json or .xml formats supported", demand:true, requiresArg:true},
+        connection:{ alias:"c", description:"Connection String or name of a connection in the config.json file", demand:true, requiresArg:true}
+    }, (args)=>{
+        var arrrg:any=args;
+        exp(arrrg.entity,arrrg.file,arrrg.connection);
     })
-    .option("entity",{
-        alias:"e",
-        describe:"name of the entity to be imported/exported"
-    })
-    .command("export <connection> <entity> <file>","exports data from CRM into a file")
-    .demand("command")
+    .help('h')
+    .alias('help','h')
+    .alias('version','v')
+    .version(showVersion())
+    .example("export","-e DEV -e account -f accounts.json")
     .argv;
 
+// Show help in case no argument was provided
+if(!(argv._&&argv._[0])) yargs.showHelp();
+
+
+function showVersion(){
+    var version = require('../package').version;
+    return `DynamicsNode v ${version}`; 
+}
 
 function exp(entityName:string,filePath:string,connectionName:string) {
     try{
+        console.log("exporting...");
         var crm = new CRMClient(connectionName);
         crm.export(entityName,filePath);
+        console.log("done!");
     }
     catch(ex){
         console.log("Error:");
@@ -31,25 +43,3 @@ function exp(entityName:string,filePath:string,connectionName:string) {
         else console.log(ex);    
     }
 }
-
-/*
-var cmdLineArgs = process.argv;
-
-if (cmdLineArgs.length > 1) {
-    var command = cmdLineArgs[2];
-    switch (command) {
-        case "help":
-            showHelp();
-            break;
-        case "export":
-            var entityName=cmdLineArgs[3],filePath=cmdLineArgs[4], connectionName=cmdLineArgs[5];
-            if(!entityName||!filePath||!connectionName||cmdLineArgs.length>6) wrongParameters();
-            else exp(entityName,filePath,connectionName);
-            break;
-        default:
-            wrongParameters();
-    }
-}
-else {
-    wrongParameters();
-}*/
