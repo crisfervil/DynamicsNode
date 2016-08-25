@@ -15,7 +15,7 @@ Exports the data of the specified entity to the specified file using the specifi
 Usage:
 
 ```
-$ dynamicsnode export account accounts.xml CRMOnline
+$ dynamicsnode export -e [entityName] -f [file] -c [connection]
 ```
 
 This will export all the existing accounts to the accounts.xml file.
@@ -40,9 +40,20 @@ Each name inside connectionStrings is a name you can use in your export command.
 
 ## Import
 ```
-$ dynamicsnode import accounts.xml myCrm
+$ dynamicsnode import -f [fileName] -c [connection]
 ```
-** Still to be implemented
+
+This command imports the contents of the specified file into CRM.
+
+As in the export command, you can specify any connection name in the config.json file.
+
+The specified file can be an .xml or .json file. 
+
+Each one has a very specific format. 
+
+The easiest way to review this format is generate it through the export command.
+
+TBC.
 
 
 # Repl integration
