@@ -325,8 +325,15 @@ public class CRMBridge
 
             if (fieldMetadata != null)
             {
-                object fieldConvertedValue = Convert(fieldValue, fieldMetadata);
-                entity.Attributes.Add(fieldName.ToLower(), fieldConvertedValue);
+                if (fieldMetadata.AttributeType != AttributeTypeCode.State && fieldMetadata.AttributeType != AttributeTypeCode.Status)
+                {
+                    object fieldConvertedValue = Convert(fieldValue, fieldMetadata);
+                    entity.Attributes.Add(fieldName.ToLower(), fieldConvertedValue);
+                }
+                else
+                {
+                    Console.WriteLine("Warning** {0} attribute ignored. To change the status, use the SetStatus operation", fieldName);
+                }
             }
             else
             {

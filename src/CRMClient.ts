@@ -459,13 +459,19 @@ export class CRMClient {
         
         debug("Loading data table...");
         var dt = DataTable.load(fileName);
+        debug(`${dt.rows.length} records found`);
 
-
-        debug("Getting metadata...");
+        debug(`Getting metadata for entity ${dt.name}...`);
         var metadata = this.getEntityMetadata(dt.name);
 
+        var idField = this.getIdField(dt.name);
+
         debug("Importing...");
-        // TBC
+
+        for(let i=0;i<dt.rows.length;i++){
+            debug(`record ${i+1} of ${dt.rows.length}...`);
+            this.createOrUpdate(dt.name,dt.rows[i],[idField]);
+        }
 
         debug("done!");
     }
