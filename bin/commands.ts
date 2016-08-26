@@ -1,4 +1,4 @@
-//#!/usr/bin/env node
+#!/usr/bin/env node
 
 import {CRMClient} from "../src/CRMClient";
 import yargs = require("yargs");
@@ -54,7 +54,7 @@ function imp(entityName:string,filePath:string,connectionName:string) {
 
 function exp(entityName:string,filePath:string,connectionName:string) {
     try{
-        console.log("Importing...");
+        console.log("Exporting...");
         var crm = new CRMClient(connectionName);
         crm.export(entityName,filePath);
         console.log("done!");
