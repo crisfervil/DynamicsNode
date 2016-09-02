@@ -1,5 +1,5 @@
 
-declare module 'DynamicsNode' {
+declare module 'dynamicsnode' {
     export class Guid {
         private static EMPTY;
         private static validator;
