@@ -2,6 +2,7 @@
 
 import {CRMClient} from "../src/CRMClient";
 import yargs = require("yargs");
+import repl = require("repl");
 
 // configure command line options
 var argv = yargs
@@ -20,6 +21,9 @@ var argv = yargs
     }, (args)=>{
         var arrrg:any=args;
         imp(arrrg.entity,arrrg.file,arrrg.connection);
+    })
+    .command("repl","Initiates dynamics CRM in repl mode",(args)=>{
+        startRepl();
     })
     .help('h')
     .alias('help','h')
@@ -64,4 +68,14 @@ function exp(entityName:string,filePath:string,connectionName:string) {
         if(ex.Message) console.log(ex.Message);
         else console.log(ex);    
     }
+}
+
+function startRepl(){
+    var srv = repl.start({prompt:"crm> ",useColors:true });
+    srv.on('reset', initializeContext);
+    initializeContext(srv);
+}
+
+function initializeContext(svr:any){
+    svr.context.CRMClient = CRMClient;
 }

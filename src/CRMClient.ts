@@ -448,6 +448,8 @@ export class CRMClient {
         var metadata = this.getEntityMetadata(entityName);
         debug("Getting data...");
         var data = this.retrieveMultiple(entityName,{});
+        var rowsCount = data?data.rows?data.rows.length:0:0;
+        debug(`Retrieved ${rowsCount} records`);
         debug("Saving...");
         data.save(fileName);
         debug("done!");

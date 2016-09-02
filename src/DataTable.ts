@@ -3,6 +3,8 @@ import fs = require("fs");
 import XMLWriter = require('xml-writer');
 import et = require('elementtree');
 
+var debug = require("debug")("dynamicsnode");
+
 export class DataTable {
     rows: Array<any> = [];
 
@@ -26,15 +28,18 @@ export class DataTable {
         var ext = path.extname(fileName);
         if (ext != null) ext = ext.toLowerCase();
         if (ext == ".json") {
+            debug("Serializing to json...");
             strValue = JSON.stringify(this, null, 4);
         }
         else if (ext == ".xml") {
+            debug("Serializing to xml...");
             strValue = this.serializeXml(this);
         }
         else {
             throw new Error(`Format "${ext}" not supported`);
         }
         if (strValue != null) {
+            debug(`About to write ${strValue.length} bytes to file...`);
             fs.writeFileSync(fileName, strValue);
         }
     }

@@ -72,13 +72,16 @@ Volunteers to run the integration tests on other versions are more than welcome 
 # Backlog
 (Ordered by priority)
 
-- [ ] *Improve documentation (work In progress)*
-- [ ] *Add DataTable functions (work in progress)*
-* [ ] *Improve testeability and integration tests (work in progress)* 
-* [ ] Add d.ts file to Typings repository 
-* [ ] Add import/export commands
+* [ ] *Improve documentation (work In progress)*
+* [ ] *Add DataTable functions (work in progress)*
+* [ ] Add paging support in queries
 * [ ] Add functions to work with solutions
 * [ ] Add support for missing operators in condition objects
 * [ ] Add integration tests for activities
+* [ ] Add a commands to work with connections
+* [ ] Add a commands to repl mode
+* [ ] Add d.ts file to Typings repository 
+* [x] ~~Improve testeability and integration tests (work in progress)~~
+* [x] ~~Add import/export commands~~
 * [x] ~~Add test coverage reports~~
-- [x] ~~Upload npm package~~
+* [x] ~~Upload npm package~~

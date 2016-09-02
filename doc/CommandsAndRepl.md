@@ -53,8 +53,10 @@ Each one has a very specific format.
 
 The easiest way to review this format is generate it through the export command.
 
-TBC.
-
-
 # Repl integration
-TBC
+```
+$ dynamicsnode repl
+```
+This command initiates Dynamics Node in repl mode. 
+
+This means, that you can interact with CRM using the existing API and evaluating the code as you type it.
