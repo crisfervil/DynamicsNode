@@ -79,7 +79,7 @@ Volunteers to run the integration tests on other versions are more than welcome 
 * [ ] Add support for missing operators in condition objects
 * [ ] Add integration tests for activities
 * [ ] Add a commands to work with connections
-* [ ] Add a commands to repl mode
+* [ ] Add more commands to repl mode
 * [ ] Add d.ts file to Typings repository 
 * [x] ~~Improve testeability and integration tests (work in progress)~~
 * [x] ~~Add import/export commands~~
