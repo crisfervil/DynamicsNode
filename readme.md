@@ -76,10 +76,10 @@ Volunteers to run the integration tests on other versions are more than welcome 
 * [ ] *Add DataTable functions (work in progress)*
 * [ ] Add paging support in queries
 * [ ] Add functions to work with solutions
-* [ ] Add support for missing operators in condition objects
 * [ ] Add integration tests for activities
 * [ ] Add a commands to work with connections
 * [ ] Add more commands to repl mode
+* [ ] Add support for missing operators in condition objects
 * [ ] Add d.ts file to Typings repository 
 * [x] ~~Improve testeability and integration tests (work in progress)~~
 * [x] ~~Add import/export commands~~
