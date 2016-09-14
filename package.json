@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^2.2.0",
-    "edge": "^5.0.0",
+    "edge": "^6.5.1",
     "elementtree": "^0.1.6",
     "xml-writer": "^1.6.0",
     "yargs": "^4.6.0"
