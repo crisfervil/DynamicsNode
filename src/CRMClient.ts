@@ -118,9 +118,7 @@ export class CRMClient {
         else if (typeof idOrConditions === "object") {
             // Assume a conditions objet was passed
             // Get the records that meet the specified criteria
-            // The id field of an entity is always the entity name + "id"
-            // TODO: Except for activities
-            var idField: string = `${entityName}id`.toLowerCase();
+            var idField = this.getIdField(entityName);
             var foundRecords = this.retrieveMultiple(entityName, idOrConditions, idField);
             if (foundRecords.rows !== null) {
                 if (foundRecords.rows.length > 1) throw new Error("Too many records found matching the specified criteria");
@@ -242,9 +240,7 @@ export class CRMClient {
         }
         else if (typeof idsOrConditions == "object" && !(idsOrConditions instanceof Date)) {
             // Get the records that meet the specified criteria
-            // The id field of an entity is always the entity name + "id"
-            // TODO: Except for activities
-            var idField: string = `${entityName}id`.toLowerCase();
+            var idField: string = this.getIdField(entityName);
             var foundRecords = this.retrieveMultiple(entityName, idsOrConditions, idField);
             ids = [];
             for (var i = 0; i < foundRecords.rows.length; i++) {
@@ -314,8 +310,24 @@ export class CRMClient {
     }
 
     getIdField(entityName: string): string {
-        // TODO: Improve this
-        return entityName + "id";
+
+        var idAttr=null;
+        var metadata = this.getEntityMetadata(entityName);
+
+        if(metadata){
+            // Find the primary Attribute
+            for(var i=0;i<metadata.Attributes.length;i++){
+                if(metadata.Attributes[i].IsPrimaryId==true){
+                    idAttr=metadata.Attributes[i].SchemaName;
+                    break;
+                }
+            }
+        }
+
+        if(idAttr==null) throw `Primary Attribute not found for entity ${entityName}`;
+
+        // convert it to lowercase
+        return idAttr.toLowerCase();
     }
 
     createOrUpdate(entityName: string, attributes, matchFields: string[]): void {
