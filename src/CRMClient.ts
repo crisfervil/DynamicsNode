@@ -447,7 +447,12 @@ export class CRMClient {
         var metadata = JSON.parse(metadataStr);
         return metadata;
     }
-    
+
+    public Execute(request){
+        var response = this._crmBridge.Execute(request, true);
+        return response;
+    }
+
     export (entityName:string, fileName:string){
         
         debug(`Exporting ${entityName} to ${fileName}...`);

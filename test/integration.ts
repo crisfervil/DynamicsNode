@@ -5,6 +5,7 @@ import {DataTable} from "../src/DataTable";
 import assert = require("assert");
 import path = require("path");
 import fs = require("fs");
+import {WhoAmIRequest,WhoAmIResponse} from "../src/Messages";
 
 
 before(function(){
@@ -247,6 +248,15 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         assert.equal(metadata.SchemaName,"Account");
         assert.equal(metadata.PrimaryIdAttribute,"accountid");
     });
+
+    it('Executes a WHoAmIRequest',function (){   
+        var myRequest = new WhoAmIRequest();
+        var response:WhoAmIResponse = crm.Execute(myRequest);
+        assert.ok(response.UserId);
+        assert.ok(response.OrganizationId);
+        assert.ok(response.BusinessUnitId);
+    });
+    
 
     it('Exports accounts in xml format',function (){
         var fileName = `test/tmp/accounts-${connectionStringName}.xml`;

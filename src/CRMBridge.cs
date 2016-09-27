@@ -7,6 +7,7 @@ using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -75,6 +76,12 @@ public class Startup
                 {
                     return bridge.GetEntityMetadata(i);
                 }
+            ),
+            Execute = (Func<object, Task<object>>)(
+                async (i) =>
+                {
+                    return bridge.Execute(i);
+                }
             )
         };
     }
@@ -140,7 +147,6 @@ public class CrmService : IOrganizationService
 
 public class CRMBridge
 {
-
     private IOrganizationService _service;
     private Dictionary<string, EntityMetadata> _metadataCache = new Dictionary<string, EntityMetadata>();
 
@@ -518,6 +524,49 @@ public class CRMBridge
         RetrieveEntityResponse metaDataResponse = (RetrieveEntityResponse)_service.Execute(metaDataRequest);
 
         return metaDataResponse.EntityMetadata;
+    }
+
+    public OrganizationResponse Execute(dynamic request)
+    {
+        OrganizationRequest objRequest = ConvertFromDynamic(request,typeof(WhoAmIRequest).Assembly);
+        OrganizationResponse response = _service.Execute(objRequest);
+        return response;
+    }
+
+    private object ConvertFromDynamic(ExpandoObject value, Assembly assembly)
+    {
+        object converted = null;
+        var valueDictionary = (IDictionary<string, object>)value;
+        string typeName = (string)valueDictionary["__typeName"];
+
+        if (string.IsNullOrEmpty(typeName))
+        {
+            throw new Exception("Class Type Name not specified");
+        }
+        else
+        {
+            converted = assembly.CreateInstance(typeName);
+
+            if (converted == null)
+            {
+                throw new Exception(string.Format("Couldn't create class of type {0}",typeName));
+            }
+            else
+            {
+                Type convertedType = converted.GetType();
+
+                foreach (var prop in valueDictionary)
+                {
+                    var propDef = convertedType.GetProperty(prop.Key);
+                    if (propDef != null)
+                    {
+                        propDef.SetValue(converted, prop.Value);
+                    }
+                }
+            }
+        }
+
+        return converted;
     }
 }
 

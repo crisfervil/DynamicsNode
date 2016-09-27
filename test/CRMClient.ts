@@ -1,6 +1,7 @@
 import assert = require("assert");
 import {CRMClient} from "../src/CRMClient";
 import {Guid} from "../src/Guid";
+import {WhoAmIRequest,WhoAmIResponse} from "../src/Messages";
 
 describe('CRMClient', function () {
   it('Throws an exception with an invalid connection',function (){
@@ -65,4 +66,10 @@ describe('CRMClient', function () {
     assert.equal(metadata.SchemaName,"myEntity");
   });
 
+  it('Executes a Request WHoAmIRequest',function (){   
+    var crm = new CRMClient("my connection string",true);
+    var myRequest = new WhoAmIRequest();
+    var response:WhoAmIResponse = crm.Execute(myRequest);
+    assert.equal(response.UserId,"73174763-ed0e-4aeb-b02a-9f6dc078260a");
+  });
 });
