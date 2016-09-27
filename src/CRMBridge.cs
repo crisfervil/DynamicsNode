@@ -528,12 +528,12 @@ public class CRMBridge
 
     public OrganizationResponse Execute(dynamic request)
     {
-        OrganizationRequest objRequest = ConvertFromDynamic(request,typeof(WhoAmIRequest).Assembly);
+        OrganizationRequest objRequest = ConvertFromDynamic(request);
         OrganizationResponse response = _service.Execute(objRequest);
         return response;
     }
 
-    private object ConvertFromDynamic(ExpandoObject value, Assembly assembly)
+    private object ConvertFromDynamic(ExpandoObject value)
     {
         object converted = null;
         var valueDictionary = (IDictionary<string, object>)value;
@@ -545,7 +545,8 @@ public class CRMBridge
         }
         else
         {
-            converted = assembly.CreateInstance(typeName);
+            var typeNameParts = typeName.Split(',');
+            converted = Activator.CreateInstance(typeNameParts[0], typeNameParts[1]);
 
             if (converted == null)
             {
@@ -557,10 +558,20 @@ public class CRMBridge
 
                 foreach (var prop in valueDictionary)
                 {
-                    var propDef = convertedType.GetProperty(prop.Key);
-                    if (propDef != null)
+                    if (prop.Value != null)
                     {
-                        propDef.SetValue(converted, prop.Value);
+                        var propDef = convertedType.GetProperty(prop.Key);
+                        if (propDef != null)
+                        {
+                            var propValue = prop.Value;
+                            Type propValueType = prop.Value.GetType();
+                            if (propValueType == typeof(ExpandoObject))
+                            {
+                                ExpandoObject propExpando = (ExpandoObject)propValue;
+                                propValue = ConvertFromDynamic(propExpando);
+                            }
+                            propDef.SetValue(converted, propValue);
+                        }
                     }
                 }
             }

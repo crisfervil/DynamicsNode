@@ -3,10 +3,17 @@ import {DataTable} from "./DataTable";
 import {Guid} from "./Guid";
 import {Fetch} from "./Fetch";
 import {Dictionary} from "./Dictionary";
+import {AssignRequest} from "./Messages";
 
 import path = require("path");
 import edge = require("edge");
 var debug = require("debug")("dynamicsnode");
+
+export class EntityReference {
+    public __typeName="Microsoft.Crm.Sdk.dll,Microsoft.Crm.Sdk.Messages.WhoAmIRequest";
+    constructor(public Id:string,public LogicalName:string){
+    }
+}
 
 /**
  * @class Allows to access to CRM functions.
@@ -451,6 +458,16 @@ export class CRMClient {
     public Execute(request){
         var response = this._crmBridge.Execute(request, true);
         return response;
+    }
+
+    public Assign(targetId:Guid|string, targetType:string, assigneeId:Guid|string);
+    public Assign(targetId:Guid|string, targetType:string, assigneeId:Guid|string, assigneeType?:string):void{
+        // set the default value
+        if(assigneeType===undefined) assigneeType=="systemuser";
+        var request = new AssignRequest();
+        request.Assignee = new EntityReference(assigneeId.toString(),assigneeType);
+        request.Target = new EntityReference(targetId.toString(),targetType);
+        var response = this.Execute(request);
     }
 
     export (entityName:string, fileName:string){
