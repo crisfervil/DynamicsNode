@@ -8,6 +8,7 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -533,51 +534,61 @@ public class CRMBridge
         return response;
     }
 
+    private Assembly GetAssembly(string name)
+    {
+        var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name==name);
+        return assembly;
+    }
+
     private object ConvertFromDynamic(ExpandoObject value)
     {
         object converted = null;
         var valueDictionary = (IDictionary<string, object>)value;
         string typeName = (string)valueDictionary["__typeName"];
 
-        if (string.IsNullOrEmpty(typeName))
-        {
-            throw new Exception("Class Type Name not specified");
-        }
-        else
-        {
-            var typeNameParts = typeName.Split(',');
-            converted = Activator.CreateInstance(typeNameParts[0], typeNameParts[1]);
+        if (string.IsNullOrEmpty(typeName)) throw new Exception("Class Type Name not specified");
 
-            if (converted == null)
-            {
-                throw new Exception(string.Format("Couldn't create class of type {0}",typeName));
-            }
-            else
-            {
-                Type convertedType = converted.GetType();
+        converted = GetTypeInstance(typeName);
+        Type convertedType = converted.GetType();
 
-                foreach (var prop in valueDictionary)
+        foreach (var prop in valueDictionary)
+        {
+            if (prop.Value != null)
+            {
+                var propDef = convertedType.GetProperty(prop.Key);
+                if (propDef != null)
                 {
-                    if (prop.Value != null)
+                    var propValue = prop.Value;
+                    Type propValueType = prop.Value.GetType();
+                    if (propValueType == typeof(ExpandoObject))
                     {
-                        var propDef = convertedType.GetProperty(prop.Key);
-                        if (propDef != null)
-                        {
-                            var propValue = prop.Value;
-                            Type propValueType = prop.Value.GetType();
-                            if (propValueType == typeof(ExpandoObject))
-                            {
-                                ExpandoObject propExpando = (ExpandoObject)propValue;
-                                propValue = ConvertFromDynamic(propExpando);
-                            }
-                            propDef.SetValue(converted, propValue);
-                        }
+                        ExpandoObject propExpando = (ExpandoObject)propValue;
+                        propValue = ConvertFromDynamic(propExpando);
                     }
+                    else if (propDef.PropertyType == typeof(Guid) && propValueType == typeof(string))
+                    {
+                        propValue = new Guid((string)propValue);
+                    }
+                    propDef.SetValue(converted, propValue);
                 }
             }
         }
 
         return converted;
+    }
+
+    private object GetTypeInstance(string typeFullName)
+    {
+        object typeInstance;
+        var typeNameParts = typeFullName.Split(',');
+        string assemblyName = typeNameParts[0], className = typeNameParts[1];
+
+        var assembly = GetAssembly(assemblyName);
+        if (assembly == null) throw new Exception(string.Format("Can't find assembly '{0}'", assemblyName));
+        typeInstance = assembly.CreateInstance(className);
+
+        if (typeInstance == null) throw new Exception(string.Format("Can't create class of type '{0}'", typeFullName));
+        return typeInstance;
     }
 }
 

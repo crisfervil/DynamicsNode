@@ -1,7 +1,7 @@
-import {EntityReference} from "./CRMClient";
+import {EntityReference} from "./CRMDataTypes";
 
 export class WhoAmIRequest{
-    public __typeName="Microsoft.Crm.Sdk.dll,Microsoft.Crm.Sdk.Messages.WhoAmIRequest";
+    public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.WhoAmIRequest";
 }
 
 export class WhoAmIResponse{
@@ -11,7 +11,7 @@ export class WhoAmIResponse{
 }
 
 export class AssignRequest{
-    public __typeName="Microsoft.Crm.Sdk.dll,Microsoft.Crm.Sdk.Messages.AssignRequest";
+    public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.AssignRequest";
     public Assignee:EntityReference;
     public Target:EntityReference;    
 }

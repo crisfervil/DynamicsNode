@@ -257,6 +257,55 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         assert.ok(response.BusinessUnitId);
     });
     
+    it('Assigns a record',function (){   
+
+        var account:any = {name:"test account", description:"this is a test", AccountCategoryCode:1};
+        var accountId = crm.create("acCount",account);
+        assert.ok(accountId);
+
+        // find a user that's not me
+        var myUser = crm.whoAmI();
+        // TODO: add current user operator
+        var usrs = crm.retrieveMultiple("systemuser",{systemuserid:{$neq:myUser}},["fullname"]);
+        var userId = usrs.rows[0].systemuserid;
+        
+        // assign the record
+        crm.Assign(accountId,"account",userId);
+
+        // Check if the record was assigned to the user
+        account = crm.retrieve("account",accountId,["ownerid"]);
+        assert.equal(account.ownerid,userId);
+
+        // delete the created acount
+        crm.delete("account",accountId);
+    });
+
+    // TODO: Find a team with permissions on accounts
+    it.skip('Assigns a record to a team',function (){   
+
+        var account:any = {name:"test account", description:"this is a test", AccountCategoryCode:1};
+        var accountId = crm.create("acCount",account);
+        assert.ok(accountId);
+
+        // find the top business unit
+        var topBu = crm.retrieve("businessunit",{parentbusinessunitid:null},["name","businessunitid"]);
+        console.log(topBu);
+
+        // find a team from the top
+        var teams = crm.retrieveMultiple("team",{businessunitid:topBu.businessunitid},["name"]);
+        var teamId = teams.rows[0].teamid;
+        
+        // assign the record
+        crm.Assign(accountId,"account",teamId,"team");
+
+        // Check if the record was assigned to the user
+        account = crm.retrieve("account",accountId,["ownerid"]);
+        assert.equal(account.ownerid,teamId);
+
+        // delete the created acount
+        crm.delete("account",accountId);
+    });    
+
 
     it('Exports accounts in xml format',function (){
         var fileName = `test/tmp/accounts-${connectionStringName}.xml`;
@@ -268,12 +317,14 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
     });
 
     it.skip("Export and import users to a File",function(){
+
       var fileName = `test/tmp/users-${connectionStringName}.xml`;
 
       var users = crm.retrieveAll("systemuser");
       users.save(fileName);
       var users2 = DataTable.load(fileName);
       assert.deepEqual(users,users2);
+
     });
   });
 }

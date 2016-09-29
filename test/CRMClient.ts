@@ -72,7 +72,7 @@ describe('CRMClient', function () {
     var response:WhoAmIResponse = crm.Execute(myRequest);
     assert.equal(response.UserId,"73174763-ed0e-4aeb-b02a-9f6dc078260a");
   });
-  it.only('Executes an assigment',function (){   
+  it('Executes an assigment',function (){   
     var crm = new CRMClient("my connection string",true);
     crm.Assign(Guid.create(),"asdfasdf",Guid.create());
   });

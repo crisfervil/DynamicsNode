@@ -4,16 +4,12 @@ import {Guid} from "./Guid";
 import {Fetch} from "./Fetch";
 import {Dictionary} from "./Dictionary";
 import {AssignRequest} from "./Messages";
+import {EntityReference} from "./CRMDataTypes";
 
 import path = require("path");
 import edge = require("edge");
 var debug = require("debug")("dynamicsnode");
-
-export class EntityReference {
-    public __typeName="Microsoft.Crm.Sdk.dll,Microsoft.Crm.Sdk.Messages.WhoAmIRequest";
-    constructor(public Id:string,public LogicalName:string){
-    }
-}
+var debugQueries = require("debug")("dynamicsnode:queries");
 
 /**
  * @class Allows to access to CRM functions.
@@ -130,6 +126,7 @@ export class CRMClient {
             if (foundRecords.rows !== null) {
                 if (foundRecords.rows.length > 1) throw new Error("Too many records found matching the specified criteria");
                 if (foundRecords.rows.length > 0) {
+                    // TODO: Refactor to avoid querying CRM twice
                     idValue = foundRecords.rows[0][idField];
                 }
             }
@@ -181,6 +178,7 @@ export class CRMClient {
                 fetch.setAttributes(attributes);
             }
             fetchXml = fetch.toString();
+            debugQueries(fetchXml);
         }
 
         var retrieveResult = this._crmBridge.RetrieveMultiple(fetchXml, true);
@@ -323,15 +321,12 @@ export class CRMClient {
 
         if(metadata){
             // Find the primary Attribute
-            for(var i=0;i<metadata.Attributes.length;i++){
-                if(metadata.Attributes[i].IsPrimaryId==true){
-                    idAttr=metadata.Attributes[i].SchemaName;
-                    break;
-                }
-            }
+            idAttr = metadata.PrimaryIdAttribute;
         }
 
         if(idAttr==null) throw `Primary Attribute not found for entity ${entityName}`;
+
+        debug(`idAttr for entity '${entityName}': '${idAttr}'`);
 
         // convert it to lowercase
         return idAttr.toLowerCase();
@@ -460,10 +455,9 @@ export class CRMClient {
         return response;
     }
 
-    public Assign(targetId:Guid|string, targetType:string, assigneeId:Guid|string);
     public Assign(targetId:Guid|string, targetType:string, assigneeId:Guid|string, assigneeType?:string):void{
         // set the default value
-        if(assigneeType===undefined) assigneeType=="systemuser";
+        if(assigneeType===undefined) assigneeType="systemuser";
         var request = new AssignRequest();
         request.Assignee = new EntityReference(assigneeId.toString(),assigneeType);
         request.Target = new EntityReference(targetId.toString(),targetType);
