@@ -21,15 +21,8 @@ public class Startup
         bool useFake = options.useFake;
 
         CRMBridge bridge = new CRMBridge(connectionString, useFake);
-        bridge.TestConnection();
         return new
         {
-            WhoAmI = (Func<object, Task<object>>)(
-                async (i) =>
-                {
-                    return bridge.WhoAmI();
-                }
-            ),
             Retrieve = (Func<object, Task<object>>)(
                 async (i) =>
                 {
@@ -160,23 +153,6 @@ public class CRMBridge
         else
         {
             _service = new CrmService(connectionString);
-        }
-    }
-
-    public Guid WhoAmI()
-    {
-        return ((WhoAmIResponse)_service.Execute(new WhoAmIRequest())).UserId;
-    }
-
-    public void TestConnection()
-    {
-        try
-        {
-            WhoAmI();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(String.Format("Error trying to connect to Server: {0}\n{1}", ex.Message, ex.ToString()));
         }
     }
 

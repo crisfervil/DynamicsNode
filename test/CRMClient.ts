@@ -16,7 +16,7 @@ describe('CRMClient', function () {
     var crm = new CRMClient("my connection string",true);
     
     var actual = crm.whoAmI();
-    assert.equal(actual,expected);
+    assert.equal(actual.UserId,expected);
     
   });
   

@@ -3,7 +3,7 @@ import {DataTable} from "./DataTable";
 import {Guid} from "./Guid";
 import {Fetch} from "./Fetch";
 import {Dictionary} from "./Dictionary";
-import {AssignRequest} from "./Messages";
+import {AssignRequest,WhoAmIRequest,WhoAmIResponse} from "./Messages";
 import {EntityReference} from "./CRMDataTypes";
 
 import path = require("path");
@@ -28,6 +28,7 @@ export class CRMClient {
         }
 
         this._crmBridge = this.getBridge(fakeBridge);
+        this.testConnection();
     }
 
 
@@ -80,8 +81,20 @@ export class CRMClient {
         return converted;
     }
 
-    whoAmI() {
-        return this._crmBridge.WhoAmI(null, true);
+    whoAmI():WhoAmIResponse {
+        var request = new WhoAmIRequest();
+        var response:WhoAmIResponse = this.Execute(request);        
+        return response;
+    }
+
+    testConnection(){
+        try{
+            this.whoAmI();// Performs a who am i request
+        }
+        catch(e){
+            var error = new Error();
+            throw new Error("Error trying to connect to server\n"+JSON.stringify(e));
+        }
     }
 
     retrieve(entityName: string, idOrConditions: string | Guid | Object, pColumns?: string | string[] | boolean) {

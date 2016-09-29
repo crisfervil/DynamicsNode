@@ -99,13 +99,15 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
 
     it('Knows Who I am',function (){
         var who = crm.whoAmI();
-        assert.ok(who);
+        assert.ok(who.UserId);
+        assert.ok(who.OrganizationId);
+        assert.ok(who.BusinessUnitId);
     });
 
     it('Performs a simple retrieve',function (){
         var who = crm.whoAmI();
         assert.ok(who);
-        var myUser = crm.retrieve("systemuser",who);
+        var myUser = crm.retrieve("systemuser",who.UserId);
         assert.ok(myUser);
         // test just a few properties
         assert.ok(myUser.domainname);
@@ -137,7 +139,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         var who = crm.whoAmI();
         assert.ok(who);
         // Use different casing in entity and field names
-        var myUser = crm.retrieve("systemuser",who,["fullname","DomainName","internalemailaddress","systemuserid"]);
+        var myUser = crm.retrieve("systemuser",who.UserId,["fullname","DomainName","internalemailaddress","systemuserid"]);
         assert.ok(myUser);
     });
 
@@ -145,7 +147,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         var who = crm.whoAmI();
         assert.ok(who);
         // Use different casing in entity and field names
-        var myUser = crm.retrieve("systemuser",who,true);
+        var myUser = crm.retrieve("systemuser",who.UserId,true);
         assert.ok(myUser);
     });
 
@@ -167,7 +169,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
     it('Performs a simple retrieve multiple',function (){
       var who = crm.whoAmI();
       assert.ok(who);
-      var fetch = new Fetch("SystemUser","*",{systemuserid:who});
+      var fetch = new Fetch("SystemUser","*",{systemuserid:who.UserId});
       var fetchXml = fetch.toString();
       // Use different casing in entity and field names
       var records = crm.retrieveMultiple(fetchXml);
@@ -266,7 +268,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         // find a user that's not me
         var myUser = crm.whoAmI();
         // TODO: add current user operator
-        var usrs = crm.retrieveMultiple("systemuser",{systemuserid:{$neq:myUser}},["fullname"]);
+        var usrs = crm.retrieveMultiple("systemuser",{systemuserid:{$neq:myUser.UserId}},["fullname"]);
         var userId = usrs.rows[0].systemuserid;
         
         // assign the record
