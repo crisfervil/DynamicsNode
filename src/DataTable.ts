@@ -94,7 +94,7 @@ export class DataTable {
 
     private static parseValue(str) {
         var result: any = str;
-        if (typeof str === 'string' || str instanceof String) {
+        if (typeof str === 'string') {
             var parsedValue = DataTable.parseBooleans(str);
             if (parsedValue === null) {
                 parsedValue = DataTable.parseNumbers(str);

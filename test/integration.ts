@@ -182,10 +182,16 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
     });
     
     it('Performs a retrieve all',function (){
+        // create a lead
+        var leadId = crm.create("lead",{description:"test"});
+
         // retrieve all the leads
         var leads = crm.retrieveAll("lead");
         assert.ok(leads);
         assert.ok(leads.rows.length>0);
+
+        // delete created record
+        crm.delete("lead",leadId);
     });    
 
     it('Creates an incident associated to an account',function (){
@@ -204,35 +210,34 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
 
     });    
 
-
     it('Associates and Disassociates a lead and an contact',function (){
-        // retrieve any lead
-        var leads = crm.retrieveMultiple("lead",null,"leadid");
-        var lead = leads.rows[0];
+        // create a lead
+        var leadId = crm.create("lead",{description:"test"});
         
-        // retrieve any contact
-        var contacts = crm.retrieveMultiple("contact",null,"contactid");
-        var contact = contacts.rows[0];
+        // create a contact
+        var contactId = crm.create("contact",{firstname:"test"});
         
         // associate them
-        crm.associate("contact",contact.contactid,"contactleads_association","lead",lead.leadid);
+        crm.associate("contact",contactId,"contactleads_association","lead",leadId);
         
         // delete association
-        crm.disassociate("contact",contact.contactid,"contactleads_association","lead",lead.leadid);
+        crm.disassociate("contact",contactId,"contactleads_association","lead",leadId);
+
+        // delete created records
+        crm.delete("lead",leadId);
+        crm.delete("contact",contactId); 
     });
 
     it('Associates and Disassociates a lead and an contact using a DataTable',function (){
-        // retrieve any lead
-        var leads = crm.retrieveMultiple("lead",null,"leadid");
-        var lead = leads.rows[0];
+        // create a lead
+        var leadId = crm.create("lead",{description:"test"});
         
-        // retrieve any contact
-        var contacts = crm.retrieveMultiple("contact",null,"contactid");
-        var contact = contacts.rows[0];
+        // create a contact
+        var contactId = crm.create("contact",{firstname:"test"});
         
         // Create the datatable
         var dt = new DataTable("contactleads_association");
-        var row = {from:{type:"contact",value:contact.contactid},to:{type:"lead",value:lead.leadid}};
+        var row = {from:{type:"contact",value:contactId},to:{type:"lead",value:leadId}};
         dt.rows.push(row);
         
         // associate them
@@ -240,6 +245,10 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         
         // delete association
         crm.disassociateData(dt);
+
+        // delete created records
+        crm.delete("lead",leadId);
+        crm.delete("contact",contactId);
     });
 
     it('Gets entity metadata',function (){
