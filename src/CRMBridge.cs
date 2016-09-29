@@ -587,7 +587,9 @@ public class FakeService : IOrganizationService
         {
             if (_connectionString == "INCORRECT_CONNECTION_STRING") throw new Exception("incorrect connection string");
             res = new WhoAmIResponse();
-            //res["UserId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
+            res["BusinessUnitId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
+            res["OrganizationId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
+            res["UserId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
         }
         else if (request.GetType() == typeof(RetrieveEntityRequest))
         {
