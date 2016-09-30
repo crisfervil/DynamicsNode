@@ -511,10 +511,17 @@ public class CRMBridge
         return metaDataResponse.EntityMetadata;
     }
 
-    public OrganizationResponse Execute(dynamic request)
+    public object Execute(dynamic request)
     {
         OrganizationRequest objRequest = ConvertFromDynamic(request);
         OrganizationResponse response = _service.Execute(objRequest);
+
+        if (response!=null && response.GetType() == typeof(WhoAmIResponse))
+        {
+            var rs = (WhoAmIResponse)response;
+            return new { UserId=Guid.NewGuid(), BusinessUnitId= Guid.NewGuid(), OrganizationId= Guid.NewGuid() };
+        }
+
         Console.WriteLine("after execute");
         return response;
     }
@@ -592,24 +599,27 @@ public class FakeService : IOrganizationService
     public OrganizationResponse Execute(OrganizationRequest request)
     {
         OrganizationResponse res = null;
-        if (request.GetType() == typeof(WhoAmIRequest))
+        if (request != null)
         {
-            if (_connectionString == "INCORRECT_CONNECTION_STRING") throw new Exception("incorrect connection string");
-            res = new WhoAmIResponse();
-            res["BusinessUnitId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
-            res["OrganizationId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
-            res["UserId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
-        }
-        else if (request.GetType() == typeof(RetrieveEntityRequest))
-        {
-            var em = new EntityMetadata() { SchemaName = "myEntity" };
-            AttributeMetadata attr1 = (AttributeMetadata)typeof(AttributeMetadata).GetConstructor(BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.Instance, null, new Type[] { typeof(AttributeTypeCode), typeof(string) }, null)
-                                        .Invoke(new Object[] { AttributeTypeCode.Integer, "prop1" });
-            attr1.LogicalName = "prop1";
-            var attrs = new AttributeMetadata[] { attr1 };
-            em.GetType().GetProperty("Attributes").SetValue(em, attrs);
-            res = new RetrieveEntityResponse();
-            res["EntityMetadata"] = em;
+            if (request.GetType() == typeof(WhoAmIRequest))
+            {
+                if (_connectionString == "INCORRECT_CONNECTION_STRING") throw new Exception("incorrect connection string");
+                res = new WhoAmIResponse();
+                res["BusinessUnitId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
+                res["OrganizationId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
+                res["UserId"] = new Guid("73174763-ed0e-4aeb-b02a-9f6dc078260a");
+            }
+            else if (request.GetType() == typeof(RetrieveEntityRequest))
+            {
+                var em = new EntityMetadata() { SchemaName = "myEntity" };
+                AttributeMetadata attr1 = (AttributeMetadata)typeof(AttributeMetadata).GetConstructor(BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.Instance, null, new Type[] { typeof(AttributeTypeCode), typeof(string) }, null)
+                                            .Invoke(new Object[] { AttributeTypeCode.Integer, "prop1" });
+                attr1.LogicalName = "prop1";
+                var attrs = new AttributeMetadata[] { attr1 };
+                em.GetType().GetProperty("Attributes").SetValue(em, attrs);
+                res = new RetrieveEntityResponse();
+                res["EntityMetadata"] = em;
+            }
         }
         return res;
     }
