@@ -515,6 +515,7 @@ public class CRMBridge
     {
         OrganizationRequest objRequest = ConvertFromDynamic(request);
         OrganizationResponse response = _service.Execute(objRequest);
+        Console.WriteLine("after execute");
         return response;
     }
 
