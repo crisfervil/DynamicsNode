@@ -5,6 +5,7 @@ node_js:
 
 env:
   - CXX=g++-4.8
+  - EDGE_CS_DEBUG=1
 
 addons:
   apt:
