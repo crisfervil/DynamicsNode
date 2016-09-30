@@ -519,7 +519,23 @@ public class CRMBridge
         if (response != null && response.GetType() == typeof(WhoAmIResponse))
         {
             var rs = (WhoAmIResponse)response;
-            return new { UserId = rs.UserId, BusinessUnitId = rs.BusinessUnitId, OrganizationId = rs.OrganizationId };
+            object rtVal;
+            try
+            {
+                rtVal = new { UserId = rs.UserId,
+                                BusinessUnitId = rs.BusinessUnitId,
+                                OrganizationId = rs.OrganizationId,
+                                ExtensionData = rs.ExtensionData,
+                                Results = rs.Results,
+                                ResponseName=rs.ResponseName
+                               };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                throw ex;
+            }
+            return rtVal;
         }
 
         //Console.WriteLine("after execute");
