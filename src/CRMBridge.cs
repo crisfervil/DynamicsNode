@@ -21,6 +21,9 @@ public class Startup
         bool useFake = options.useFake;
 
         //foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) Console.WriteLine(a.FullName);
+        System.AppDomain.CurrentDomain.UnhandledException += (x,y)=>{
+            Console.WriteLine(y.ExceptionObject.ToString());
+        };
 
         CRMBridge bridge = new CRMBridge(connectionString, useFake);
         return new
@@ -510,7 +513,7 @@ public class CRMBridge
 
         return metaDataResponse.EntityMetadata;
     }
-
+    
     public object Execute(dynamic request)
     {
         OrganizationRequest objRequest = ConvertFromDynamic(request);
@@ -526,7 +529,7 @@ public class CRMBridge
                                 BusinessUnitId = rs.BusinessUnitId,
                                 OrganizationId = rs.OrganizationId,
                                 ExtensionData = rs.ExtensionData,
-                                //Results = rs.Results,
+                                Results = rs.Results,
                                 ResponseName=rs.ResponseName
                                };
             }
