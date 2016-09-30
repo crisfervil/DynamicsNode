@@ -529,7 +529,7 @@ public class CRMBridge
                                 BusinessUnitId = rs.BusinessUnitId,
                                 OrganizationId = rs.OrganizationId,
                                 ExtensionData = rs.ExtensionData,
-                                Results = rs.Results,
+                                //Results = rs.Results,
                                 ResponseName=rs.ResponseName
                                };
             }
