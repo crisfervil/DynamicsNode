@@ -516,11 +516,11 @@ public class CRMBridge
         OrganizationRequest objRequest = ConvertFromDynamic(request);
         OrganizationResponse response = _service.Execute(objRequest);
 
-        //if (response!=null && response.GetType() == typeof(WhoAmIResponse))
-        //{
-        //    var rs = (WhoAmIResponse)response;
-        //    return new { UserId=Guid.NewGuid(), BusinessUnitId= Guid.NewGuid(), OrganizationId= Guid.NewGuid() };
-        //}
+        if (response != null && response.GetType() == typeof(WhoAmIResponse))
+        {
+            var rs = (WhoAmIResponse)response;
+            return new { UserId = rs.UserId, BusinessUnitId = rs.BusinessUnitId, OrganizationId = rs.OrganizationId };
+        }
 
         //Console.WriteLine("after execute");
         return response;
