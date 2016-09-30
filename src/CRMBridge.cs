@@ -20,6 +20,8 @@ public class Startup
         string connectionString = options.connectionString;
         bool useFake = options.useFake;
 
+        foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) Console.WriteLine(a.FullName);
+
         CRMBridge bridge = new CRMBridge(connectionString, useFake);
         return new
         {
