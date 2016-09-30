@@ -79,13 +79,7 @@ public class Startup
             Execute = (Func<object, Task<object>>)(
                 async (i) =>
                 {
-                    try
-                    {
-                        return bridge.Execute(i);
-                    }catch(Exception ex)
-                    {
-                        throw new Exception(ex.Message + "\n" + ex.ToString());
-                    }
+                    return bridge.Execute(i);
                 }
             )
         };
@@ -517,31 +511,19 @@ public class CRMBridge
     public object Execute(dynamic request)
     {
         OrganizationRequest objRequest = ConvertFromDynamic(request);
-        OrganizationResponse response = _service.Execute(objRequest);
+        object response = _service.Execute(objRequest);
 
         if (response != null && response.GetType() == typeof(WhoAmIResponse))
         {
             var rs = (WhoAmIResponse)response;
-            object rtVal;
-            try
-            {
-                rtVal = new { UserId = rs.UserId,
-                                BusinessUnitId = rs.BusinessUnitId,
-                                OrganizationId = rs.OrganizationId,
-                                ExtensionData = rs.ExtensionData,
-                                //Results = rs.Results,
-                                ResponseName=rs.ResponseName
-                               };
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-                throw ex;
-            }
-            return rtVal;
+            response = new
+            { UserId = rs.UserId,
+                BusinessUnitId = rs.BusinessUnitId,
+                OrganizationId = rs.OrganizationId,
+                ExtensionData = rs.ExtensionData,
+                //Results = rs.Results,
+                ResponseName=rs.ResponseName };
         }
-
-        //Console.WriteLine("after execute");
         return response;
     }
 
