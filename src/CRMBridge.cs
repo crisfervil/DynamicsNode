@@ -525,7 +525,7 @@ public class CRMBridge
                 rtVal = new { UserId = rs.UserId,
                                 BusinessUnitId = rs.BusinessUnitId,
                                 OrganizationId = rs.OrganizationId,
-                                ExtensionData = rs.ExtensionData,
+                                //ExtensionData = rs.ExtensionData,
                                 //Results = rs.Results,
                                 ResponseName=rs.ResponseName
                                };
