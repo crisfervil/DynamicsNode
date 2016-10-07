@@ -13,13 +13,16 @@ var debugQueries = require("debug")("dynamicsnode:queries");
 
 /**
  * Allows to access to CRM functions.
- * @param {string} connectionString Optional. A valid connection string or connection string name
  */
 export class CRMClient {
 
     private _crmBridge: any;
     private _metadataCache=new Dictionary();
 
+    /**
+     * 
+     * @param {string} connectionString Optional. A valid connection string or connection string name
+     */
     constructor(public connectionString: string = "default", fakeBridge: boolean = false) {
 
         var config = this.tryGetModule(path.join(process.cwd(), "config.json"));
