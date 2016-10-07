@@ -22,8 +22,9 @@ install:
   - npm install -g grunt-cli
   - npm install -g codecov
   - npm install -g nyc
-  - npm install
- 
+  - npm install coveralls
+  - npm install mocha-lcov-reporter
+
 before_script: npm run build
 
 script:
@@ -31,3 +32,4 @@ script:
   - nyc mocha
   - nyc report --reporter=json
   - codecov -f coverage/*.json
+  - nyc report --reporter=text-lcov | coveralls
