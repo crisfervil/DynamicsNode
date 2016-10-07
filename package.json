@@ -32,7 +32,7 @@
     "test": "mocha --recursive",
     "integration-test": "mocha test/integration",
     "build": "typings install && tsc -p . --sourcemap",
-    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive -reporter json",
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive --reporter json",
     "doc": "jsdoc src/ -r -d doc"
   },
   "keywords": [
