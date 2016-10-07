@@ -45,7 +45,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
 
     it('Throws an exception with an invalid connection',function (){
         assert.throws(function(){
-        var crm = new CRMClient("asdasd");
+            var crm2 = new CRMClient("asdasd");
         });
     });
 
