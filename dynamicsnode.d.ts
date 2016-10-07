@@ -1,5 +1,29 @@
 
 declare module 'dynamicsnode' {
+
+    export class EntityReference {
+        Id: string;
+        LogicalName: string;
+        __typeName: string;
+        constructor(Id: string, LogicalName: string);
+    }
+
+    export class WhoAmIRequest {
+        __typeName: string;
+    }
+    export class WhoAmIResponse {
+        BusinessUnitId: string;
+        OrganizationId: string;
+        UserId: string;
+    }
+    export class AssignRequest {
+        __typeName: string;
+        Assignee: EntityReference;
+        Target: EntityReference;
+    }
+    export class AssignResponse {
+    }
+
     export class Guid {
         private static EMPTY;
         private static validator;
@@ -16,7 +40,7 @@ declare module 'dynamicsnode' {
         static raw(): string;
         static empty(): Guid;
     }
-    
+
     export class DataTable {
         rows: Array<any>;
         constructor(rows?: Array<any>);
@@ -32,7 +56,7 @@ declare module 'dynamicsnode' {
         private serializeXml(data);
         private serializeValue(value);
     }
-    
+
     export class Fetch {
         entityName: string;
         filter: Filter;
@@ -48,15 +72,18 @@ declare module 'dynamicsnode' {
         private operatorJsonNames;
         private convert(conditionExpression);
     }
+
     export enum FilterTypes {
         And = 0,
         Or = 1,
     }
+
     export class Filter {
         conditions: Array<Condition>;
         filterType: FilterTypes;
         constructor(conditions?: Array<Condition>, filterType?: FilterTypes);
     }
+
     export enum Operators {
         Equal = 0,
         NotEqual = 1,
@@ -73,32 +100,38 @@ declare module 'dynamicsnode' {
         Null = 12,
         NotNull = 13,
     }
-    
+
     export class Condition {
         attribute: string;
         operator: Operators;
         values: Array<any>;
         constructor(attribute?: string, operator?: Operators, values?: Array<any>);
     }
-    
+
+    /**
+     * @class Allows to access to CRM functions.
+     * @param {string} connectionString Optional. A valid connection string or connection string name
+     */
     export class CRMClient {
-        private connectionString;
-        private crmBridge;
-        constructor(connectionString?: string, version?: string);
-        private tryGetModule(moduleId);
-        private convert(propertiesArray);
-        whoAmI(): any;
-        retrieve(entityName: string, idOrConditions: string | Guid | Object, columns?: string | string[] | boolean): any;
+        whoAmI(): WhoAmIResponse;
+        testConnection(): void;
+        retrieve(entityName: string, idOrConditions: string | Guid | Object, pColumns?: string | string[] | boolean): any;
         retrieveMultiple(fetchXml: string): DataTable;
         retrieveMultiple(entityName: string, conditions?: any, attributes?: boolean | string | string[]): DataTable;
         retrieveAll(entityName: string): DataTable;
         create(entityName: string, attributes: any): string;
         delete(entityName: string, idsOrConditions: any): number;
-        private deleteMultiple(entityName, ids);
         update(entityName: string, attributes: any, conditions?: any): number;
-        createOrUpdate(entityName: string, attributes, matchFields:string[]): void;
-        associate(entityName: string, fromEntityId: string | Guid, relationshipName: string, toEntityName: string, toEntityId: string | Guid): void;
-        disassociate(entityName: string, fromEntityId: string | Guid, relationshipName: string, toEntityName: string, toEntityId: string | Guid): void;
-    }    
-    
+        getIdField(entityName: string): string;
+        createOrUpdate(entityName: string, attributes: any, matchFields: string[]): void;
+        associateData(data: DataTable): void;
+        associate(fromEntityName: string, fromEntityId: string | Guid, relationshipName: string, toEntityName: string, toEntityId: string | Guid): void;
+        disassociateData(data: DataTable): void;
+        disassociate(fromEntityName: string, fromEntityId: string | Guid, relationshipName: string, toEntityName: string, toEntityId: string | Guid): void;
+        getEntityMetadata(entityName: string): any;
+        execute(request: any): any;
+        assign(targetId: Guid | string, targetType: string, assigneeId: Guid | string, assigneeType?: string): void;
+        export(entityName: string, fileName: string): void;
+        import(fileName: string): void;
+    }
 }
