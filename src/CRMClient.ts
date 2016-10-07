@@ -468,7 +468,7 @@ export class CRMClient {
         return response;
     }
 
-    public Assign(targetId:Guid|string, targetType:string, assigneeId:Guid|string, assigneeType?:string):void{
+    public assign(targetId:Guid|string, targetType:string, assigneeId:Guid|string, assigneeType?:string):void{
         // set the default value
         if(assigneeType===undefined) assigneeType="systemuser";
         var request = new AssignRequest();

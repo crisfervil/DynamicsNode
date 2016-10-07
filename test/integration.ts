@@ -43,6 +43,12 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
     this.timeout(15000); // Aplyies to all the suite
     var crm = new CRMClient(connectionStringValue); // Use the same instance of CRM cliente to improve performance
 
+    it('Throws an exception with an invalid connection',function (){
+        assert.throws(function(){
+        var crm = new CRMClient("asdasd");
+        });
+    });
+
     it('Creates an account',function (){
         // Use different casing in entity and field names
         var guid = crm.create("acCount",{name:"test account", description:"this is a test", AccountCategoryCode:1});

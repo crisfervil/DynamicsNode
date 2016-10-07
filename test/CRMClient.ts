@@ -4,7 +4,7 @@ import {Guid} from "../src/Guid";
 import {WhoAmIRequest,WhoAmIResponse} from "../src/Messages";
 
 describe('CRMClient', function () {
-  it('Throws an exception with an invalid connection',function (){
+  it('Throws an exception with an invalid connection - using fake',function (){
     assert.throws(function(){
       var crm = new CRMClient("INCORRECT_CONNECTION_STRING",true);
     });
@@ -74,7 +74,7 @@ describe('CRMClient', function () {
   });
   it('Executes an assigment',function (){   
     var crm = new CRMClient("my connection string",true);
-    crm.Assign(Guid.create(),"asdfasdf",Guid.create());
+    crm.assign(Guid.create(),"asdfasdf",Guid.create());
   });
 
 });
