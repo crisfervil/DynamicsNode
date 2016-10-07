@@ -23,6 +23,7 @@ install:
   - npm install -g codecov
   - npm install -g nyc
   - npm install coveralls
+  - npm install
   - npm install mocha-lcov-reporter
 
 before_script: npm run build
