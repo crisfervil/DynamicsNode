@@ -12,7 +12,7 @@ var debug = require("debug")("dynamicsnode");
 var debugQueries = require("debug")("dynamicsnode:queries");
 
 /**
- * @class Allows to access to CRM functions.
+ * Allows to access to CRM functions.
  * @param {string} connectionString Optional. A valid connection string or connection string name
  */
 export class CRMClient {
@@ -81,6 +81,7 @@ export class CRMClient {
         return converted;
     }
 
+    /** Returns information about the current user */
     whoAmI():WhoAmIResponse {
         var request = new WhoAmIRequest();
         var response:WhoAmIResponse = this.Execute(request);        
