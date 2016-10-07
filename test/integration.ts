@@ -43,12 +43,6 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
     this.timeout(15000); // Aplyies to all the suite
     var crm = new CRMClient(connectionStringValue); // Use the same instance of CRM cliente to improve performance
 
-    it('Throws an exception with an invalid connection',function (){
-        assert.throws(function(){
-        var crm1 = new CRMClient("asdasd");
-        });
-    });
-
     it('Creates an account',function (){
         // Use different casing in entity and field names
         var guid = crm.create("acCount",{name:"test account", description:"this is a test", AccountCategoryCode:1});
@@ -281,7 +275,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         var userId = usrs.rows[0].systemuserid;
         
         // assign the record
-        crm.Assign(accountId,"account",userId);
+        crm.assign(accountId,"account",userId);
 
         // Check if the record was assigned to the user
         account = crm.retrieve("account",accountId,["ownerid"]);
@@ -307,7 +301,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         var teamId = teams.rows[0].teamid;
         
         // assign the record
-        crm.Assign(accountId,"account",teamId,"team");
+        crm.assign(accountId,"account",teamId,"team");
 
         // Check if the record was assigned to the user
         account = crm.retrieve("account",accountId,["ownerid"]);
