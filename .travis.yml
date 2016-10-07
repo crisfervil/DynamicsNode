@@ -27,4 +27,4 @@ before_script: npm run build
 
 script:
   - npm run cover
-  - codecov -f coverage/*.json
+  - codecov
