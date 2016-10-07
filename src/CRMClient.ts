@@ -11,16 +11,15 @@ import edge = require("edge");
 var debug = require("debug")("dynamicsnode");
 var debugQueries = require("debug")("dynamicsnode:queries");
 
-/**
- * Allows to access to CRM functions.
- */
+
 export class CRMClient {
 
     private _crmBridge: any;
     private _metadataCache=new Dictionary();
 
     /**
-     * 
+     * Allows access to CRM functions 
+     * @class CRMClient
      * @param {string} connectionString Optional. A valid connection string or connection string name
      */
     constructor(public connectionString: string = "default", fakeBridge: boolean = false) {
@@ -34,7 +33,13 @@ export class CRMClient {
         this.testConnection();
     }
 
-
+    /**
+     * Gets the bridge
+     * @private
+     * @method CRMClient#getBridge
+     * @param fakeBridge {boolean} indicates if a fake bridge whants to be retrieved
+     * @returns a .net bridge
+     */
     private getBridge(fakeBridge: boolean) {
 
         var source = path.join(__dirname, "CRMBridge.cs");
@@ -84,7 +89,10 @@ export class CRMClient {
         return converted;
     }
 
-    /** Returns information about the current user */
+    /** 
+    * Returns information about the current user 
+    * @method CRMClient#whoAmI
+    */
     whoAmI():WhoAmIResponse {
         var request = new WhoAmIRequest();
         var response:WhoAmIResponse = this.Execute(request);        

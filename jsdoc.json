@@ -1,0 +1,37 @@
+{
+  "opts":{
+    "recurse":true,
+    "destination": "doc",
+    "template":"./node_modules/ink-docstrap/template",
+    "private":true
+  },
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "source":{
+    "include":["src/","readme.md"]
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "logoFile": "",
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "dateFormat": "ddd MMM Do YYYY",
+    "outputSourceFiles": true,
+    "outputSourcePath": true,
+    "systemName": "DocStrap",
+    "footer": "",
+    "copyright": "(c) Cristhian Fernandez",
+    "navType": "vertical",
+    "theme": "spacelab",
+    "linenums": true,
+    "collapseSymbols": false,
+    "inverseNav": true,
+    "protocol": "html://",
+    "methodHeadingReturns": false
+  },
+  "markdown": {
+    "parser": "gfm",
+    "hardwrap": true
+  }
+}
