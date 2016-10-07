@@ -5,7 +5,7 @@ Dynamics Node is a library built on node.js that allows you to quickly create sc
 
 The main goal of Dynamics Node is to make you very productive when it comes to automate small tasks in Dynamics CRM. Just create a js file, add a few lines and execute it.
 
-No more .net console applications with all the boilerplate code just to create one record. Go productive!
+No more .net console applications with all the boilerplate code just for creating one record. Go productive!
 
 # How to use it
 Create a new directory to store your scripts and cd into it
@@ -27,7 +27,8 @@ Create a new js file named myscript.js and start adding code
 
 var dn = require("dynamicsnode");
 
-var crm = new dn.CRMClient("Url=http://crm.contoso.com/xrmContoso"); // update this with your CRM url and credentials if needed
+// update this with your CRM url and credentials if needed
+var crm = new dn.CRMClient("Url=http://crm.contoso.com/xrmContoso"); 
 
 // retrieve the current user
 var who = crm.whoAmI();
@@ -58,8 +59,6 @@ $ node myscript
 Requires [Node.js](nodejs.org)
 
 This tool is based on [Edge](https://github.com/tjanczuk/edge) and requires .NET Framework 4.5 to be installed.
-
-Due to Edge requirements, you can use only node up to the v5.1.0. If you want to use later versions of node, you have to compile edge manually, following the instructions available in: https://github.com/tjanczuk/edge
 
 It has been tested in Windows environments only, but could potentially work in Linux too using Mono.
 
