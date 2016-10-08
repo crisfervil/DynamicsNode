@@ -1,7 +1,7 @@
 {
   "opts":{
     "recurse":true,
-    "destination": "doc",
+    "destination": "docs",
     "template":"./node_modules/ink-docstrap/template",
     "private":true
   },
@@ -19,7 +19,7 @@
     "dateFormat": "ddd MMM Do YYYY",
     "outputSourceFiles": true,
     "outputSourcePath": true,
-    "systemName": "DocStrap",
+    "systemName": "DynamicsNode",
     "footer": "",
     "copyright": "(c) Cristhian Fernandez",
     "navType": "vertical",
