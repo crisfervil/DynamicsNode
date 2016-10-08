@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>DynamicsNode Source: CRMClient.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.spacelab.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">DynamicsNode</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="CRMClient.html">CRMClient</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: CRMClient.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+var DataTable_1 = require("./DataTable");
+var Guid_1 = require("./Guid");
+var Fetch_1 = require("./Fetch");
+var Dictionary_1 = require("./Dictionary");
+var Messages_1 = require("./Messages");
+var CRMDataTypes_1 = require("./CRMDataTypes");
+var path = require("path");
+var edge = require("edge");
+var debug = require("debug")("dynamicsnode");
+var debugQueries = require("debug")("dynamicsnode:queries");
+var CRMClient = (function () {
+    /**
+     * Allows access to CRM functions
+     * @class CRMClient
+     * @param {string} connectionString Optional. A valid connection string or connection string name
+     */
+    function CRMClient(connectionString, fakeBridge) {
+        if (connectionString === void 0) { connectionString = "default"; }
+        if (fakeBridge === void 0) { fakeBridge = false; }
+        this.connectionString = connectionString;
+        this._metadataCache = new Dictionary_1.Dictionary();
+        var config = this.tryGetModule(path.join(process.cwd(), "config.json"));
+        if (config &amp;&amp; config.connectionStrings &amp;&amp; config.connectionStrings[connectionString]) {
+            this.connectionString = config.connectionStrings[connectionString];
+        }
+        this._crmBridge = this.getBridge(fakeBridge);
+        this.testConnection();
+    }
+    /**
+     * Gets the bridge
+     * @private
+     * @method CRMClient#getBridge
+     * @param fakeBridge {boolean} indicates if a fake bridge whants to be retrieved
+     * @returns a .net bridge
+     */
+    CRMClient.prototype.getBridge = function (fakeBridge) {
+        var source = path.join(__dirname, "CRMBridge.cs");
+        var ref1 = path.join(__dirname, "bin/Microsoft.Crm.Sdk.Proxy.dll");
+        var ref2 = path.join(__dirname, "bin/Microsoft.Xrm.Client.dll");
+        var ref3 = path.join(__dirname, "bin/Microsoft.Xrm.Sdk.dll");
+        var ref4 = path.join("System.Runtime.Serialization.dll");
+        var ref5 = path.join(__dirname, "bin/Newtonsoft.Json.dll");
+        var createBridge = edge.func({
+            source: source,
+            references: [ref1, ref2, ref3, ref4, ref5]
+        });
+        var bridge = createBridge({ connectionString: this.connectionString, useFake: fakeBridge }, true);
+        return bridge;
+    };
+    CRMClient.prototype.tryGetModule = function (moduleId) {
+        var result = null;
+        try {
+            result = require(moduleId);
+        }
+        catch (e) { }
+        return result;
+    };
+    CRMClient.prototype.convert = function (propertiesArray) {
+        var converted = null;
+        if (propertiesArray) {
+            converted = {};
+            for (var i = 0; i &lt; propertiesArray.length; i++) {
+                var propValue = propertiesArray[i];
+                if (propValue[1] instanceof Array) {
+                    var convertedValues = [];
+                    for (var j = 0; i &lt; propValue[1].length; i++) {
+                        var arrayItem = propValue[1][j];
+                        convertedValues.push(this.convert(arrayItem));
+                    }
+                    converted[propValue[0]] = convertedValues;
+                }
+                else {
+                    converted[propValue[0]] = propValue[1];
+                }
+            }
+        }
+        return converted;
+    };
+    /**
+    * Returns information about the current user
+    * @method CRMClient#whoAmI
+    */
+    CRMClient.prototype.whoAmI = function () {
+        var request = new Messages_1.WhoAmIRequest();
+        var response = this.Execute(request);
+        return response;
+    };
+    CRMClient.prototype.testConnection = function () {
+        try {
+            this.whoAmI(); // Performs a who am i request
+        }
+        catch (e) {
+            var error = new Error();
+            throw new Error("Error trying to connect to server\n" + JSON.stringify(e));
+        }
+    };
+    CRMClient.prototype.retrieve = function (entityName, idOrConditions, pColumns) {
+        var idValue;
+        var result;
+        var columns;
+        if (!entityName)
+            throw "Entity name not specified";
+        if (!idOrConditions)
+            throw "Id or Conditions not specified";
+        entityName = entityName.toLocaleLowerCase(); // normalize casing
+        // validate columns
+        if (pColumns === undefined) {
+            columns = true; // default value
+        }
+        else {
+            columns = pColumns;
+            if (typeof pColumns == "string") {
+                columns = [pColumns];
+            }
+            if (Array.isArray(columns)) {
+                for (var i = 0; i &lt; columns.length; i++) {
+                    columns[i] = columns[i].toLocaleLowerCase(); // normalize casing;
+                }
+            }
+        }
+        if (idOrConditions instanceof Guid_1.Guid) {
+            idValue = idOrConditions.getValue();
+        }
+        else if (typeof idOrConditions === "string" || idOrConditions instanceof String) {
+            idValue = idOrConditions;
+            if (!Guid_1.Guid.isGuid(idValue))
+                throw "Invalid GUID value";
+        }
+        else if (typeof idOrConditions === "object") {
+            // Assume a conditions objet was passed
+            // Get the records that meet the specified criteria
+            var idField = this.getIdField(entityName);
+            var foundRecords = this.retrieveMultiple(entityName, idOrConditions, idField);
+            if (foundRecords.rows !== null) {
+                if (foundRecords.rows.length > 1)
+                    throw new Error("Too many records found matching the specified criteria");
+                if (foundRecords.rows.length > 0) {
+                    // TODO: Refactor to avoid querying CRM twice
+                    idValue = foundRecords.rows[0][idField];
+                }
+            }
+        }
+        else {
+            throw new Error("invalid idOrConditions type value");
+        }
+        if (idValue) {
+            var params = { entityName: entityName, id: idValue, columns: columns };
+            var retrieveResult;
+            try {
+                retrieveResult = this._crmBridge.Retrieve(params, true);
+            }
+            catch (ex) {
+                var rethrow = false;
+                if (ex.Detail &amp;&amp; ex.Detail.InnerFault &amp;&amp; ex.Detail.InnerFault.Message) {
+                    // Record with specified Id doesn't exists
+                    var msg = entityName + " With Id = " + idValue.toLowerCase().replace("{", "").replace("}", "") + " Does Not Exist";
+                    if (ex.Detail.InnerFault.Message != msg)
+                        rethrow = true;
+                }
+                if (rethrow)
+                    throw ex;
+            }
+            // convert the result to a js object
+            if (retrieveResult != null) {
+                result = this.convert(retrieveResult);
+            }
+        }
+        return result;
+    };
+    CRMClient.prototype.retrieveMultiple = function (entityNameOrFetchXml, conditions, attributes) {
+        var result = new Array();
+        var fetchXml;
+        if (!(conditions || attributes)) {
+            // No conditions or attributes were specified, means a FetchXml value is expected.
+            // Improve this: could use a regular expression to distinguish between an xml and an entity name?
+            fetchXml = entityNameOrFetchXml;
+        }
+        else {
+            var fetch = new Fetch_1.Fetch(entityNameOrFetchXml);
+            if (conditions) {
+                fetch.setFilter(conditions);
+            }
+            if (attributes) {
+                fetch.setAttributes(attributes);
+            }
+            fetchXml = fetch.toString();
+            debugQueries(fetchXml);
+        }
+        var retrieveResult = this._crmBridge.RetrieveMultiple(fetchXml, true);
+        for (var i = 0; i &lt; retrieveResult.length; i++) {
+            var record = retrieveResult[i];
+            var convertedRecod = this.convert(record);
+            result.push(convertedRecod);
+        }
+        var dt = new DataTable_1.DataTable(entityNameOrFetchXml, result);
+        return dt;
+    };
+    CRMClient.prototype.retrieveAll = function (entityName) {
+        var fetch = new Fetch_1.Fetch(entityName, "*");
+        var fetchXml = fetch.toString();
+        var result = this.retrieveMultiple(fetchXml);
+        return result;
+    };
+    CRMClient.prototype.create = function (entityName, attributes) {
+        // perform some validations
+        if (!entityName)
+            throw "Entity name not specified";
+        if (!attributes)
+            throw "Attributes not specified";
+        entityName = entityName.toLocaleLowerCase(); // normalize casing
+        var values = new Array();
+        for (var prop in attributes) {
+            values.push(prop.toLocaleLowerCase()); // normalize casing
+            values.push(attributes[prop]);
+        }
+        var params = { entityName: entityName, values: values };
+        var createdGuid = this._crmBridge.Create(params, true);
+        return createdGuid;
+    };
+    CRMClient.prototype.delete = function (entityName, idsOrConditions) {
+        var ids;
+        var recordsAffected = 0;
+        if (!entityName)
+            throw "Entity name not specified";
+        entityName = entityName.toLowerCase(); // normalize casing
+        if (idsOrConditions instanceof Guid_1.Guid) {
+            ids = [idsOrConditions.getValue()];
+        }
+        else if (typeof idsOrConditions == "string") {
+            if (!Guid_1.Guid.isGuid(idsOrConditions))
+                throw "Invalid GUID value";
+            ids = [idsOrConditions];
+        }
+        else if (Array.isArray(ids)) {
+            for (var i = 0; i &lt; ids.length; i++) {
+                var item = ids[i];
+                if (!(item instanceof Guid_1.Guid) || Guid_1.Guid.isGuid(item)) {
+                    throw "Invalid GUID";
+                }
+            }
+            ids = idsOrConditions;
+        }
+        else if (typeof idsOrConditions == "object" &amp;&amp; !(idsOrConditions instanceof Date)) {
+            // Get the records that meet the specified criteria
+            var idField = this.getIdField(entityName);
+            var foundRecords = this.retrieveMultiple(entityName, idsOrConditions, idField);
+            ids = [];
+            for (var i = 0; i &lt; foundRecords.rows.length; i++) {
+                ids.push(foundRecords.rows[i][idField]);
+            }
+        }
+        recordsAffected = this.deleteMultiple(entityName, ids);
+        return recordsAffected;
+    };
+    CRMClient.prototype.deleteMultiple = function (entityName, ids) {
+        var recordsAffected = 0;
+        for (var i = 0; i &lt; ids.length; i++) {
+            var params = { entityName: entityName, id: ids[i] };
+            this._crmBridge.Delete(params, true);
+            recordsAffected++;
+        }
+        return recordsAffected;
+    };
+    CRMClient.prototype.update = function (entityName, attributes, conditions) {
+        var updatedRecordsCount = 0;
+        var values = new Array();
+        if (!entityName)
+            throw "Entity name not specified";
+        entityName = entityName.toLowerCase(); // normalize casing
+        // prepare values
+        for (var prop in attributes) {
+            var attrName = prop.toLowerCase(); // normalize casing
+            values.push(attrName);
+            values.push(attributes[prop]);
+        }
+        // get records GUIDS
+        if (conditions != undefined) {
+            // The id field of an entity is always the entity name + "id"
+            // TODO: Except for activities
+            var idField = (entityName + "id").toLowerCase();
+            var foundRecords = this.retrieveMultiple(entityName, conditions, idField);
+            var idFieldIndex = values.indexOf(idField);
+            if (idFieldIndex &lt; 0) {
+                // Add the id field to the values array and save the attribute index
+                idFieldIndex = values.push(idField) - 1;
+                values.push(null);
+            }
+            for (var i = 0; i &lt; foundRecords.rows.length; i++) {
+                var foundRecordId = foundRecords.rows[i][idField];
+                values[idFieldIndex + 1] = foundRecordId;
+                var params = { entityName: entityName, values: values };
+                this._crmBridge.Update(params, true);
+            }
+            updatedRecordsCount = foundRecords.rows.length;
+        }
+        else {
+            // the attributes parameter must contain the entity id on it
+            var params = { entityName: entityName, values: values };
+            this._crmBridge.Update(params, true);
+            updatedRecordsCount = 1;
+        }
+        return updatedRecordsCount;
+    };
+    CRMClient.prototype.getIdField = function (entityName) {
+        var idAttr = null;
+        var metadata = this.getEntityMetadata(entityName);
+        if (metadata) {
+            // Find the primary Attribute
+            idAttr = metadata.PrimaryIdAttribute;
+        }
+        if (idAttr == null)
+            throw "Primary Attribute not found for entity " + entityName;
+        debug("idAttr for entity '" + entityName + "': '" + idAttr + "'");
+        // convert it to lowercase
+        return idAttr.toLowerCase();
+    };
+    CRMClient.prototype.createOrUpdate = function (entityName, attributes, matchFields) {
+        var idField = this.getIdField(entityName);
+        var conditions = {};
+        for (var i = 0; i &lt; matchFields.length; i++) {
+            var matchField = matchFields[i];
+            if (attributes[matchField] !== undefined &amp;&amp; attributes[matchField] !== null) {
+                conditions[matchField] = attributes[matchField];
+            }
+        }
+        // check if the record exists
+        var foundRecord = this.retrieve(entityName, conditions, idField);
+        if (foundRecord) {
+            // The record exists. Update it
+            attributes[idField] = foundRecord[idField];
+            this.update(entityName, attributes);
+        }
+        else {
+            // The record doesn't exists. Create it
+            this.create(entityName, attributes);
+        }
+    };
+    CRMClient.prototype.associateData = function (data) {
+        for (var i = 0; i &lt; data.rows.length; i++) {
+            var row = data.rows[i];
+            this.associate(row.from.type, row.from.value, data.name, row.to.type, row.to.value);
+        }
+    };
+    CRMClient.prototype.associate = function (fromEntityName, fromEntityId, relationshipName, toEntityName, toEntityId) {
+        // perform some validations
+        if (!fromEntityName)
+            throw "From entity name not specified";
+        fromEntityName = fromEntityName.toLowerCase(); // normalize casing
+        if (!toEntityName)
+            throw "To entity name not specified";
+        toEntityName = toEntityName.toLowerCase(); // normalize casing
+        if (!fromEntityId)
+            throw "fromEntityId not specified";
+        if (!toEntityId)
+            throw "toEntityId not specified";
+        var fromId, toId;
+        if (fromEntityId instanceof Guid_1.Guid) {
+            fromId = fromEntityId.getValue();
+        }
+        else {
+            fromId = fromEntityId;
+        }
+        if (toEntityId instanceof Guid_1.Guid) {
+            toId = toEntityId.getValue();
+        }
+        else {
+            toId = toEntityId;
+        }
+        var params = { entityName: fromEntityName, entityId: fromId, relationship: relationshipName, relatedEntities: [{ entityName: toEntityName, entityId: toId }] };
+        this._crmBridge.Associate(params, true);
+    };
+    CRMClient.prototype.disassociateData = function (data) {
+        for (var i = 0; i &lt; data.rows.length; i++) {
+            var row = data.rows[i];
+            this.disassociate(row.from.type, row.from.value, data.name, row.to.type, row.to.value);
+        }
+    };
+    CRMClient.prototype.disassociate = function (fromEntityName, fromEntityId, relationshipName, toEntityName, toEntityId) {
+        // perform some validations
+        if (!fromEntityName)
+            throw "From entity name not specified";
+        fromEntityName = fromEntityName.toLowerCase(); // normalize casing
+        if (!toEntityName)
+            throw "To entity name not specified";
+        toEntityName = toEntityName.toLowerCase(); // normalize casing
+        if (!fromEntityId)
+            throw "fromEntityId not specified";
+        if (!toEntityId)
+            throw "toEntityId not specified";
+        var fromId, toId;
+        if (fromEntityId instanceof Guid_1.Guid) {
+            fromId = fromEntityId.getValue();
+        }
+        else {
+            fromId = fromEntityId;
+        }
+        if (toEntityId instanceof Guid_1.Guid) {
+            toId = toEntityId.getValue();
+        }
+        else {
+            toId = toEntityId;
+        }
+        var params = { entityName: fromEntityName, entityId: fromId, relationship: relationshipName, relatedEntities: [{ entityName: toEntityName, entityId: toId }] };
+        this._crmBridge.Disassociate(params, true);
+    };
+    CRMClient.prototype.getEntityMetadata = function (entityName) {
+        var ndx = this._metadataCache.indexOf(entityName);
+        var metadata = null;
+        if (ndx > -1) {
+            metadata = this._metadataCache.getValue(ndx);
+        }
+        else {
+            metadata = this.getEntityMetadataFromCrm(entityName);
+            this._metadataCache.push(entityName, metadata);
+        }
+        return metadata;
+    };
+    CRMClient.prototype.getEntityMetadataFromCrm = function (entityName) {
+        var params = { entityName: entityName };
+        var metadataStr = this._crmBridge.GetEntityMetadata(params, true);
+        var metadata = JSON.parse(metadataStr);
+        return metadata;
+    };
+    CRMClient.prototype.Execute = function (request) {
+        var response = this._crmBridge.Execute(request, true);
+        return response;
+    };
+    CRMClient.prototype.assign = function (targetId, targetType, assigneeId, assigneeType) {
+        // set the default value
+        if (assigneeType === undefined)
+            assigneeType = "systemuser";
+        var request = new Messages_1.AssignRequest();
+        request.Assignee = new CRMDataTypes_1.EntityReference(assigneeId.toString(), assigneeType);
+        request.Target = new CRMDataTypes_1.EntityReference(targetId.toString(), targetType);
+        var response = this.Execute(request);
+    };
+    CRMClient.prototype.export = function (entityName, fileName) {
+        debug("Exporting " + entityName + " to " + fileName + "...");
+        // perform some validations
+        if (!entityName)
+            throw "Entity name not specified";
+        entityName = entityName.toLowerCase(); // normalize casing
+        debug("Getting metadata...");
+        var metadata = this.getEntityMetadata(entityName);
+        debug("Getting data...");
+        var data = this.retrieveMultiple(entityName, {});
+        var rowsCount = data ? data.rows ? data.rows.length : 0 : 0;
+        debug("Retrieved " + rowsCount + " records");
+        debug("Saving...");
+        data.save(fileName);
+        debug("done!");
+    };
+    CRMClient.prototype.import = function (fileName) {
+        debug("Importing " + fileName + "...");
+        debug("Loading data table...");
+        var dt = DataTable_1.DataTable.load(fileName);
+        debug(dt.rows.length + " records found");
+        debug("Getting metadata for entity " + dt.name + "...");
+        var metadata = this.getEntityMetadata(dt.name);
+        var idField = this.getIdField(dt.name);
+        debug("Importing...");
+        for (var i = 0; i &lt; dt.rows.length; i++) {
+            debug("record " + (i + 1) + " of " + dt.rows.length + "...");
+            this.createOrUpdate(dt.name, dt.rows[i], [idField]);
+        }
+        debug("done!");
+    };
+    return CRMClient;
+}());
+exports.CRMClient = CRMClient;
+//# sourceMappingURL=CRMClient.js.map</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	(c) Cristhian Fernandez
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
+	
+		on Sat Oct 8th 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

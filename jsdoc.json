@@ -3,7 +3,8 @@
     "recurse":true,
     "destination": "docs",
     "template":"./node_modules/ink-docstrap/template",
-    "private":true
+    "private":true,
+    "package":"package.json"
   },
   "tags": {
     "allowUnknownTags": true
