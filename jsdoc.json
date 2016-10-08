@@ -4,7 +4,7 @@
     "destination": "docs",
     "template":"./node_modules/ink-docstrap/template",
     "private":true,
-    "package":"package.json"
+    "tutorials":"./docs/tutorials"
   },
   "tags": {
     "allowUnknownTags": true

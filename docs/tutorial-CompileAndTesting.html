@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>DynamicsNode Class: CRMClient</title>
+	<title>DynamicsNode Tutorial: CompileAndTesting</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -67,441 +67,109 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
-			
-
-	<h1 class="page-title">Class: CRMClient</h1>
-<section>
+			<section class="tutorial-section">
 
 <header>
     
-        <h2>
-        CRMClient
-        </h2>
-        
-    
+
+    <h2>CompileAndTesting</h2>
 </header>
 
-
 <article>
-    <div class="container-overview">
-    
-        
-<hr>
-<dt>
-    <h4 class="name" id="CRMClient"><span class="type-signature"></span>new CRMClient(connectionString)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Allows access to CRM functions</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>connectionString</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Optional. A valid connection string or connection string name</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-13">line 13</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        <dl>
-            
-<hr>
-<dt>
-    <h4 class="name" id="getBridge"><span class="type-signature">&lt;private> </span>getBridge(fakeBridge)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Gets the bridge</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>fakeBridge</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>indicates if a fake bridge whants to be retrieved</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-30">line 30</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>a .net bridge</p>
-</div>
-
-
-
-
-        
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="whoAmI"><span class="type-signature"></span>whoAmI()</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Returns information about the current user</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-80">line 80</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dd>
-
-        </dl>
-    
-
-    
-
-    
+    <h1>How to compile the code</h1><h2>Prerequisites</h2><p>In order to build the TypeScript compiler, ensure that you have <a href="https://git-scm.com/downloads">Git</a> and <a href="https://nodejs.org">Node.js</a> installed.</p>
+<h2>Steps</h2><p>First, get the latest version of the code from Github, either using the clone button from the web, or using the command line.</p>
+<pre class="prettyprint source"><code>$ git clone https://github.com/crisfervil/DynamicsNode.git</code></pre><p>Then, cd into the cloned directory</p>
+<pre class="prettyprint source"><code>$ cd DynamicsNode</code></pre><p>Install dependencies using npm</p>
+<pre class="prettyprint source"><code>$ npm install</code></pre><p>Run the build script</p>
+<pre class="prettyprint source"><code>$ npm run build</code></pre><h1>How to run tests</h1><p>Use the default npm command for testing.</p>
+<pre class="prettyprint source"><code>$  npm test</code></pre><h1>Debug</h1><p>In order to see debug information in console, type following command:</p>
+<pre class="prettyprint source"><code>set DEBUG=dynamicsnode</code></pre><p>You should see debug information like this:</p>
+<pre class="prettyprint source"><code>  dynamicsnode Exporting account to accounts.xml +0ms
+  dynamicsnode Getting metadata... +0ms
+  dynamicsnode Getting data... +1s
+  dynamicsnode Saving... +531ms
+  dynamicsnode done! +32ms</code></pre><h2>Integration Tests</h2><p>In order to run the integration tests, first clone and compile the code as described above.</p>
+<p>Then, you need create a config.json file in the root of DynamicsNode folder.</p>
+<p>The config.json must have the following format:</p>
+<pre class="prettyprint source lang-json"><code>{
+    &quot;connectionStrings&quot;:
+    {
+        &quot;IntegrationTestsOnline&quot;:&quot;Url=https://contoso.crm4.dynamics.com; Username=admin@contoso.onmicrosoft.com; Password=YourPassword;&quot;
+    }
+}</code></pre><p>You need to create a connection string named &quot;IntegrationTestsXXXX&quot; where XXXX is whatever name you want to use to indentify your connection.</p>
+<p>After doing that, just re-run tests script with npm.</p>
+<pre class="prettyprint source"><code>$  npm test</code></pre><p>You should see something like this:</p>
+<pre class="prettyprint source lang-console"><code>c:\GitHub\DynamicsNode>npm test
+
+> dynamicsnode@0.0.4 test c:\GitHub\DynamicsNode
+> mocha --recursive
+
+
+
+  CRMClient
+    √ Throws an exception with an invalid connection (169ms)
+    √ Tells who I am (148ms)
+    √ Creates a record (153ms)
+    √ Deletes a record (147ms)
+    √ Updates a record (137ms)
+    √ Associates two records (169ms)
+    √ Disassociates two records (163ms)
+    √ Gets entity metadata (153ms)
+
+  DataTable
+    √ Initializes from an existing Array
+    √ Loads and read JSON data
+    √ Loads and reads XML data
+
+  Fetch
+    √ Serializes a simple Fetch
+    √ Serializes a simple Fetch with conditions
+    √ Serializes a complex Fetch
+
+  Guid
+    √ Creates an instance of non empty Guid
+    √ Creates an instance of empty Guid
+    √ Creates an instance from a string
+    √ Validates Guid format on creation
+    √ Generates new Guids
+    √ Compares two different Guids
+    √ Compares two equal Guids
+    √ Compares a Guid value with a string
+
+  Integration tests: IntegrationTestsOnline
+    √ Throws an exception with an invalid connection (169ms)
+    √ Creates an account (937ms)
+    √ Updates an account (588ms)
+    √ Updates an account using a criteria (1740ms)
+    √ Knows Who I am (68ms)
+    √ Performs a simple retrieve (139ms)
+    √ Performs a retrieve that doesnt returns any records (134ms)
+    √ Performs a retrieve that doesnt returns any records using a GUID (100ms)
+    √ Performs a retrieve with specific columns (139ms)
+    √ Performs a retrieve with all columns (131ms)
+    √ Performs a &quot;retrieve all&quot; of an entity (134ms)
+    √ Performs a simple retrieve multiple (185ms)
+    √ Performs a retrieve all (154ms)
+    √ Associates and Disassociates a lead and an contact (434ms)
+    √ Associates and Disassociates a lead and an contact using a DataTable (440ms)
+    √ Gets entity metadata
+    - Export and import users to a File
+
+
+  38 passing (7s)
+  1 pending</code></pre>
 </article>
 
 </section>
-
-
-
 
 		</div>
 	</div>
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>

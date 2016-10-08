@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/crisfervil/DynamicsNode.svg?branch=master)](https://travis-ci.org/crisfervil/DynamicsNode) [![codecov.io](https://codecov.io/github/crisfervil/DynamicsNode/coverage.svg?branch=master)](https://codecov.io/github/crisfervil/DynamicsNode?branch=master) [![Coverage Status](https://coveralls.io/repos/github/crisfervil/DynamicsNode/badge.svg?branch=master)](https://coveralls.io/github/crisfervil/DynamicsNode?branch=master) [![npm](https://img.shields.io/npm/v/dynamicsnode.svg)](https://www.npmjs.com/package/dynamicsnode)
 # Project description
 
-DynamicsNode is a library built on node.js that allows you to quickly create scripts to interact with Microsoft Dynamics CRM using javascript.
+DynamicsNode is a library built on node.js that allows you to quickly create scripts to interact with Microsoft Dynamics CRM using JavaScript.
 
 The main goal of Dynamics Node is to make you very productive when it comes to automate small tasks in Dynamics CRM. Just create a js file, add a few lines and execute it.
 
@@ -48,17 +48,17 @@ In order to run the script use node
 $ node myscript
 ```
 
-**Further information:** [API](doc/api.md)
+**Further information:** [API](//dynamicsnode.js.org/classes.list.html)
 
-**How to compile and test the code:** [Compile and Testing](doc/CompileAndTesting.md)
+**How to compile and test the code:** [Compile and Testing](//dynamicsnode.js.org/tutorial-CompileAndTesting.md)
 
-**Use it as a command line tool:** [Commands and Repl](doc/CommandsAndRepl.md)
+**Use it as a command line tool:** [Commands and Repl](//dynamicsnode.js.org/tutorial-CommandsAndRepl.md)
 
 
 # Requirements
-Requires [Node.js](nodejs.org)
+Requires [Node.js](//nodejs.org)
 
-This tool is based on [Edge](https://github.com/tjanczuk/edge) and requires .NET Framework 4.5 to be installed.
+This tool is based on [Edge](//github.com/tjanczuk/edge) and requires .NET Framework 4.5 to be installed.
 
 It has been tested in Windows environments only, but could potentially work in Linux too using Mono.
 
