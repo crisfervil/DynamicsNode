@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="CRMClient.html">CRMClient</a></li>
+					<li><a href="CRMClient.html">CRMClient</a></li><li><a href="WhoAmIResponse.html">WhoAmIResponse</a></li>
 				</ul>
 			</li>
 			
@@ -97,6 +97,7 @@
 <h1>Project description</h1><p>DynamicsNode is a library built on node.js that allows you to quickly create scripts to interact with Microsoft Dynamics CRM using JavaScript.</p>
 <p>The main goal of Dynamics Node is to make you very productive when it comes to automate small tasks in Dynamics CRM. Just create a js file, add a few lines and execute it.</p>
 <p>No more .net console applications with all the boilerplate code just for creating one record. Go productive!</p>
+<p>Github project: https://github.com/crisfervil/DynamicsNode</p>
 <h1>How to use it</h1><p>Create a new directory to store your scripts and cd into it</p>
 <pre class="prettyprint source"><code>$ mkdir MyScripts && cd MyScripts</code></pre><p>Install DynamicsNode</p>
 <pre class="prettyprint source"><code>$  npm install dynamicsnode</code></pre><h2>Writing code</h2><p>Create a new js file named myscript.js and start adding code</p>
@@ -117,8 +118,8 @@ var anotherUser = crm.retrieve(&quot;systemuser&quot;,{fullname:&quot;John Doe&q
 console.log(anotherUser);</code></pre><p>Save the file and run the script.</p>
 <p>In order to run the script use node</p>
 <pre class="prettyprint source"><code>$ node myscript</code></pre><p><strong>Further information:</strong> <a href="//dynamicsnode.js.org/classes.list.html">API</a></p>
-<p><strong>How to compile and test the code:</strong> <a href="//dynamicsnode.js.org/tutorial-CompileAndTesting.md">Compile and Testing</a></p>
-<p><strong>Use it as a command line tool:</strong> <a href="//dynamicsnode.js.org/tutorial-CommandsAndRepl.md">Commands and Repl</a></p>
+<p><strong>How to compile and test the code:</strong> <a href="//dynamicsnode.js.org/tutorial-CompileAndTesting.html">Compile and Testing</a></p>
+<p><strong>Use it as a command line tool:</strong> <a href="//dynamicsnode.js.org/tutorial-CommandsAndRepl.html">Commands and Repl</a></p>
 <h1>Requirements</h1><p>Requires <a href="//nodejs.org">Node.js</a></p>
 <p>This tool is based on <a href="//github.com/tjanczuk/edge">Edge</a> and requires .NET Framework 4.5 to be installed.</p>
 <p>It has been tested in Windows environments only, but could potentially work in Linux too using Mono.</p>

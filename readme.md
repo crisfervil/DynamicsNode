@@ -7,6 +7,8 @@ The main goal of Dynamics Node is to make you very productive when it comes to a
 
 No more .net console applications with all the boilerplate code just for creating one record. Go productive!
 
+Github project: https://github.com/crisfervil/DynamicsNode
+
 # How to use it
 Create a new directory to store your scripts and cd into it
 
@@ -50,9 +52,9 @@ $ node myscript
 
 **Further information:** [API](//dynamicsnode.js.org/classes.list.html)
 
-**How to compile and test the code:** [Compile and Testing](//dynamicsnode.js.org/tutorial-CompileAndTesting.md)
+**How to compile and test the code:** [Compile and Testing](//dynamicsnode.js.org/tutorial-CompileAndTesting.html)
 
-**Use it as a command line tool:** [Commands and Repl](//dynamicsnode.js.org/tutorial-CommandsAndRepl.md)
+**Use it as a command line tool:** [Commands and Repl](//dynamicsnode.js.org/tutorial-CommandsAndRepl.html)
 
 
 # Requirements

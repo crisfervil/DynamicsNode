@@ -11,16 +11,45 @@ import edge = require("edge");
 var debug = require("debug")("dynamicsnode");
 var debugQueries = require("debug")("dynamicsnode:queries");
 
-
 export class CRMClient {
 
     private _crmBridge: any;
     private _metadataCache=new Dictionary();
 
     /**
-     * Allows access to CRM functions 
+     * Allow access to CRM functions. Contains the functions to interact with CRM services.
      * @class CRMClient
-     * @param {string} connectionString Optional. A valid connection string or connection string name
+     * @param {string} connectionString Optional. A valid connection string or connection string name.
+     * 
+     * The connection string could be either a valid connection string or a name of an existing connection string in the file "config.json" at the root path.
+     * 
+     * If no value is passed to the constructor, the "default" text will be assumed, which means that a connection string named "default" will be used.
+     * @see {@link https://msdn.microsoft.com/en-us/library/gg695810.aspx} for further information
+     * 
+     * @example <caption>config.json file format</caption>
+     * {
+	 *      "connectionStrings":
+	 *      {
+     *          "default":"Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode",
+     *          "connection2":"Url=http://crm.contoso.com/xrmContoso"
+	 *      }
+     * }
+     * 
+     * @example <caption>Create a connection using a valid Connection String</caption>
+     * 
+     * var crm = new CRMClient("Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode");
+     * 
+     * @example <caption>Create a connection using the connection string named "connection2" specified in the config.json file</caption>
+     * 
+     * var crm = new CRMClient("connection2");
+     * 
+     * @example <caption>Create a connection using the connection string named "default" specified in the config.json file</caption>
+     * 
+     * var crm = new CRMClient();
+     * 
+     * @example <caption>Create a connection using the connection string named "default" specified in the config.json file</caption>
+     * 
+     * var crm = new CRMClient("default");
      */
     constructor(public connectionString: string = "default", fakeBridge: boolean = false) {
 
@@ -34,11 +63,11 @@ export class CRMClient {
     }
 
     /**
-     * Gets the bridge
+     * Gets the bridge object betweem Node and .net
      * @private
      * @method CRMClient#getBridge
      * @param fakeBridge {boolean} indicates if a fake bridge whants to be retrieved
-     * @returns a .net bridge
+     * @returns a .net bridge that allows node to interact with .net
      */
     private getBridge(fakeBridge: boolean) {
 
@@ -90,8 +119,16 @@ export class CRMClient {
     }
 
     /** 
-    * Returns information about the current user 
+    * Returns information about the current user. Useful for testing the active connection.
+    * @returns a {@link WhoAmIResponse} object with the information about the authenticated user in CRM.
     * @method CRMClient#whoAmI
+    * @example <caption>Returns information about the current user</caption>
+    * var who = crm.whoAmI();
+    * console.log(who);
+    * //prints: 
+    * // {BusinessUnitId:"6fefeb79-5447-e511-a5db-0050568a69e2",
+    * //  OrganizationId:"2b476bd1-aaed-43ee-b386-eee0f1b87207",
+    * //  UserId:"9ba35c25-b892-4f8a-b124-3920d9873af4"}
     */
     whoAmI():WhoAmIResponse {
         var request = new WhoAmIRequest();
@@ -99,6 +136,12 @@ export class CRMClient {
         return response;
     }
 
+    /**
+     * Tests the active connection. Throws an exception if there's any error.
+     * The method performs a WhoAmIRequest.
+     * @method CRMClient#testConnection
+     * @see CRMClient#whoAmI
+     */
     testConnection(){
         try{
             this.whoAmI();// Performs a who am i request
@@ -109,6 +152,9 @@ export class CRMClient {
         }
     }
 
+    /**
+     * @method CRMClient#retrieve
+     */
     retrieve(entityName: string, idOrConditions: string | Guid | Object, pColumns?: string | string[] | boolean) {
         var idValue: string;
         var result: any;
