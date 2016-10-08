@@ -6,7 +6,7 @@ typings
 coverage
 .nyc_output
 tmp
-doc
+docs
 *.ts
 *.d.ts
 !dynamicsnode.d.ts

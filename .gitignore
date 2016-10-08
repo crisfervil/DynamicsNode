@@ -50,15 +50,15 @@ typings/**
 !typings/custom.d.ts
 *.js
 *.d.ts
-!dynamicsnode.d.ts
 *.js.map
+!dynamicsnode.d.ts
+!docs/*.js
+!docs/**/*.js
 .vscode
 npm-debug.log
 tmp
 #imdone tasks
 .imdone/
-doc/**
-!doc/*.md
 src/bin/*.xml
 src/bin/*.pdb
 .nyc_output
