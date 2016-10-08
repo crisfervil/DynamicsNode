@@ -7,7 +7,7 @@ The main goal of Dynamics Node is to make you very productive when it comes to a
 
 No more .net console applications with all the boilerplate code just for creating one record. Go productive!
 
-Github project: https://github.com/crisfervil/DynamicsNode
+Github project: [https://github.com/crisfervil/DynamicsNode](https://github.com/crisfervil/DynamicsNode)
 
 # How to use it
 Create a new directory to store your scripts and cd into it
