@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>DynamicsNode Tutorials</title>
+	<title>DynamicsNode Source: Guid.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -67,109 +67,91 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	<h1 class="page-title">Tutorials</h1>
+		<h1 class="page-title">Source: Guid.js</h1>
+    
 <section>
-
-<header>
-    
-        <h2>
-        
-        </h2>
-        
-    
-</header>
-
-
-<article>
-    <div class="container-overview">
-    
-        
-
-        
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="CRMClient.html">CRMClient</a></dt>
-            <dd></dd>
-        
-            <dt><a href="DataTable.html">DataTable</a></dt>
-            <dd></dd>
-        
-            <dt><a href="Guid.html">Guid</a></dt>
-            <dd></dd>
-        
-            <dt><a href="WhoAmIResponse.html">WhoAmIResponse</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+var Guid = (function () {
+    /**
+     * Default constructor
+     * @classdesc Provides methos to generate an validate GUID values and to convert them from and to a String.
+     * @class Guid
+     * @param {string} string value representing a Guid Value
+     */
+    function Guid(guid) {
+        if (guid === undefined) {
+            this.value = Guid.EMPTY;
+        }
+        else {
+            if (Guid.isGuid(guid)) {
+                this.value = guid;
+            }
+            else {
+                throw new Error("Invalid GUID value");
+            }
+        }
+    }
+    Guid.gen = function (count) {
+        var out = "";
+        for (var i = 0; i &lt; count; i++) {
+            out += (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return out;
+    };
+    Guid.prototype.equals = function (other) {
+        // Comparing string `value` against provided `guid` will auto-call
+        // toString on `guid` for comparison
+        if (other instanceof Guid)
+            return this.value == other.getValue();
+        return Guid.isGuid(other) &amp;&amp; this.value == other;
+    };
+    ;
+    Guid.prototype.isEmpty = function () {
+        return this.value === Guid.EMPTY;
+    };
+    ;
+    Guid.prototype.toString = function () {
+        return this.value;
+    };
+    ;
+    Guid.prototype.toJSON = function () {
+        return this.value;
+    };
+    ;
+    Guid.prototype.getValue = function () {
+        return this.value;
+    };
+    Guid.isGuid = function (value) {
+        return value &amp;&amp; (value instanceof Guid || Guid.validator.test(value.toString()));
+    };
+    ;
+    Guid.create = function () {
+        return new Guid([Guid.gen(2), Guid.gen(1), Guid.gen(1), Guid.gen(1), Guid.gen(3)].join("-"));
+    };
+    ;
+    Guid.raw = function () {
+        return [Guid.gen(2), Guid.gen(1), Guid.gen(1), Guid.gen(1), Guid.gen(3)].join("-");
+    };
+    ;
+    Guid.empty = function () {
+        return new Guid(Guid.EMPTY);
+    };
+    Guid.EMPTY = "00000000-0000-0000-0000-000000000000";
+    Guid.validator = new RegExp("^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$", "i");
+    return Guid;
+}());
+exports.Guid = Guid;
+</pre>
+    </article>
 </section>
+
 
 
 
@@ -179,10 +161,6 @@
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>

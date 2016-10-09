@@ -17,11 +17,12 @@ export class CRMClient {
     private _metadataCache=new Dictionary();
 
     /**
-     * Allow access to CRM functions. Contains the functions to interact with CRM services.
+     * Default constructor
+     * @classdesc Allow access to CRM functions. Contains the functions to interact with CRM services.
      * @class CRMClient
      * @param {string} connectionString Optional. A valid connection string or connection string name.
      * 
-     * The connection string could be either a valid connection string or a name of an existing connection string in the file "config.json" at the root path.
+     * The connection string can be either a valid connection string or a name of an existing connection string in the file "config.json" at the root path.
      * 
      * If no value is passed to the constructor, the "default" text will be assumed, which means that a connection string named "default" will be used.
      * @see {@link https://msdn.microsoft.com/en-us/library/gg695810.aspx} for further information
@@ -63,7 +64,7 @@ export class CRMClient {
     }
 
     /**
-     * Gets the bridge object betweem Node and .net
+     * Gets the bridge object between node and .net
      * @private
      * @method CRMClient#getBridge
      * @param fakeBridge {boolean} indicates if a fake bridge whants to be retrieved
@@ -153,7 +154,41 @@ export class CRMClient {
     }
 
     /**
+     * Retrieves one single record from CRM.
      * @method CRMClient#retrieve
+     * @param entityName {string} Name of the entity to be retrieved. The name is case insensitive, so all values are lowercased before being sent to CRM.
+     * @param idOrConditions {string|Guid|object} Either a string with the GUID if the record to be retrieved, a {@link Guid} object with the same value, or a conditions object that returns only one record.
+     * @param columns {string|string[]|boolean} Optional. Either a column name, an array of column names, or a true value indicating that all columns must be retrieved. The default value is true. An ***** value has the same effect
+     * 
+     * @returns A javascript object containing the values of the record. If no data found, then a null object is returned.
+     * 
+     * @example <caption>Return all the columns for the specified account id</caption>
+     * var account = crm.retrieve("account","6fefeb79-5447-e511-a5db-0050568a69e2");
+     * console.log(account);
+     * @example <caption>Return all the columns for the specified account id</caption>
+     * var account = crm.retrieve("account","6fefeb79-5447-e511-a5db-0050568a69e2","*");
+     * console.log(account);
+     * @example <caption>Return all the columns for the specified account id</caption>
+     * var account = crm.retrieve("account","6fefeb79-5447-e511-a5db-0050568a69e2",true);
+     * console.log(account);
+     * @example <caption>You can use the Guid class to specify the id parameter. This allows to perform a GUID format validation before calling the method.</caption>
+     * var Guid = require("dynamicsnode").Guid;
+     * var account = crm.retrieve("account",new Guid("6fefeb79-5447-e511-a5db-0050568a69e2"));
+     * console.log(account);
+     * @example <caption>Get the accountid,name,ownerid,createdon columns for the given account id</caption>
+     * var account = crm.retrieve("account","6fefeb79-5447-e511-a5db-0050568a69e2",["accountid","name","ownerid","createdon"]);
+     * console.log(account);
+     * @example <caption>Get the name of the specified account</caption>
+     * var account = crm.retrieve("account","6fefeb79-5447-e511-a5db-0050568a69e2","name");
+     * console.log(account.name);
+     * @example <caption>Accessing information about a related record</caption>
+     * var account = crm.retrieve("account","6fefeb79-5447-e511-a5db-0050568a69e2","ownerid");
+     * console.log(account.ownerid); // outputs the GUID value
+     * console.log(account.ownerid_type); // outputs systemuser
+     * console.log(account.ownerid_name); // outputs John Doe
+     * @example <caption>Returns an account using a condition object. If there are more than one account named "Acme" then an exception will be thrown</caption>
+     * var account = crm.retrieve("account",{name:"Acme"});
+     * console.log(account.name);
      */
     retrieve(entityName: string, idOrConditions: string | Guid | Object, pColumns?: string | string[] | boolean) {
         var idValue: string;
@@ -231,6 +266,29 @@ export class CRMClient {
 
     retrieveMultiple(fetchXml: string): DataTable;
     retrieveMultiple(entityName: string, conditions?, attributes?: boolean | string | string[]): DataTable;
+
+    /**
+     * Retrieves one or more records of the specified entity that fulfill the specified conditions.
+     * @method CRMClient#retrieveMultiple
+     * 
+     * @param entityNameOrFetchXml {string} Name of the entity or Fetch Xml query to specify the records to be retrieved. More info: {@link https://msdn.microsoft.com/en-us/library/gg328332.aspx}
+     * @param conditions {object} Optional. In case you don't want to write an xml to specify the records to retrieve, you can use a conditions object to specify the criteria to retrieve records. If you omit this parameter, all the existing records of the specified entity will be retrieved; omitting this parameter is equivalent to write a FetchXml without any filter conditions.
+     * @param attributes {string|string[]|boolean} Optional. Either a column name, an array of column names, or a true value indicating that all columns must be retrieved. The default value is true. An ***** value has the same effect
+     * @returns {DataTable} {@link DataTable} object with the values of the records found. 
+     * 
+     * @see Build queries with FetchXML: {@link https://msdn.microsoft.com/en-us/library/gg328332.aspx}
+     * 
+     * @example <caption>Retrieves all the records of the account entity. Only the accountid column will be retrieved (the id column is always returned in all Crm queries)</caption>
+     * var accounts = crm.retrieveMultiple("<fetch><entity name='account'></entity></fetch>");
+     * @example <caption>Retrieves all the records of the account entity. Includes also all the columns of the entity.</caption>
+     * var accounts = crm.retrieveMultiple("account");
+     * @example <caption>Retrieves all the records of the account entity where the account name is equals to "contoso". Returns all the columns of the entity.</caption>
+     * var accounts = crm.retrieveMultiple("account",{name:"contoso"});
+     * @example <caption>Retrieves all the records of the account entity where the account name is equals to "contoso", but only the specified columns are included in the query.</caption>
+     * var accounts = crm.retrieveMultiple("account",{name:"contoso"},["accountid","name","ownerid","createdon"]);
+     * @example <caption>Retrieves all the records of the account entity where the account name is equals to "contoso" or "acme". Returns all the columns of the entity.</caption>
+     * var accounts = crm.retrieveMultiple("account",{name:["contoso","acme"]});
+     * */
     retrieveMultiple(entityNameOrFetchXml: string, conditions?, attributes?: boolean | string | string[]): DataTable {
         var result = new Array<any>();
 

@@ -8,6 +8,10 @@ var debug = require("debug")("dynamicsnode");
 export class DataTable {
     rows: Array<any> = [];
 
+    /** Default constructor
+     * @class DataTable
+     * @classdesc Represents a DataTable object. Contains methods to save and load the row values from a file. 
+     */
     constructor(public name?: string, rows?: Array<any>) {
         if (rows !== undefined) {
             this.rows = rows;

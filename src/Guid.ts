@@ -3,6 +3,12 @@ export class Guid {
     private static validator = new RegExp("^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$", "i");
     private value: string;
 
+    /**
+     * Default constructor
+     * @classdesc Provides methos to generate an validate GUID values and to convert them from and to a String.
+     * @class Guid
+     * @param {string} string value representing a Guid Value
+     */
     constructor(guid?: string) {
         if (guid === undefined) {
             this.value = Guid.EMPTY;

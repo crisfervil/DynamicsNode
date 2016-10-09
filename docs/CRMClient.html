@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="CRMClient.html">CRMClient</a></li><li><a href="WhoAmIResponse.html">WhoAmIResponse</a></li>
+					<li><a href="CRMClient.html">CRMClient</a></li><li><a href="DataTable.html">DataTable</a></li><li><a href="Guid.html">Guid</a></li><li><a href="WhoAmIResponse.html">WhoAmIResponse</a></li>
 				</ul>
 			</li>
 			
@@ -81,6 +81,8 @@
         CRMClient
         </h2>
         
+            <div class="class-description"><p>Allow access to CRM functions. Contains the functions to interact with CRM services.</p></div>
+        
     
 </header>
 
@@ -99,7 +101,7 @@
 
     
     <div class="description">
-        <p>Allow access to CRM functions. Contains the functions to interact with CRM services.</p>
+        <p>Default constructor</p>
     </div>
     
 
@@ -152,7 +154,7 @@
             
 
             <td class="description last"><p>Optional. A valid connection string or connection string name.</p>
-<p>The connection string could be either a valid connection string or a name of an existing connection string in the file &quot;config.json&quot; at the root path.</p>
+<p>The connection string can be either a valid connection string or a name of an existing connection string in the file &quot;config.json&quot; at the root path.</p>
 <p>If no value is passed to the constructor, the &quot;default&quot; text will be assumed, which means that a connection string named &quot;default&quot; will be used.</p></td>
         </tr>
 
@@ -288,7 +290,7 @@
 
     
     <div class="description">
-        <p>Gets the bridge object betweem Node and .net</p>
+        <p>Gets the bridge object between node and .net</p>
     </div>
     
 
@@ -385,7 +387,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-60">line 60</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-61">line 61</a>
 			</li>
 		</ul>
 	</dd>
@@ -429,19 +431,133 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="retrieve"><span class="type-signature"></span>retrieve()</h4>
+    <h4 class="name" id="retrieve"><span class="type-signature"></span>retrieve(entityName, idOrConditions, columns)</h4>
     
     
 </dt>
 <dd>
 
     
-
+    <div class="description">
+        <p>Retrieves one single record from CRM.</p>
+    </div>
     
 
     
 
     
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>entityName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the entity to be retrieved. The name is case insensitive, so all values are lowercased before being sent to CRM.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>idOrConditions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type"><a href="Guid.html">Guid</a></span>
+|
+
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Either a string with the GUID if the record to be retrieved, a <a href="Guid.html">Guid</a> object with the same value, or a conditions object that returns only one record.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>columns</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">Array.&lt;string></span>
+|
+
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Optional. Either a column name, an array of column names, or a true value indicating that all columns must be retrieved. The default value is true. An <strong>*</strong> value has the same effect</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
     
 
     
@@ -480,7 +596,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-142">line 142</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-143">line 143</a>
 			</li>
 		</ul>
 	</dd>
@@ -505,6 +621,300 @@
     
 
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>A javascript object containing the values of the record. If no data found, then a null object is returned.</p>
+</div>
+
+
+
+
+        
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">Return all the columns for the specified account id</p>
+    
+    <pre class="sunlight-highlight-javascript">var account = crm.retrieve(&quot;account&quot;,&quot;6fefeb79-5447-e511-a5db-0050568a69e2&quot;);console.log(account);</pre>
+
+        <p class="code-caption">Return all the columns for the specified account id</p>
+    
+    <pre class="sunlight-highlight-javascript">var account = crm.retrieve(&quot;account&quot;,&quot;6fefeb79-5447-e511-a5db-0050568a69e2&quot;,&quot;*&quot;);console.log(account);</pre>
+
+        <p class="code-caption">Return all the columns for the specified account id</p>
+    
+    <pre class="sunlight-highlight-javascript">var account = crm.retrieve(&quot;account&quot;,&quot;6fefeb79-5447-e511-a5db-0050568a69e2&quot;,true);console.log(account);</pre>
+
+        <p class="code-caption">You can use the Guid class to specify the id parameter. This allows to perform a GUID format validation before calling the method.</p>
+    
+    <pre class="sunlight-highlight-javascript">var Guid = require(&quot;dynamicsnode&quot;).Guid;var account = crm.retrieve(&quot;account&quot;,new Guid(&quot;6fefeb79-5447-e511-a5db-0050568a69e2&quot;));console.log(account);</pre>
+
+        <p class="code-caption">Get the accountid,name,ownerid,createdon columns for the given account id</p>
+    
+    <pre class="sunlight-highlight-javascript">var account = crm.retrieve(&quot;account&quot;,&quot;6fefeb79-5447-e511-a5db-0050568a69e2&quot;,[&quot;accountid&quot;,&quot;name&quot;,&quot;ownerid&quot;,&quot;createdon&quot;]);console.log(account);</pre>
+
+        <p class="code-caption">Get the name of the specified account</p>
+    
+    <pre class="sunlight-highlight-javascript">var account = crm.retrieve(&quot;account&quot;,&quot;6fefeb79-5447-e511-a5db-0050568a69e2&quot;,&quot;name&quot;);console.log(account.name);</pre>
+
+        <p class="code-caption">Accessing information about a related record</p>
+    
+    <pre class="sunlight-highlight-javascript">var account = crm.retrieve(&quot;account&quot;,&quot;6fefeb79-5447-e511-a5db-0050568a69e2&quot;,&quot;ownerid&quot;);console.log(account.ownerid); // outputs the GUID valueconsole.log(account.ownerid_type); // outputs systemuserconsole.log(account.ownerid_name); // outputs John Doe</pre>
+
+        <p class="code-caption">Returns an account using a condition object. If there are more than one account named "Acme" then an exception will be thrown</p>
+    
+    <pre class="sunlight-highlight-javascript">var account = crm.retrieve(&quot;account&quot;,{name:&quot;Acme&quot;});console.log(account.name);</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="retrieveMultiple"><span class="type-signature"></span>retrieveMultiple(entityNameOrFetchXml, conditions, attributes)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Retrieves one or more records of the specified entity that fulfill the specified conditions.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>entityNameOrFetchXml</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the entity or Fetch Xml query to specify the records to be retrieved. More info: <a href="https://msdn.microsoft.com/en-us/library/gg328332.aspx">https://msdn.microsoft.com/en-us/library/gg328332.aspx</a></p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>conditions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Optional. In case you don't want to write an xml to specify the records to retrieve, you can use a conditions object to specify the criteria to retrieve records. If you omit this parameter, all the existing records of the specified entity will be retrieved; omitting this parameter is equivalent to write a FetchXml without any filter conditions.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>attributes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">Array.&lt;string></span>
+|
+
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Optional. Either a column name, an array of column names, or a true value indicating that all columns must be retrieved. The default value is true. An <strong>*</strong> value has the same effect</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="CRMClient.js.html">CRMClient.js</a>,
+				 <a href="CRMClient.js.html#sunlight-1-line-253">line 253</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li>Build queries with FetchXML: <a href="https://msdn.microsoft.com/en-us/library/gg328332.aspx">https://msdn.microsoft.com/en-us/library/gg328332.aspx</a></li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p><a href="DataTable.html">DataTable</a> object with the values of the records found.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="DataTable.html">DataTable</a></span>
+
+
+
+    </dd>
+</dl>
+
+
+        
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">Retrieves all the records of the account entity. Only the accountid column will be retrieved (the id column is always returned in all Crm queries)</p>
+    
+    <pre class="sunlight-highlight-javascript">var accounts = crm.retrieveMultiple(&quot;&lt;fetch&gt;&lt;entity name=&#x27;account&#x27;&gt;&lt;/entity&gt;&lt;/fetch&gt;&quot;);</pre>
+
+        <p class="code-caption">Retrieves all the records of the account entity. Includes also all the columns of the entity.</p>
+    
+    <pre class="sunlight-highlight-javascript">var accounts = crm.retrieveMultiple(&quot;account&quot;);</pre>
+
+        <p class="code-caption">Retrieves all the records of the account entity where the account name is equals to "contoso". Returns all the columns of the entity.</p>
+    
+    <pre class="sunlight-highlight-javascript">var accounts = crm.retrieveMultiple(&quot;account&quot;,{name:&quot;contoso&quot;});</pre>
+
+        <p class="code-caption">Retrieves all the records of the account entity where the account name is equals to "contoso", but only the specified columns are included in the query.</p>
+    
+    <pre class="sunlight-highlight-javascript">var accounts = crm.retrieveMultiple(&quot;account&quot;,{name:&quot;contoso&quot;},[&quot;accountid&quot;,&quot;name&quot;,&quot;ownerid&quot;,&quot;createdon&quot;]);</pre>
+
+        <p class="code-caption">Retrieves all the records of the account entity where the account name is equals to "contoso" or "acme". Returns all the columns of the entity.</p>
+    
+    <pre class="sunlight-highlight-javascript">var accounts = crm.retrieveMultiple(&quot;account&quot;,{name:[&quot;contoso&quot;,&quot;acme&quot;]});</pre>
+
 
     
 </dd>
@@ -568,7 +978,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-127">line 127</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-128">line 128</a>
 			</li>
 		</ul>
 	</dd>
@@ -663,7 +1073,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-110">line 110</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-111">line 111</a>
 			</li>
 		</ul>
 	</dd>
@@ -765,7 +1175,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Sat Oct 8th 2016
+		on Sun Oct 9th 2016
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

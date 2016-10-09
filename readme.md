@@ -32,10 +32,10 @@ var dn = require("dynamicsnode");
 // update this with your CRM url and credentials if needed
 var crm = new dn.CRMClient("Url=http://crm.contoso.com/xrmContoso"); 
 
-// retrieve the current user
+// retrieve current user information
 var who = crm.whoAmI();
-var myUser = crm.retrieve("systemuser",who);
-console.log(myUser);
+var myUserInfo = crm.retrieve("systemuser",who);
+console.log(myUser.UserId);
 
 // retrieve a user named John Doe
 var anotherUser = crm.retrieve("systemuser",{fullname:"John Doe"});
