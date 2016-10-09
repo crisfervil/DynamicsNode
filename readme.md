@@ -76,6 +76,7 @@ Volunteers to run the integration tests on other versions are more than welcome 
 * [ ] *Improve documentation (work In progress)*
 * [ ] *Add DataTable functions (work in progress)*
 * [ ] Refactor to minimize .net code
+* [ ] Increase code coverage
 * [ ] Add paging support in queries
 * [ ] Add support for .net core
 * [ ] Make it work in Mono and Linux
