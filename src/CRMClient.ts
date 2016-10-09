@@ -22,7 +22,7 @@ export class CRMClient {
      * @class CRMClient
      * @param {string} connectionString Optional. A valid connection string or connection string name.
      * 
-     * The connection string can be either a valid connection string or a name of an existing connection string in the file "config.json" at the root path.
+     * The connection string can be either a valid connection string or a name of an existing connection string in the file "config.json" at the root path of your application.
      * 
      * If no value is passed to the constructor, the "default" text will be assumed, which means that a connection string named "default" will be used.
      * @see {@link https://msdn.microsoft.com/en-us/library/gg695810.aspx} for further information
