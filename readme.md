@@ -3,7 +3,7 @@
 
 DynamicsNode is a library built on node.js that allows you to quickly create scripts to interact with Microsoft Dynamics CRM using JavaScript.
 
-The main goal of Dynamics Node is to make you very productive when it comes to automate small tasks in Dynamics CRM. Just create a js file, add a few lines and execute it.
+The main goal of DynamicsNode is to make you very productive when it comes to automate small tasks in Dynamics CRM. Just create a .js file, add a few lines and execute it.
 
 No more .net console applications with all the boilerplate code just for creating one record. Go productive!
 
@@ -75,13 +75,22 @@ Volunteers to run the integration tests on other versions are more than welcome 
 
 * [ ] *Improve documentation (work In progress)*
 * [ ] *Add DataTable functions (work in progress)*
+* [ ] Refactor to minimize .net code
 * [ ] Add paging support in queries
+* [ ] Add support for .net core
+* [ ] Make it work in Mono and Linux
+* [ ] Improve Exception Handling to show errors in CRM side
 * [ ] Add functions to work with solutions
 * [ ] Add integration tests for activities
+* [ ] Add an Assert object to allow create integration tests
+* [ ] Add examples page
 * [ ] Add a commands to work with connections
 * [ ] Add more commands to repl mode
 * [ ] Add support for missing operators in condition objects
 * [ ] Add d.ts file to Typings repository 
+* [ ] Add functions to create performance tests
+* [ ] Add functions to allow Continuos Integration tools
+* [ ] Add extensibility
 * [x] ~~Improve testeability and integration tests~~
 * [x] ~~Add import/export commands~~
 * [x] ~~Add test coverage reports~~
