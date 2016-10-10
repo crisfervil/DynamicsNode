@@ -199,10 +199,13 @@ export class Fetch {
 }
 
 /**
- * Possible Filter Types
- * @enum {number}
+ * Filter Type Values
+ * @typedef {object} FilterTypes
+ * @property {number} And Indicates that all the values in the conditions must be true
+ * @property {number} Or Indicates that only one of the conditions must be true
  */
 export enum FilterTypes { And, Or }
+
 
 export class Filter {
 
