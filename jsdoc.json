@@ -14,6 +14,7 @@
   },
   "plugins": ["plugins/markdown"],
   "templates": {
+    "analytics":{"ua":"UA-85523002-1","domain":"dynamicsnode.js.org"},
     "logoFile": "",
     "cleverLinks": false,
     "monospaceLinks": false,
