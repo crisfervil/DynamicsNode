@@ -3,6 +3,14 @@ import assert = require("assert");
 
 
 describe('Fetch', function () {
+    it('Serializes an Empty Fetch',function(){
+        var fetch = new Fetch();
+        var expected = 
+`<fetch>
+    <entity></entity>
+</fetch>`;
+        assert.equal(fetch.toString(),expected);
+    });
   it('Serializes a simple Fetch',function(){
       // the entity name and column names must be lowercased
       var fetch = new Fetch("tEst",["*"]);

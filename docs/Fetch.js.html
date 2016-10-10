@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>DynamicsNode Source: Fetch.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.spacelab.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">DynamicsNode</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="CRMClient.html">CRMClient</a></li><li><a href="DataTable.html">DataTable</a></li><li><a href="Fetch.html">Fetch</a></li><li><a href="Filter.html">Filter</a></li><li><a href="Guid.html">Guid</a></li><li><a href="WhoAmIResponse.html">WhoAmIResponse</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="tutorial-CommandsAndRepl.html">CommandsAndRepl</a></li><li><a href="tutorial-CompileAndTesting.html">CompileAndTesting</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: Fetch.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+var XMLWriter = require('xml-writer');
+var Fetch = (function () {
+    /** Default Constructor
+     * @class Fetch
+     * @classdesc Provides properties and methods to create FetchXml queries
+     * @param entityName {string} Optional. Name of the entity which the query is for
+     * @param attr {string|boolean|string[]} Optional. Either a column name, or a list of column names, or a boolean value indicating that all the attribute values want to be retrieved. The default value is null, and means that only the primary attribute will be retrieved.
+     * @param filterConditions {object} Optional. Object that describes conditions in an JSON notation. More Info: {@link Fetch#setFilter}
+     * @example &lt;caption>Create an empty FetchXml&lt;/caption>
+     * var fetch = new Fetch();
+     * console.log(fetch.toString()); // outputs: &lt;fetch>&lt;entity>&lt;/entity>&lt;/fetch>
+     * @example &lt;caption>Create a Fetch query for the "account"" entity, with 3 attributes and one filter&lt;/caption>
+     * var fetch = new Fetch("account",["description","createdon","ownerid"],{name:"acme"});
+     * @example &lt;caption>Create a Fetch query for the "account"" entity, with all attributes and one filter&lt;/caption>
+     * var fetch = new Fetch("account",true,{name:"acme"});
+     */
+    function Fetch(entityName, attr, filterConditions) {
+        this.entityName = entityName;
+        this.attributes = [];
+        this.operatorNames = ['eq', 'neq', 'gt', 'ge', 'le', 'lt', 'like', 'not-like', 'in', 'not-in', 'between', 'not-between', 'null', 'not-null'];
+        this.operatorJsonNames = ['$eq', '$neq', '$gt', '$ge', '$le', '$lt', '$like', '$notlLike', '$in', '$notIn', '$between', '$notBetween', "",  /*'null'*/, "" /*	'not-null'*/];
+        if (this.attributes != undefined)
+            this.setAttributes(attr);
+        if (filterConditions != undefined)
+            this.setFilter(filterConditions);
+    }
+    Fetch.prototype.toString = function () {
+        var xw = new XMLWriter(true);
+        xw.startElement('fetch');
+        xw.startElement('entity');
+        if (this.entityName) {
+            xw.writeAttribute('name', this.entityName.toLowerCase());
+        }
+        this.serializeAttributes(this.attributes, xw);
+        this.serializeConditions(this.filter, xw);
+        xw.endDocument();
+        return xw.toString();
+    };
+    Fetch.prototype.serializeAttributes = function (value, writer) {
+        for (var i = 0; i &lt; value.length; i++) {
+            var attr = value[i].toLowerCase();
+            if (attr == "*") {
+                writer.startElement("all-attributes");
+            }
+            else {
+                writer.startElement("attribute");
+                writer.writeAttribute("name", attr);
+            }
+            writer.endElement();
+        }
+    };
+    /**
+     * Sets the filter criteria of the current &lt;i>FetchXml&lt;/i> with the specified values.
+     *
+     * The specified value can be eiher a {@link Filter} object or a conditions object.
+     *
+     * A conditions object is a Javascript object where every property represents a condition.
+     *
+     * If the object contains a property, and that property contains a simple value, like an string or a number, that means property equals to value.
+     *
+     * If you need to specify another operator, then you have to use the form: {attribute:{$operator:value}}
+     *
+     * If the value is an array, then the $in operator is used.
+     *
+     * If the value is a null value, then the nulloperator is applied. For example: {name:null} will retrieve all the records where the name is null.
+     *
+     * @method Fetch#setFilter
+     * @param filterCondition {Filter|object} A Filter object or a Conditions specified in JSON notation.
+     *
+     * @see Build queries with FetchXML: {@link https://msdn.microsoft.com/en-us/library/gg328332.aspx}
+     *
+     * @example &lt;caption>When the simple syntax is used {name:value} then the $eq operator is used. The following filter retrieves all records where the attribute &lt;i>name&lt;/i> is equals to "myAccount"&lt;/caption>
+     * var cond = {name:"myAccount"};
+     * @example &lt;caption>The following retrieves all records where the attribute &lt;i>name&lt;/i> is equals to "myAccount" &lt;b>AND&lt;/b> the createdon date is equals to the system date&lt;/caption>
+     * var cond = {name:"myAccount", createdon:new Date()}
+     * @example &lt;caption>If you need to specify additional operators, then use a subobject with the operator name. The following retrieves all records where the attribute &lt;i>name&lt;/i> begins with "contoso%" and the attribute &lt;i>createdon&lt;/i> is bigger than the current date&lt;/caption>
+     * var cond = {name:{$like:"contoso%"}, createdon:{$bt:new Date()}}
+     * @example &lt;caption>Currently supported operators:&lt;/caption>
+     * $eq, $neq, $gt, $ge, $le, $lt, $like, $notlLike, $in, $notIn, $between, $notBetween
+     * @example &lt;caption>If the value is an array, then the &lt;i>in&lt;/i> operator is applied. The wollowing means: where name is one of contoso, acme or cycleworks&lt;/caption>
+     * var cond = {name:["contoso", "acme", "cycleworks"]};
+     * @example &lt;caption>To specify the null operator, use a null value next to the attribute name. The following will retrieve all the records where the name is null.&lt;/caption>
+     * var cond = {name:null};
+     */
+    Fetch.prototype.setFilter = function (filterConditions) {
+        if (filterConditions != null) {
+            if (filterConditions instanceof Filter) {
+                this.filter = filterConditions;
+            }
+            else {
+                this.filter = this.convert(filterConditions);
+            }
+        }
+    };
+    Fetch.prototype.setAttributes = function (attributes) {
+        if (attributes == null) {
+            this.attributes = [];
+        }
+        else {
+            if (Array.isArray(attributes)) {
+                this.attributes = attributes;
+            }
+            else if (typeof attributes == "string") {
+                this.attributes = [attributes];
+            }
+            else if (typeof attributes == "boolean") {
+                this.attributes = ["*"];
+            }
+        }
+    };
+    Fetch.prototype.serializeValue = function (value) {
+        var strValue = "";
+        if (value !== null &amp;&amp; value !== undefined) {
+            if (value instanceof Date) {
+                var dateValue = value;
+                // TODO: Refactor this awful code
+                var pad2 = function (x) { return String("00" + x).slice(-2); };
+                strValue = dateValue.getUTCFullYear() + "-" + pad2(dateValue.getUTCMonth()) + "-" + pad2(dateValue.getUTCDate()) + " " + pad2(dateValue.getUTCHours()) + ":" + pad2(dateValue.getUTCMinutes()) + ":" + pad2(dateValue.getUTCSeconds());
+            }
+            else {
+                strValue = value + "";
+            }
+        }
+        return strValue;
+    };
+    Fetch.prototype.serializeConditions = function (filter, writer) {
+        if (filter &amp;&amp; filter.conditions &amp;&amp; filter.conditions.length > 0) {
+            var filterTypeName = FilterTypes[filter.filterType].toLowerCase();
+            writer.startElement("filter").writeAttribute("type", filterTypeName);
+            for (var i = 0; i &lt; filter.conditions.length; i++) {
+                var filterCondition = filter.conditions[i];
+                var operatorName = this.operatorNames[filterCondition.operator];
+                var attributeName = filterCondition.attribute.toLowerCase();
+                writer.startElement("condition")
+                    .writeAttribute("attribute", attributeName)
+                    .writeAttribute("operator", operatorName);
+                if (filterCondition.values &amp;&amp; filterCondition.values.length > 0) {
+                    if (filterCondition.operator == Operators.In || filterCondition.operator == Operators.NotIn || filterCondition.values.length > 1) {
+                        for (var j = 0; j &lt; filterCondition.values.length; j++) {
+                            var strValue = this.serializeValue(filterCondition.values[j]);
+                            writer.startElement("value").text(strValue).endElement();
+                        }
+                    }
+                    else {
+                        var strValue = this.serializeValue(filterCondition.values[0]);
+                        writer.writeAttribute("value", strValue);
+                    }
+                }
+                writer.endElement(); // condition;
+            }
+            writer.endElement(); // filter;
+        }
+    };
+    Fetch.prototype.convert = function (conditionExpression) {
+        var filter = new Filter();
+        for (var propName in conditionExpression) {
+            var propValue = conditionExpression[propName];
+            if (propValue == null) {
+                filter.conditions.push(new Condition(propName, Operators.Null));
+            }
+            else if (typeof propValue === 'number' || propValue instanceof Number || typeof propValue === 'string' || propValue instanceof String ||
+                typeof propValue === 'boolean' || propValue instanceof Date) {
+                filter.conditions.push(new Condition(propName, Operators.Equal, [propValue]));
+            }
+            else if (Array.isArray(propValue)) {
+                filter.conditions.push(new Condition(propName, Operators.In, propValue));
+            }
+            else if (typeof propValue === 'object' &amp;&amp; !(propValue instanceof Date)) {
+                for (var i = 0; i &lt; this.operatorJsonNames.length; i++) {
+                    var operatorName = this.operatorJsonNames[i];
+                    if (operatorName &amp;&amp; propValue[operatorName] != undefined) {
+                        propValue = propValue[operatorName];
+                        if (Array.isArray(propValue)) {
+                            filter.conditions.push(new Condition(propName, i, propValue));
+                        }
+                        else {
+                            filter.conditions.push(new Condition(propName, i, [propValue]));
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return filter;
+    };
+    return Fetch;
+}());
+exports.Fetch = Fetch;
+/**
+ * Possible Filter Types
+ * @enum {number}
+ */
+(function (FilterTypes) {
+    FilterTypes[FilterTypes["And"] = 0] = "And";
+    FilterTypes[FilterTypes["Or"] = 1] = "Or";
+})(exports.FilterTypes || (exports.FilterTypes = {}));
+var FilterTypes = exports.FilterTypes;
+var Filter = (function () {
+    /**
+     * Default Constructor
+     * @class Filter
+     * @classdesc Describes a Filter in a {@link Fetch} query.
+     */
+    /** @member Filter#conditions {Condition[]} Contains the conditions of this filter */
+    /** @member Filter#filterType {FilterTypes} Indicates if the filter is an And or Or filter */
+    function Filter(conditions, filterType) {
+        this.conditions = conditions;
+        this.filterType = filterType;
+        if (this.conditions == null)
+            this.conditions = new Array();
+        if (this.filterType == null)
+            this.filterType = FilterTypes.And;
+    }
+    return Filter;
+}());
+exports.Filter = Filter;
+// https://msdn.microsoft.com/en-us/library/gg309405.aspx
+(function (Operators) {
+    Operators[Operators["Equal"] = 0] = "Equal";
+    Operators[Operators["NotEqual"] = 1] = "NotEqual";
+    Operators[Operators["GreaterThan"] = 2] = "GreaterThan";
+    Operators[Operators["GreaterEqual"] = 3] = "GreaterEqual";
+    Operators[Operators["LessEqual"] = 4] = "LessEqual";
+    Operators[Operators["LessThan"] = 5] = "LessThan";
+    Operators[Operators["Like"] = 6] = "Like";
+    Operators[Operators["NotLike"] = 7] = "NotLike";
+    Operators[Operators["In"] = 8] = "In";
+    Operators[Operators["NotIn"] = 9] = "NotIn";
+    Operators[Operators["Between"] = 10] = "Between";
+    Operators[Operators["NotBetween"] = 11] = "NotBetween";
+    Operators[Operators["Null"] = 12] = "Null";
+    Operators[Operators["NotNull"] = 13] = "NotNull";
+})(exports.Operators || (exports.Operators = {}));
+var Operators = exports.Operators;
+var Condition = (function () {
+    function Condition(attribute, operator, values) {
+        this.attribute = attribute;
+        this.operator = operator;
+        this.values = values;
+    }
+    return Condition;
+}());
+exports.Condition = Condition;
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	(c) Cristhian Fernandez
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
+	
+		on Mon Oct 10th 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>

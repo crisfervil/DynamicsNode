@@ -295,7 +295,7 @@ export class CRMClient {
         var fetchXml;
         if (!(conditions || attributes)) {
             // No conditions or attributes were specified, means a FetchXml value is expected.
-            // Improve this: could use a regular expression to distinguish between an xml and an entity name?
+            // TODO: Improve this. could use a regular expression to distinguish between an xml and an entity name?
             fetchXml = entityNameOrFetchXml;
         }
         else {

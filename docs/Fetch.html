@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>DynamicsNode Class: Fetch</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.spacelab.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">DynamicsNode</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="CRMClient.html">CRMClient</a></li><li><a href="DataTable.html">DataTable</a></li><li><a href="Fetch.html">Fetch</a></li><li><a href="Filter.html">Filter</a></li><li><a href="Guid.html">Guid</a></li><li><a href="WhoAmIResponse.html">WhoAmIResponse</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="tutorials.list.html" class="dropdown-toggle" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="tutorial-CommandsAndRepl.html">CommandsAndRepl</a></li><li><a href="tutorial-CompileAndTesting.html">CompileAndTesting</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+        
+            <div class="col-sm-3 col-md-3">
+                <form class="navbar-form" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	<h1 class="page-title">Class: Fetch</h1>
+<section>
+
+<header>
+    
+        <h2>
+        Fetch
+        </h2>
+        
+            <div class="class-description"><p>Provides properties and methods to create FetchXml queries</p></div>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="Fetch"><span class="type-signature"></span>new Fetch(entityName, attr, filterConditions)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Default Constructor</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>entityName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Optional. Name of the entity which the query is for</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>attr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">boolean</span>
+|
+
+<span class="param-type">Array.&lt;string></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Optional. Either a column name, or a list of column names, or a boolean value indicating that all the attribute values want to be retrieved. The default value is null, and means that only the primary attribute will be retrieved.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>filterConditions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Optional. Object that describes conditions in an JSON notation. More Info: <a href="Fetch.html#setFilter">Fetch#setFilter</a></p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="Fetch.js.html">Fetch.js</a>,
+				 <a href="Fetch.js.html#sunlight-1-line-4">line 4</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">Create an empty FetchXml</p>
+    
+    <pre class="sunlight-highlight-javascript">var fetch = new Fetch();console.log(fetch.toString()); // outputs: &lt;fetch&gt;&lt;entity&gt;&lt;/entity&gt;&lt;/fetch&gt;</pre>
+
+        <p class="code-caption">Create a Fetch query for the "account"" entity, with 3 attributes and one filter</p>
+    
+    <pre class="sunlight-highlight-javascript">var fetch = new Fetch(&quot;account&quot;,[&quot;description&quot;,&quot;createdon&quot;,&quot;ownerid&quot;],{name:&quot;acme&quot;});</pre>
+
+        <p class="code-caption">Create a Fetch query for the "account"" entity, with all attributes and one filter</p>
+    
+    <pre class="sunlight-highlight-javascript">var fetch = new Fetch(&quot;account&quot;,true,{name:&quot;acme&quot;});</pre>
+
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="setFilter"><span class="type-signature"></span>setFilter(filterCondition)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Sets the filter criteria of the current <i>FetchXml</i> with the specified values.</p>
+<p>The specified value can be eiher a <a href="Filter.html">Filter</a> object or a conditions object.</p>
+<p>A conditions object is a Javascript object where every property represents a condition.</p>
+<p>If the object contains a property, and that property contains a simple value, like an string or a number, that means property equals to value.</p>
+<p>If you need to specify another operator, then you have to use the form: {attribute:{$operator:value}}</p>
+<p>If the value is an array, then the $in operator is used.</p>
+<p>If the value is a null value, then the nulloperator is applied. For example: {name:null} will retrieve all the records where the name is null.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>filterCondition</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Filter.html">Filter</a></span>
+|
+
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A Filter object or a Conditions specified in JSON notation.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="Fetch.js.html">Fetch.js</a>,
+				 <a href="Fetch.js.html#sunlight-1-line-53">line 53</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li>Build queries with FetchXML: <a href="https://msdn.microsoft.com/en-us/library/gg328332.aspx">https://msdn.microsoft.com/en-us/library/gg328332.aspx</a></li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">When the simple syntax is used {name:value} then the $eq operator is used. The following filter retrieves all records where the attribute <i>name</i> is equals to "myAccount"</p>
+    
+    <pre class="sunlight-highlight-javascript">var cond = {name:&quot;myAccount&quot;};</pre>
+
+        <p class="code-caption">The following retrieves all records where the attribute <i>name</i> is equals to "myAccount" <b>AND</b> the createdon date is equals to the system date</p>
+    
+    <pre class="sunlight-highlight-javascript">var cond = {name:&quot;myAccount&quot;, createdon:new Date()}</pre>
+
+        <p class="code-caption">If you need to specify additional operators, then use a subobject with the operator name. The following retrieves all records where the attribute <i>name</i> begins with "contoso%" and the attribute <i>createdon</i> is bigger than the current date</p>
+    
+    <pre class="sunlight-highlight-javascript">var cond = {name:{$like:&quot;contoso%&quot;}, createdon:{$bt:new Date()}}</pre>
+
+        <p class="code-caption">Currently supported operators:</p>
+    
+    <pre class="sunlight-highlight-javascript">$eq, $neq, $gt, $ge, $le, $lt, $like, $notlLike, $in, $notIn, $between, $notBetween</pre>
+
+        <p class="code-caption">If the value is an array, then the <i>in</i> operator is applied. The wollowing means: where name is one of contoso, acme or cycleworks</p>
+    
+    <pre class="sunlight-highlight-javascript">var cond = {name:[&quot;contoso&quot;, &quot;acme&quot;, &quot;cycleworks&quot;]};</pre>
+
+        <p class="code-caption">To specify the null operator, use a null value next to the attribute name. The following will retrieve all the records where the name is null.</p>
+    
+    <pre class="sunlight-highlight-javascript">var cond = {name:null};</pre>
+
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+
+    <div class="modal fade" id="searchResults">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Search results</h4>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	(c) Cristhian Fernandez
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
+	
+		on Mon Oct 10th 2016
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+
+    <script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre, pre.prettyprint.source" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            SearcherDisplay.init();
+        });
+    </script>
+
+
+</body>
+</html>
