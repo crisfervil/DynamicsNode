@@ -424,7 +424,7 @@ export class CRMClient {
      * @method CRMClient#update
      * @param entityName {string} The name of the entity which record you want to update.
      * @param attributes {object} Javascript object with the values the new record will have.
-     * @param conditions {opbject} Optional. Javascript condition object that will be used to retrieve the records to be updated. 
+     * @param conditions {opbject} Optional. Javascript condition object with the filter values that is going to be used to know which records are going to be updated. 
      * If you omit this parameter, then you have to provide the record GUID in the attributes parameter. 
      * Learn how to write condition objects: {@link Fetch#setFilter}
      * @returns {number} Number of modified records
