@@ -139,7 +139,7 @@ export class CRMClient {
 
     /**
      * Tests the active connection. Throws an exception if there's any error.
-     * The method performs a WhoAmIRequest.
+     * The method performs a {@link WhoAmIRequest}.
      * @method CRMClient#testConnection
      * @see CRMClient#whoAmI
      */
@@ -157,8 +157,9 @@ export class CRMClient {
      * Retrieves one single record from CRM.
      * @method CRMClient#retrieve
      * @param entityName {string} Name of the entity to be retrieved. The name is case insensitive, so all values are lowercased before being sent to CRM.
-     * @param idOrConditions {string|Guid|object} Either a string with the GUID if the record to be retrieved, a {@link Guid} object with the same value, or a conditions object that returns only one record.
-     * @param columns {string|string[]|boolean} Optional. Either a column name, an array of column names, or a true value indicating that all columns must be retrieved. The default value is true. An ***** value has the same effect
+     * @param idOrConditions {string|Guid|object} Either a string with the GUID if the record to be retrieved, a {@link Guid} object with the same value, or a conditions object that returns only one record. 
+     * Learn how to write condition objects: {@link Fetch#setFilter}
+     * @param attributes {string|string[]|boolean} Optional. Either an attribute name, an array of attributes, or a true value indicating that all attributes must be retrieved. The default value is true. An ***** value has the same effect
      * 
      * @returns A javascript object containing the values of the record. If no data found, then a null object is returned.
      * 
@@ -272,9 +273,10 @@ export class CRMClient {
      * @method CRMClient#retrieveMultiple
      * 
      * @param entityNameOrFetchXml {string} Name of the entity or Fetch Xml query to specify the records to be retrieved. More info: {@link https://msdn.microsoft.com/en-us/library/gg328332.aspx}
-     * @param conditions {object} Optional. In case you don't want to write a FetchXml to specify the records to retrieve, you can use a conditions object to specify the criteria to retrieve records. If you omit this parameter, all the existing records of the specified entity will be retrieved; omitting this parameter is equivalent to write a FetchXml without any filter conditions.
-     * @param attributes {string|string[]|boolean} Optional. Either a column name, an array of column names, or a true value indicating that all columns must be retrieved. The default value is true. An ***** value has the same effect
-     * @returns {DataTable} {@link DataTable} object with the values of the records found. 
+     * @param conditions {object} Optional. In case you don't want to write a FetchXml to specify the records to retrieve, you can use a conditions object to specify the criteria to retrieve records. If you omit this parameter, all the existing records of the specified entity will be retrieved; omitting this parameter is equivalent to write a FetchXml without any filter conditions. 
+     * Learn how to write condition objects: {@link Fetch#setFilter}
+     * @param attributes {string|string[]|boolean} Optional. Either an attribute name, an array of attributes, or a true value indicating that all attributes must be retrieved. The default value is true. An ***** value has the same effect
+     * @returns {DataTable} {@link DataTable} object with the records found.
      * 
      * @see Build queries with FetchXML: {@link https://msdn.microsoft.com/en-us/library/gg328332.aspx}
      * 
@@ -322,6 +324,13 @@ export class CRMClient {
         return dt;
     }
 
+    /** It is a simpified way of retrieving all the existing records of an entity. Is equivalent to call the {@link CRMClient#retrieveMultiple} method not specifying the conditions or attributes method
+     * @method CRMClient#retrieveAll
+     * @param entityName {string} Name of the entity which records you want to retrieve.
+     * @returns {DataTable} {@link DataTable} object with the records found.
+     * @example <caption>Retrieve all existing account records</caption>
+     * var accounts = crm.retrieveAll("account"); 
+    */
     retrieveAll(entityName: string): DataTable {
         var fetch = new Fetch(entityName, "*");
         var fetchXml = fetch.toString();
@@ -329,6 +338,19 @@ export class CRMClient {
         return result;
     }
 
+
+    /**
+     * Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before send the operation to Crm.
+     * @method CRMClient#create
+     * @param entityName {string} The name of the entity which record you want to create
+     * @param attributes {object} Javascript object with the values the new record will have.
+     * 
+     * @returns {string} GUID of the record created.
+     * 
+     * @example <caption>Create an account named "Contoso"</caption>
+     * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
+     * console.log(accountid);
+     */
     create(entityName: string, attributes: any): string {
       
         // perform some validations
@@ -397,6 +419,21 @@ export class CRMClient {
         return recordsAffected;
     }
 
+    /**
+     * Updates one or more records that meet the specified conditions and returns the number of updated records.
+     * @method CRMClient#update
+     * @param entityName {string} The name of the entity which record you want to update.
+     * @param attributes {object} Javascript object with the values the new record will have.
+     * @param conditions {opbject} Optional. Javascript condition object that will be used to retrieve the records to be updated. 
+     * If you omit this parameter, then you have to provide the record GUID in the attributes parameter. 
+     * Learn how to write condition objects: {@link Fetch#setFilter}
+     * @returns {number} Number of modified records
+     * 
+     * @example <caption>Updates all the accounts which name is contoso, and set the attribute value to "contoso-updated"</caption>
+     * var affectedRecords = crm.update("account",{name:"contoso-updated"},{name:"contoso"})
+     * @example <caption>In this example, only the account with the specified account id will be updated. If the specified record id exists, then affectedRecords will be equals to 1.</caption>
+     * var affectedRecords = crm.update("account",{accountid:"6fefeb79-5447-e511-a5db-0050568a69e2",name:"contoso-updated"})
+     */
     update(entityName: string, attributes: any, conditions?): number {
 
         var updatedRecordsCount = 0;
