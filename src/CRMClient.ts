@@ -21,9 +21,7 @@ export class CRMClient {
      * @classdesc Allow access to CRM functions. Contains the functions to interact with CRM services.
      * @class CRMClient
      * @param {string} connectionString Optional. A valid connection string or connection string name.
-     * 
      * The connection string can be either a valid connection string or a name of an existing connection string in the file "config.json" at the root path of your application.
-     * 
      * If no value is passed to the constructor, the "default" text will be assumed, which means that a connection string named "default" will be used.
      * @see {@link https://msdn.microsoft.com/en-us/library/gg695810.aspx} for further information
      * 
@@ -35,21 +33,13 @@ export class CRMClient {
      *          "connection2":"Url=http://crm.contoso.com/xrmContoso"
 	 *      }
      * }
-     * 
      * @example <caption>Create a connection using a valid Connection String</caption>
-     * 
      * var crm = new CRMClient("Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode");
-     * 
      * @example <caption>Create a connection using the connection string named "connection2" specified in the config.json file</caption>
-     * 
      * var crm = new CRMClient("connection2");
-     * 
      * @example <caption>Create a connection using the connection string named "default" specified in the config.json file</caption>
-     * 
      * var crm = new CRMClient();
-     * 
      * @example <caption>Create a connection using the connection string named "default" specified in the config.json file</caption>
-     * 
      * var crm = new CRMClient("default");
      */
     constructor(public connectionString: string = "default", fakeBridge: boolean = false) {
@@ -125,11 +115,9 @@ export class CRMClient {
     * @method CRMClient#whoAmI
     * @example <caption>Returns information about the current user</caption>
     * var who = crm.whoAmI();
-    * console.log(who);
-    * //prints: 
-    * // {BusinessUnitId:"6fefeb79-5447-e511-a5db-0050568a69e2",
-    * //  OrganizationId:"2b476bd1-aaed-43ee-b386-eee0f1b87207",
-    * //  UserId:"9ba35c25-b892-4f8a-b124-3920d9873af4"}
+    * console.log(who.BusinessUnitId); // prints 6fefeb79-5447-e511-a5db-0050568a69e2
+    * console.log(who.OrganizationId); // prints 2b476bd1-aaed-43ee-b386-eee0f1b87207
+    * console.log(who.UserId); // prints 9ba35c25-b892-4f8a-b124-3920d9873af4
     */
     whoAmI():WhoAmIResponse {
         var request = new WhoAmIRequest();
@@ -371,6 +359,26 @@ export class CRMClient {
         return createdGuid;
     }
 
+    /**
+     * Deletes one on more records in CRM, and returns the number of records affected.
+     * @method CRMClient#delete
+     * @param entityName {string} Name of the entity which record you want to delete
+     * @param idsOrConditions {string|Guid|string[]|object} Can be either a Guid, a string, an array or a conditions object. 
+     * If it is Guid will delete the record with the specified id. 
+     * If it is a string, must be a Guid value, and again, will delete the records matching the specified id. 
+     * If the parameter is an array, each element in it must be either a string or a Guid, and in each case, the records deleted will be the ones specified by these Guids. 
+     * If it is a condition object, first, all the matching records will be retrieved, and then deleted.
+     * Learn how to write condition objects: {@link Fetch#setFilter}
+     * @returns {number} Number of records deleted
+     * @example <caption>Delete an account with a known Guid</caption>
+     * var affectedRecords = crm.delete("account","6fefeb79-5447-e511-a5db-0050568a69e2");
+     * @example <caption>Delete an account with a known Guid. A validation of the Guid format will be performed before calling to the method.</caption>
+     * var affectedRecords = crm.delete("account",new Guid("6fefeb79-5447-e511-a5db-0050568a69e2"));
+     * @example <caption>Delete several account records at once</caption>
+     * var affectedRecords = crm.delete("account",["6fefeb79-5447-e511-a5db-0050568a69e2","6fefeb79-5447-e511-a5db-0050568a69e2");
+     * @example <caption>Delete all existing accounts named "contoso"</caption>
+     * var affectedRecords = crm.delete("account",{name:"contoso"});
+     */
     delete(entityName: string, idsOrConditions): number {
         var ids: string[];
         var recordsAffected = 0;
@@ -498,6 +506,15 @@ export class CRMClient {
         return idAttr.toLowerCase();
     }
 
+    /** Takes a list of attributes and values, tries to find an existing record with those values in CRM, if it exists, then performs an update, otherwhise it creates it. 
+     * @method CRMClient#createOrUpdate
+     * @param entityName {string} Name of the entity which record you want to update.
+     * @param attributes {object} Javascript object with the attributes you want to create or update.
+     * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
+     * The attributes specified in this parameter will be used to perform a {@link retrieve}. 
+     * @example <caption>Create an account named "contoso". In this case, a retrieve of an account with name="contoso" will be performed. If exists, then the name and description will be updated. If it doesn't exist, then the account will be created with the specified name and description. If theres more than one account with that name, an exception will be thrown</caption>
+     * crm.createOrUpdate("account",{name:"contoso", description:"Account Updated"},["name"]);
+    */
     createOrUpdate(entityName: string, attributes, matchFields: string[]): void {
         var idField = this.getIdField(entityName);
         var conditions = {};
