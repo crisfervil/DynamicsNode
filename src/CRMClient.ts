@@ -511,9 +511,12 @@ export class CRMClient {
      * @param entityName {string} Name of the entity which record you want to update.
      * @param attributes {object} Javascript object with the attributes you want to create or update.
      * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
-     * The attributes specified in this parameter will be used to perform a {@link retrieve}. 
+     * The attributes specified in this parameter will be used to perform a {@link CRMClient#retrieve}. 
      * @example <caption>Create an account named "contoso". In this case, a retrieve of an account with name="contoso" will be performed. If exists, then the name and description will be updated. If it doesn't exist, then the account will be created with the specified name and description. If theres more than one account with that name, an exception will be thrown</caption>
      * crm.createOrUpdate("account",{name:"contoso", description:"Account Updated"},["name"]);
+     * @example <caption>Searches for an account named "contoso" owned by me. If exists, it updates it, otherwhise it creates a new one.</caption>
+     * var me = crm.whoAmI().UserId;
+     * crm.createOrUpdate("account",{name:"contoso", description:"Account Updated", ownerid:me},["name","ownerid"]);
     */
     createOrUpdate(entityName: string, attributes, matchFields: string[]): void {
         var idField = this.getIdField(entityName);

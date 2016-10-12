@@ -589,7 +589,7 @@
 
             
 
-            <td class="description last"><p>List of fields in the attributes parameter you want to use to know if the record exists in CRM.<br>The attributes specified in this parameter will be used to perform a retrieve.</p></td>
+            <td class="description last"><p>List of fields in the attributes parameter you want to use to know if the record exists in CRM.<br>The attributes specified in this parameter will be used to perform a <a href="CRMClient.html#retrieve">CRMClient#retrieve</a>.</p></td>
         </tr>
 
     
@@ -661,11 +661,15 @@
     
 
     
-        <h5>Example</h5>
+        <h5>Examples</h5>
         
         <p class="code-caption">Create an account named "contoso". In this case, a retrieve of an account with name="contoso" will be performed. If exists, then the name and description will be updated. If it doesn't exist, then the account will be created with the specified name and description. If theres more than one account with that name, an exception will be thrown</p>
     
     <pre class="sunlight-highlight-javascript">crm.createOrUpdate(&quot;account&quot;,{name:&quot;contoso&quot;, description:&quot;Account Updated&quot;},[&quot;name&quot;]);</pre>
+
+        <p class="code-caption">Searches for an account named "contoso" owned by me. If exists, it updates it, otherwhise it creates a new one.</p>
+    
+    <pre class="sunlight-highlight-javascript">var me = crm.whoAmI().UserId;crm.createOrUpdate(&quot;account&quot;,{name:&quot;contoso&quot;, description:&quot;Account Updated&quot;, ownerid:me},[&quot;name&quot;,&quot;ownerid&quot;]);</pre>
 
 
     
