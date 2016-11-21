@@ -210,6 +210,14 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
 
     });    
 
+    it.only('Creates and Update a Lead',function (){
+        // create a lead
+        var leadId = crm.create("lead",{description:"test", estimatedCloseDate:new Date()});
+        
+        crm.update("lead",{leadid:leadId,estimatedCloseDate:null});
+
+    });
+
     it('Associates and Disassociates a lead and an contact',function (){
         // create a lead
         var leadId = crm.create("lead",{description:"test"});
