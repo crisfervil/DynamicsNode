@@ -210,7 +210,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
 
     });    
 
-    it.only('Creates and Update a Lead',function (){
+    it('Creates and Update a Lead',function (){
         // create a lead
         var leadId = crm.create("lead",{description:"test", estimatedCloseDate:new Date()});
         
