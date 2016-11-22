@@ -174,18 +174,11 @@ public class CRMBridge
         return null;
     }
 
-    public object Create(dynamic options)
+    public object Create(dynamic entity)
     {
         Guid createdId = Guid.Empty;
-
-        string entityName = options.entityName;
-        object[] values = options.values;
-
-        // convert the values to an entity type
-        var entity = Convert(entityName, values);
-
-        createdId = _service.Create(entity);
-
+        Entity e = ConvertFromDynamic(entity);
+        createdId = _service.Create(e);
         return createdId;
     }
 
@@ -529,8 +522,7 @@ public class CRMBridge
                 BusinessUnitId = rs.BusinessUnitId,
                 OrganizationId = rs.OrganizationId,
                 ExtensionData = rs.ExtensionData,
-                //Results = rs.Results,
-                // test
+                Results = rs.Results,
                 ResponseName=rs.ResponseName };
         }
         return response;
@@ -571,12 +563,46 @@ public class CRMBridge
                     {
                         propValue = new Guid((string)propValue);
                     }
+                    else if (propDef.PropertyType == typeof(AttributeCollection))
+                    {
+                        if (propValueType != typeof(ExpandoObject)) throw new Exception(string.Format("Can't convert from {0} to AttributeCollection", propValueType.Name));
+                        propValue = ConvertFromDynamicToAttributeCollection((ExpandoObject)propValue);
+                    }
                     propDef.SetValue(converted, propValue);
                 }
             }
         }
 
         return converted;
+    }
+
+    private AttributeCollection ConvertFromDynamicToAttributeCollection(ExpandoObject value)
+    {
+        AttributeCollection retVal = null;
+        if (value != null)
+        {
+            var valueDictionary = (IDictionary<string, object>)value;
+            if (valueDictionary.Keys.Count > 0) retVal = new AttributeCollection();
+            foreach (var prop in valueDictionary)
+            {
+                if (prop.Value != null)
+                {
+                    // Convert values
+                    object convertedValue = prop.Value;
+                    var propValueType = prop.Value.GetType();
+
+                    if(propValueType == typeof(ExpandoObject))
+                    {
+                        convertedValue = ConvertFromDynamic((ExpandoObject)prop.Value);
+                    }
+
+                    // TODO: Convert GUIDS
+
+                    retVal.Add(prop.Key, convertedValue);
+                }
+            }
+        }
+        return retVal;
     }
 
     private object GetTypeInstance(string typeFullName)

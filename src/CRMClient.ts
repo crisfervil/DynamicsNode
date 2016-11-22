@@ -4,7 +4,7 @@ import {Guid} from "./Guid";
 import {Fetch} from "./Fetch";
 import {Dictionary} from "./Dictionary";
 import {AssignRequest,WhoAmIRequest,WhoAmIResponse} from "./Messages";
-import {EntityReference} from "./CRMDataTypes";
+import {Entity,EntityReference} from "./CRMDataTypes";
 
 import path = require("path");
 import edge = require("edge");
@@ -346,17 +346,36 @@ export class CRMClient {
         if (!attributes) throw "Attributes not specified";
 
         entityName = entityName.toLocaleLowerCase(); // normalize casing
-    
-        var values = new Array<any>();
+
+        var entity = new Entity();
+        entity.LogicalName = entityName;
+        entity.Attributes = {};
+
+        var metadata = this.getEntityMetadata(entityName);
 
         for (var prop in attributes) {
-            values.push(prop.toLocaleLowerCase()); // normalize casing
-            values.push(attributes[prop]);
-        }
+            var attributeName = prop.toLocaleLowerCase(); // normalize casing 
+            var attributeValue = null;
 
-        var params = { entityName: entityName, values: values };
-        var createdGuid = this._crmBridge.Create(params, true);
+            // get the attribute from metadata
+            var attributeMetadata = this.getAttributeMetadata(entityName,attributeName);
+
+            if(attributeMetadata.AttributeType==14 /* string */){
+                if(typeof attributes[prop] == "string"){
+                    attributeValue = attributes[prop];
+                }
+            }
+            if(attributeValue){
+                entity.Attributes[attributeName]=attributeValue;
+            }
+        }
+        
+        var createdGuid = this._crmBridge.Create(entity, true);
         return createdGuid;
+    }
+
+    private getAttributeMetadata(entityName:string,attributeName:string):any{
+
     }
 
     /**
