@@ -402,14 +402,19 @@ public class CRMBridge
 
     private object ConvertToDateTime(object fieldValue)
     {
-        if (fieldValue.GetType() == typeof(DateTime))
+        object convertedValue = null;
+        if (fieldValue != null)
         {
-            return fieldValue;
+            if (fieldValue.GetType() == typeof(DateTime))
+            {
+                return fieldValue;
+            }
+            else
+            {
+                return DateTime.Parse((string)fieldValue);
+            }
         }
-        else
-        {
-            return DateTime.Parse((string)fieldValue);
-        }
+        return convertedValue;
     }
 
     private Guid ConvertToUniqueidentifier(object value)

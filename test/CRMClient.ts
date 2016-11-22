@@ -29,6 +29,13 @@ describe('CRMClient', function () {
     var actual = crm.create("myEntity",record);
     assert.equal(actual,expected);
   });
+
+  it('sets a date field as null',function (){
+
+      var crm = new CRMClient("my connection string",true);
+      crm.update("lead",{leadid:"123345",estimatedCloseDate:null});
+
+  });
   
   it('Deletes a record',function (){
     
