@@ -4,7 +4,7 @@ import {Guid} from "./Guid";
 import {Fetch} from "./Fetch";
 import {Dictionary} from "./Dictionary";
 import {AssignRequest,WhoAmIRequest,WhoAmIResponse} from "./Messages";
-import {Entity,EntityReference} from "./CRMDataTypes";
+import {Entity,EntityReference,AttributeTypeCode} from "./CRMDataTypes";
 
 import path = require("path");
 import edge = require("edge");
@@ -340,7 +340,12 @@ export class CRMClient {
      * console.log(accountid);
      */
     create(entityName: string, attributes: any): string {
-      
+        var entity = this.ConvertToEntity(entityName,attributes);
+        var createdGuid = this._crmBridge.Create(entity, true);
+        return createdGuid;
+    }
+
+    private ConvertToEntity(entityName:string, attributes:any):Entity{
         // perform some validations
         if (!entityName) throw "Entity name not specified";
         if (!attributes) throw "Attributes not specified";
@@ -351,31 +356,65 @@ export class CRMClient {
         entity.LogicalName = entityName;
         entity.Attributes = {};
 
-        var metadata = this.getEntityMetadata(entityName);
-
         for (var prop in attributes) {
+
             var attributeName = prop.toLocaleLowerCase(); // normalize casing 
             var attributeValue = null;
 
             // get the attribute from metadata
             var attributeMetadata = this.getAttributeMetadata(entityName,attributeName);
 
-            if(attributeMetadata.AttributeType==14 /* string */){
-                if(typeof attributes[prop] == "string"){
-                    attributeValue = attributes[prop];
-                }
+            if(attributeMetadata.AttributeType==AttributeTypeCode.String||
+                attributeMetadata.AttributeType==AttributeTypeCode.Memo) {
+                if(!(typeof attributes[prop] == "string")) throw `Cannot convert from "${typeof attributes[prop]}" to "string"`;
+                attributeValue = attributes[prop];
             }
-            if(attributeValue){
-                entity.Attributes[attributeName]=attributeValue;
+            else if(attributeMetadata.AttributeType==AttributeTypeCode.DateTime){
+                if(!(attributes[prop] instanceof Date)) throw `Cannot convert from "${typeof attributes[prop]}" to "string"`;;
+                attributeValue = attributes[prop];
             }
+            else if(attributeMetadata.AttributeType==AttributeTypeCode.Lookup){
+                attributeValue = this.ConvertToEntityReference(attributes[prop],attributeMetadata);
+            }
+
+            // TODO: add the rest of value types
+
+            entity.Attributes[attributeName]=attributeValue;
         }
-        
-        var createdGuid = this._crmBridge.Create(entity, true);
-        return createdGuid;
+        // TODO: Set the Entity Id
+        return entity;
+    }
+
+    private ConvertToEntityReference(attributeValue,attributeMetadata):EntityReference{
+        var er=null;
+        var target=null, id=null;
+        if(typeof attributeValue == "string"){
+            // TODO: If the value is not a GUID, find the value in the target entity
+            if(attributeMetadata.Targets.Length>1) throw "Too many targets";
+            target=attributeMetadata.Targets[0];
+            id=attributeValue;
+        }
+        else if (typeof attributeValue=="object"){
+            id=attributeValue.id;
+            target=attributeValue.type;
+        }
+        if(!(target&&id)) throw "Couldn't get value";
+        er=new EntityReference(id,target);
+        return er;
     }
 
     private getAttributeMetadata(entityName:string,attributeName:string):any{
-
+        var attributeMetadata = null;
+        var entityMetadata = this.getEntityMetadata(entityName);
+        if(entityMetadata&&entityMetadata.Attributes&&entityMetadata.Attributes.length>0){
+            for(var i=0;i<entityMetadata.Attributes.length;i++){
+                if(entityMetadata.Attributes[i].LogicalName==attributeName){
+                    attributeMetadata=entityMetadata.Attributes[i];
+                    break;
+                }
+            }
+        }
+        return attributeMetadata;
     }
 
     /**

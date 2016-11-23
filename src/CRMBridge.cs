@@ -554,7 +554,12 @@ public class CRMBridge
                 {
                     var propValue = prop.Value;
                     Type propValueType = prop.Value.GetType();
-                    if (propValueType == typeof(ExpandoObject))
+                    if (propDef.PropertyType == typeof(AttributeCollection))
+                    {
+                        if (propValueType != typeof(ExpandoObject)) throw new Exception(string.Format("Can't convert from {0} to AttributeCollection", propValueType.Name));
+                        propValue = ConvertFromDynamicToAttributeCollection((ExpandoObject)propValue);
+                    }
+                    else if (propValueType == typeof(ExpandoObject))
                     {
                         ExpandoObject propExpando = (ExpandoObject)propValue;
                         propValue = ConvertFromDynamic(propExpando);
@@ -562,11 +567,6 @@ public class CRMBridge
                     else if (propDef.PropertyType == typeof(Guid) && propValueType == typeof(string))
                     {
                         propValue = new Guid((string)propValue);
-                    }
-                    else if (propDef.PropertyType == typeof(AttributeCollection))
-                    {
-                        if (propValueType != typeof(ExpandoObject)) throw new Exception(string.Format("Can't convert from {0} to AttributeCollection", propValueType.Name));
-                        propValue = ConvertFromDynamicToAttributeCollection((ExpandoObject)propValue);
                     }
                     propDef.SetValue(converted, propValue);
                 }
