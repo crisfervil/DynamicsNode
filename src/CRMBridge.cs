@@ -368,35 +368,48 @@ public class CRMBridge
 
     private EntityReference ConvertToLookup(object fieldValue, AttributeMetadata fieldMetadata)
     {
-        EntityReference lookupValue;
-
-        var lookupMetadata = (LookupAttributeMetadata)fieldMetadata;
-        if (lookupMetadata.Targets.Length > 1) throw new Exception("Too many targets");
-
-        string targetEntityName = lookupMetadata.Targets[0];
-
+        EntityReference lookupValue=null;
         Guid guidValue;
+        string targetEntityName = null;
 
-        if (Guid.TryParse((string)fieldValue, out guidValue))
+        if (fieldValue != null)
         {
-            // Is a Guid
-        }
-        else
-        {
-            // Is a text, or something else, so we have to get its Id
+            if (fieldValue.GetType() == typeof(ExpandoObject))
+            {
+                dynamic expandoValue = (ExpandoObject)fieldValue;
+                targetEntityName = expandoValue.type;
+                guidValue = Guid.Parse(expandoValue.id);
+            }
+            else
+            {
+                var lookupMetadata = (LookupAttributeMetadata)fieldMetadata;
+                if (lookupMetadata.Targets.Length > 1) throw new Exception("Too many targets");
 
-            EntityMetadata targetEntityMetadata = GetMetadataFromCache(targetEntityName);
-            var primaryNameAttribute = targetEntityMetadata.PrimaryNameAttribute;
-            var targetEntityIdFieldName = targetEntityMetadata.PrimaryIdAttribute;
-            QueryExpression qry = new QueryExpression(targetEntityName);
-            qry.Criteria.AddCondition(new ConditionExpression(primaryNameAttribute, ConditionOperator.Equal, fieldValue));
-            var lookupRecords = _service.RetrieveMultiple(qry);
-            if (lookupRecords.Entities.Count == 0) throw new Exception("no records found");
-            if (lookupRecords.Entities.Count > 1) throw new Exception("more than one record found");
-            guidValue = (Guid)lookupRecords.Entities[0].Attributes[targetEntityIdFieldName];
+                targetEntityName = lookupMetadata.Targets[0];
 
+
+                if (Guid.TryParse((string)fieldValue, out guidValue))
+                {
+                    // Is a Guid
+                }
+                else
+                {
+                    // Is a text, or something else, so we have to get its Id
+
+                    EntityMetadata targetEntityMetadata = GetMetadataFromCache(targetEntityName);
+                    var primaryNameAttribute = targetEntityMetadata.PrimaryNameAttribute;
+                    var targetEntityIdFieldName = targetEntityMetadata.PrimaryIdAttribute;
+                    QueryExpression qry = new QueryExpression(targetEntityName);
+                    qry.Criteria.AddCondition(new ConditionExpression(primaryNameAttribute, ConditionOperator.Equal, fieldValue));
+                    var lookupRecords = _service.RetrieveMultiple(qry);
+                    if (lookupRecords.Entities.Count == 0) throw new Exception("no records found");
+                    if (lookupRecords.Entities.Count > 1) throw new Exception("more than one record found");
+                    guidValue = (Guid)lookupRecords.Entities[0].Attributes[targetEntityIdFieldName];
+                }
+            }
+            lookupValue = new EntityReference(targetEntityName, guidValue);
         }
-        lookupValue = new EntityReference(targetEntityName, guidValue);
+
         return lookupValue;
     }
 
