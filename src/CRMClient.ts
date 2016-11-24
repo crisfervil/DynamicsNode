@@ -373,8 +373,13 @@ export class CRMClient {
                 if(!(attributes[prop] instanceof Date)) throw `Cannot convert from "${typeof attributes[prop]}" to "string"`;;
                 attributeValue = attributes[prop];
             }
-            else if(attributeMetadata.AttributeType==AttributeTypeCode.Lookup){
+            else if(attributeMetadata.AttributeType==AttributeTypeCode.Lookup ||
+                    attributeMetadata.AttributeType==AttributeTypeCode.Customer){
                 attributeValue = this.ConvertToEntityReference(attributes[prop],attributeMetadata);
+            }
+            else
+            {
+                attributeValue = attributes[prop];
             }
 
             // TODO: add the rest of value types

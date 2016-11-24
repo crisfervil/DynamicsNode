@@ -210,12 +210,22 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
 
     });    
 
-    it('Creates and Update a Lead',function (){
+    // TODO: Merge this tests with create and update an account
+    it('Creates and Updates a Lead',function (){
         // create a lead
-        var leadId = crm.create("lead",{description:"test", estimatedCloseDate:new Date()});
-        
+        // try different data types
+        var lead = {description:"test" // memo
+                    ,firstname:"test"// string
+                    ,estimatedCloseDate:new Date() //datetime
+                    ,donotfax:true // bolean
+                    ,address1_latitude:89.556 // double
+                    ,numberofemployees:100 // integer
+                    //,estimatedamount:150 // money
+                    //,budgetstatus:1 // picklist
+                    };
+        var leadId = crm.create("lead",lead);
         crm.update("lead",{leadid:leadId,estimatedCloseDate:null});
-
+        crm.delete("lead",leadId);
     });
 
     it('Associates and Disassociates a lead and an contact',function (){
