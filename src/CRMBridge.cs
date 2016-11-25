@@ -1,10 +1,9 @@
 using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Client;
-using Microsoft.Xrm.Client.Services;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Tooling.Connector;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -93,8 +92,7 @@ public class Startup
 public class CrmService : IOrganizationService
 {
     string _connectionString;
-    CrmConnection _connection;
-    OrganizationService _orgService;
+    CrmServiceClient _connection;
 
     public CrmService(string connectionString)
     {
@@ -102,48 +100,47 @@ public class CrmService : IOrganizationService
         WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
         _connectionString = connectionString;
         // Establish a connection to the organization web service using CrmConnection.
-        _connection = Microsoft.Xrm.Client.CrmConnection.Parse(_connectionString);
-        _orgService = new OrganizationService(_connection);
+        _connection = new CrmServiceClient(_connectionString);
     }
 
     public OrganizationResponse Execute(OrganizationRequest request)
     {
-        return _orgService.Execute(request);
+        return _connection.Execute(request);
     }
 
     public void Delete(string entityName, Guid id)
     {
-        _orgService.Delete(entityName, id);
+        _connection.Delete(entityName, id);
     }
 
     public void Associate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
     {
-        _orgService.Associate(entityName, entityId, relationship, relatedEntities);
+        _connection.Associate(entityName, entityId, relationship, relatedEntities);
     }
 
     public Guid Create(Entity entity)
     {
-        return _orgService.Create(entity);
+        return _connection.Create(entity);
     }
 
     public void Disassociate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
     {
-        _orgService.Disassociate(entityName, entityId, relationship, relatedEntities);
+        _connection.Disassociate(entityName, entityId, relationship, relatedEntities);
     }
 
     public Entity Retrieve(string entityName, Guid id, ColumnSet columnSet)
     {
-        return _orgService.Retrieve(entityName, id, columnSet);
+        return _connection.Retrieve(entityName, id, columnSet);
     }
 
     public EntityCollection RetrieveMultiple(QueryBase query)
     {
-        return _orgService.RetrieveMultiple(query);
+        return _connection.RetrieveMultiple(query);
     }
 
     public void Update(Entity entity)
     {
-        _orgService.Update(entity);
+        _connection.Update(entity);
     }
 }
 

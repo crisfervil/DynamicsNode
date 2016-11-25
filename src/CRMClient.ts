@@ -63,15 +63,19 @@ export class CRMClient {
     private getBridge(fakeBridge: boolean) {
 
         var source = path.join(__dirname, "CRMBridge.cs");
-        var ref1 = path.join(__dirname, "bin/Microsoft.Crm.Sdk.Proxy.dll");
-        var ref2 = path.join(__dirname, "bin/Microsoft.Xrm.Client.dll");
-        var ref3 = path.join(__dirname, "bin/Microsoft.Xrm.Sdk.dll");
-        var ref4 = path.join("System.Runtime.Serialization.dll");
-        var ref5 = path.join(__dirname, "bin/Newtonsoft.Json.dll");
+        var refs:Array<string> = 
+                   [ path.join(__dirname, "bin/Microsoft.Crm.Sdk.Proxy.dll")
+                    ,path.join(__dirname, "bin/Microsoft.Xrm.Tooling.Connector.dll")
+                    ,path.join(__dirname, "bin/Microsoft.Xrm.Sdk.dll")
+                    ,"System.Runtime.Serialization.dll"
+                    ,"System.ServiceModel.dll"
+                    ,path.join(__dirname,"bin/Microsoft.IdentityModel.Clients.ActiveDirectory.dll")
+                    ,path.join(__dirname, "bin/Newtonsoft.Json.dll")
+                    ];
 
         var createBridge = edge.func({
             source: source,
-            references: [ref1, ref2, ref3, ref4, ref5]
+            references: refs
         });
 
         var bridge = createBridge({ connectionString: this.connectionString, useFake: fakeBridge }, true);
