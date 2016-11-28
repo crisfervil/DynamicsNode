@@ -4,7 +4,7 @@ import {Guid} from "./Guid";
 import {Fetch} from "./Fetch";
 import {Dictionary} from "./Dictionary";
 import {AssignRequest,WhoAmIRequest,WhoAmIResponse} from "./Messages";
-import {Entity,EntityReference,AttributeTypeCode} from "./CRMDataTypes";
+import {Entity,EntityReference,OptionSetValue,AttributeTypeCode} from "./CRMDataTypes";
 
 import path = require("path");
 import edge = require("edge");
@@ -368,30 +368,51 @@ export class CRMClient {
             // get the attribute from metadata
             var attributeMetadata = this.getAttributeMetadata(entityName,attributeName);
 
-            if(attributeMetadata.AttributeType==AttributeTypeCode.String||
-                attributeMetadata.AttributeType==AttributeTypeCode.Memo) {
-                if(!(typeof attributes[prop] == "string")) throw `Cannot convert from "${typeof attributes[prop]}" to "string"`;
-                attributeValue = attributes[prop];
-            }
-            else if(attributeMetadata.AttributeType==AttributeTypeCode.DateTime){
-                if(!(attributes[prop] instanceof Date)) throw `Cannot convert from "${typeof attributes[prop]}" to "string"`;;
-                attributeValue = attributes[prop];
-            }
-            else if(attributeMetadata.AttributeType==AttributeTypeCode.Lookup ||
-                    attributeMetadata.AttributeType==AttributeTypeCode.Customer){
-                attributeValue = this.ConvertToEntityReference(attributes[prop],attributeMetadata);
-            }
-            else
-            {
-                attributeValue = attributes[prop];
-            }
+            if(attributeMetadata){
+                if(attributeMetadata.AttributeType==AttributeTypeCode.String||
+                    attributeMetadata.AttributeType==AttributeTypeCode.Memo) {
+                    if(!(typeof attributes[prop] == "string")) throw `Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'String'`;
+                    attributeValue = attributes[prop];
+                }
+                else if(attributeMetadata.AttributeType==AttributeTypeCode.DateTime) {
+                    if(attributes[prop] && !(attributes[prop] instanceof Date)) throw `Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'Date'`;;
+                    attributeValue = attributes[prop];
+                }
+                else if(attributeMetadata.AttributeType==AttributeTypeCode.Lookup ||
+                        attributeMetadata.AttributeType==AttributeTypeCode.Customer){
+                    attributeValue = this.ConvertToEntityReference(attributes[prop],attributeMetadata);
+                }
+                else if(attributeMetadata.AttributeType==AttributeTypeCode.Picklist){
+                    attributeValue = this.ConvertToOptionset(attributes[prop],attributeMetadata);
+                }
+                else
+                {
+                    attributeValue = attributes[prop];
+                }
 
-            // TODO: add the rest of value types
+                // TODO: add the rest of value types
 
-            entity.Attributes[attributeName]=attributeValue;
+                entity.Attributes[attributeName]=attributeValue;
+            }
+            else{
+                console.log(`*** Attribute ${attributeName} not found in metadata. Skipping...`);
+            }
         }
         // TODO: Set the Entity Id
         return entity;
+    }
+
+    private ConvertToOptionset(attributeValue,attributeMetadata):OptionSetValue{
+        var optionset=null;
+
+        if(typeof attributeValue == "number"){
+            optionset=new OptionSetValue(attributeValue);
+        }
+        else{
+            throw `Can't convert from ${typeof attributeValue} to OptionsetValue`;
+        }
+
+        return optionset;
     }
 
     private ConvertToEntityReference(attributeValue,attributeMetadata):EntityReference{
@@ -512,45 +533,29 @@ export class CRMClient {
     update(entityName: string, attributes: any, conditions?): number {
 
         var updatedRecordsCount = 0;
-        var values = new Array<any>();
 
         if (!entityName) throw "Entity name not specified";
         entityName = entityName.toLowerCase(); // normalize casing
 
-        // prepare values
-        for (var prop in attributes) {
-            var attrName = prop.toLowerCase(); // normalize casing
-            values.push(attrName);
-            values.push(attributes[prop]);
-        }
-
         // get records GUIDS
         if (conditions != undefined) {
-            // The id field of an entity is always the entity name + "id"
-            // TODO: Except for activities
-            var idField: string = `${entityName}id`.toLowerCase();
+            var idField = this.getIdField(entityName);
             var foundRecords = this.retrieveMultiple(entityName, conditions, idField);
-            var idFieldIndex = values.indexOf(idField);
-            if (idFieldIndex < 0) {
-                // Add the id field to the values array and save the attribute index
-                idFieldIndex = values.push(idField) - 1;
-                values.push(null);
-            }
             for (var i = 0; i < foundRecords.rows.length; i++) {
                 var foundRecordId = foundRecords.rows[i][idField];
-                values[idFieldIndex + 1] = foundRecordId;
-                var params: any = { entityName: entityName, values: values };
-                this._crmBridge.Update(params, true);
+                attributes[idField] = foundRecordId;
+                var entity = this.ConvertToEntity(entityName,attributes);
+                this._crmBridge.Update(entity, true);
             }
             updatedRecordsCount = foundRecords.rows.length;
         }
         else {
+
             // the attributes parameter must contain the entity id on it
-            var params: any = { entityName: entityName, values: values };
-            this._crmBridge.Update(params, true);
+            var entity = this.ConvertToEntity(entityName,attributes);
+            this._crmBridge.Update(entity, true);
             updatedRecordsCount = 1;
         }
-
 
         return updatedRecordsCount;
     }

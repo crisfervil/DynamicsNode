@@ -5,6 +5,12 @@ export class EntityReference {
     }
 }
 
+export class OptionSetValue {
+    public __typeName="Microsoft.Xrm.Sdk,Microsoft.Xrm.Sdk.OptionSetValue";
+    constructor(public Value:number){
+    }
+}
+
 export class Entity {
     public __typeName="Microsoft.Xrm.Sdk,Microsoft.Xrm.Sdk.Entity";
 

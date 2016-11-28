@@ -51,7 +51,8 @@ public class Startup
             Update = (Func<object, Task<object>>)(
                 async (i) =>
                 {
-                    return bridge.Update(i);
+                    bridge.Update(i);
+                    return null;
                 }
             ),
             Delete = (Func<object, Task<object>>)(
@@ -179,16 +180,11 @@ public class CRMBridge
         return createdId;
     }
 
-    public object Update(dynamic options)
+    public void Update(dynamic entity)
     {
-        string entityName = options.entityName;
-        object[] values = options.values;
-
         // convert the values to an entity type
-        var entity = Convert(entityName, values);
-        _service.Update(entity);
-
-        return null;
+        Entity e = ConvertFromDynamic(entity);
+        _service.Update(e);
     }
 
     public object Retrieve(dynamic options)
@@ -592,9 +588,14 @@ public class CRMBridge
                     {
                         convertedValue = ConvertFromDynamic((ExpandoObject)prop.Value);
                     }
-
-                    // TODO: Convert GUIDS
-
+                    else if (propValueType == typeof(string))
+                    {
+                        Guid guidValue;
+                        if(Guid.TryParse((string)prop.Value,out guidValue))
+                        {
+                            convertedValue = guidValue;
+                        }
+                    }
                     retVal.Add(prop.Key, convertedValue);
                 }
             }
