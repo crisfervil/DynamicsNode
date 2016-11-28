@@ -19,14 +19,6 @@ public class Startup
         string connectionString = options.connectionString;
         bool useFake = options.useFake;
 
-        //foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) Console.WriteLine(a.FullName);
-        System.AppDomain.CurrentDomain.UnhandledException += (x, y) => {
-            //Console.WriteLine(y.ExceptionObject.ToString());
-        };
-        System.AppDomain.CurrentDomain.FirstChanceException += (x, y) => {
-            //Console.WriteLine(y.Exception.ToString());
-        };
-
         CRMBridge bridge = new CRMBridge(connectionString, useFake);
         return new
         {
@@ -94,7 +86,6 @@ public class CrmService : IOrganizationService
         WebRequest.DefaultWebProxy = WebRequest.GetSystemWebProxy();
         WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
         _connectionString = connectionString;
-        // Establish a connection to the organization web service using CrmConnection.
         _connection = new CrmServiceClient(_connectionString);
     }
 
