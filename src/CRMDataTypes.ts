@@ -19,6 +19,17 @@ export class Entity {
     public Attributes:any;    
 }
 
+export class EntityMetadata{
+    public PrimaryIdAttribute:string;
+    public SchemaName:string;
+    public Attributes:AttributeMetadata[];
+}
+
+export class AttributeMetadata{
+    public LogicalName:string;
+    public AttributeType:string;
+}
+
 export enum AttributeTypeCode{
     BigInt=0x12,
     Boolean=0,	
@@ -41,4 +52,14 @@ export enum AttributeTypeCode{
     String=14,	
     Uniqueidentifier=15,
     Virtual=0x11	
+}
+
+export enum EntityFilters
+{
+    Entity = 1,
+    Default = 1,
+    Attributes = 2,
+    Privileges = 4,
+    Relationships = 8,
+    All = 15
 }

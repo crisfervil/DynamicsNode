@@ -3,8 +3,8 @@ import {DataTable} from "./DataTable";
 import {Guid} from "./Guid";
 import {Fetch} from "./Fetch";
 import {Dictionary} from "./Dictionary";
-import {AssignRequest,WhoAmIRequest,WhoAmIResponse} from "./Messages";
-import {Entity,EntityReference,OptionSetValue,AttributeTypeCode} from "./CRMDataTypes";
+import {AssignRequest,WhoAmIRequest,WhoAmIResponse,RetrieveEntityRequest,RetrieveEntityResponse} from "./Messages";
+import {Entity,EntityReference,OptionSetValue,AttributeTypeCode,EntityFilters,EntityMetadata,AttributeMetadata} from "./CRMDataTypes";
 
 import path = require("path");
 import edge = require("edge");
@@ -70,7 +70,6 @@ export class CRMClient {
                     ,"System.Runtime.Serialization.dll"
                     ,"System.ServiceModel.dll"
                     ,path.join(__dirname,"bin/Microsoft.IdentityModel.Clients.ActiveDirectory.dll")
-                    ,path.join(__dirname, "bin/Newtonsoft.Json.dll")
                     ];
 
         var createBridge = edge.func({
@@ -369,20 +368,20 @@ export class CRMClient {
             var attributeMetadata = this.getAttributeMetadata(entityName,attributeName);
 
             if(attributeMetadata){
-                if(attributeMetadata.AttributeType==AttributeTypeCode.String||
-                    attributeMetadata.AttributeType==AttributeTypeCode.Memo) {
+                if(attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.String]||
+                    attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.Memo]) {
                     if(!(typeof attributes[prop] == "string")) throw `Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'String'`;
                     attributeValue = attributes[prop];
                 }
-                else if(attributeMetadata.AttributeType==AttributeTypeCode.DateTime) {
+                else if(attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.DateTime]) {
                     if(attributes[prop] && !(attributes[prop] instanceof Date)) throw `Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'Date'`;;
                     attributeValue = attributes[prop];
                 }
-                else if(attributeMetadata.AttributeType==AttributeTypeCode.Lookup ||
-                        attributeMetadata.AttributeType==AttributeTypeCode.Customer){
+                else if(attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.Lookup] ||
+                        attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.Customer]){
                     attributeValue = this.ConvertToEntityReference(attributes[prop],attributeMetadata);
                 }
-                else if(attributeMetadata.AttributeType==AttributeTypeCode.Picklist){
+                else if(attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.Picklist]){
                     attributeValue = this.ConvertToOptionset(attributes[prop],attributeMetadata);
                 }
                 else
@@ -433,8 +432,8 @@ export class CRMClient {
         return er;
     }
 
-    private getAttributeMetadata(entityName:string,attributeName:string):any{
-        var attributeMetadata = null;
+    private getAttributeMetadata(entityName:string,attributeName:string):AttributeMetadata{
+        var attributeMetadata:AttributeMetadata = null;
         var entityMetadata = this.getEntityMetadata(entityName);
         if(entityMetadata&&entityMetadata.Attributes&&entityMetadata.Attributes.length>0){
             for(var i=0;i<entityMetadata.Attributes.length;i++){
@@ -688,7 +687,7 @@ export class CRMClient {
         this._crmBridge.Disassociate(params, true);
     }
     
-    getEntityMetadata(entityName:string){
+    getEntityMetadata(entityName:string):EntityMetadata{
         var ndx = this._metadataCache.indexOf(entityName);
         var metadata = null;
         if(ndx>-1){
@@ -701,11 +700,10 @@ export class CRMClient {
         return metadata;
     }
     
-    private getEntityMetadataFromCrm(entityName:string){
-        var params = { entityName: entityName };
-        var metadataStr = this._crmBridge.GetEntityMetadata(params, true);
-        var metadata = JSON.parse(metadataStr);
-        return metadata;
+    private getEntityMetadataFromCrm(entityName:string):EntityMetadata{
+        var request = new RetrieveEntityRequest(entityName, EntityFilters.All);
+        var response:RetrieveEntityResponse = this.Execute(request);
+        return response.EntityMetadata;
     }
 
     public Execute(request){

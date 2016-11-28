@@ -73,12 +73,6 @@ public class Startup
                     return bridge.Disassociate(i);
                 }
             ),
-            GetEntityMetadata = (Func<object, Task<object>>)(
-                async (i) =>
-                {
-                    return bridge.GetEntityMetadata(i);
-                }
-            ),
             Execute = (Func<object, Task<object>>)(
                 async (i) =>
                 {
@@ -279,14 +273,6 @@ public class CRMBridge
         return null;
     }
 
-    public object GetEntityMetadata(dynamic options)
-    {
-        var entityName = options.entityName;
-        var metadata = GetMetadataFromCache(entityName);
-        var res = Newtonsoft.Json.JsonConvert.SerializeObject(metadata);
-        return res;
-    }
-
     private object[] Convert(Entity entityRecord)
     {
         var values = new List<object>();
@@ -316,30 +302,6 @@ public class CRMBridge
             }
         }
         return values.ToArray();
-    }
-
-    private EntityMetadata GetMetadataFromCache(string entityName)
-    {
-        if (!_metadataCache.ContainsKey(entityName))
-        {
-            _metadataCache.Add(entityName, GetMetadata(entityName));
-        }
-        return _metadataCache[entityName];
-    }
-
-    /// <summary>
-    /// Retrieves an entity's metadata.
-    /// </summary>
-    /// <param name="entityName">entity's name</param>
-    /// <returns>Attribute Metadata for the specified entity</returns>
-    private EntityMetadata GetMetadata(string entityName)
-    {
-        RetrieveEntityRequest metaDataRequest = new RetrieveEntityRequest();
-        metaDataRequest.EntityFilters = EntityFilters.All;
-        metaDataRequest.LogicalName = entityName;
-        RetrieveEntityResponse metaDataResponse = (RetrieveEntityResponse)_service.Execute(metaDataRequest);
-
-        return metaDataResponse.EntityMetadata;
     }
     
     public object Execute(dynamic request)
