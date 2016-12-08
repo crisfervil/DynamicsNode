@@ -38,8 +38,11 @@ describe('Fetch', function () {
       assert.equal(fetch.toString(),expected);
   });
   it('Serializes a complex Fetch',function(){
-      // the entity name and column names must be lowercased
-      var fetch = new Fetch("tEst",["*"],{attr:"myValue",aTTr2:{$neq:22},attr3:{$in:["value1","value2"]},attr4:new Date(Date.UTC(1982,2,17)),ATtr5:false,attr6:["value1",false],attr7:null});
+        // the entity name and column names must be lowercased
+        var fetch = new Fetch("tEst",["*"],{attr:"myValue",aTTr2:{$neq:22},attr3:{$in:["value1","value2"]},
+                            attr4:new Date(Date.UTC(1982,2,17)),ATtr5:false,attr6:["value1",false],attr7:null,
+                            attr8:"$notNull"});
+
       var expected =
 `<fetch>
     <entity name="test">
@@ -58,6 +61,7 @@ describe('Fetch', function () {
                 <value>false</value>
             </condition>
             <condition attribute="attr7" operator="null"/>
+            <condition attribute="attr8" operator="not-null"/>
         </filter>
     </entity>
 </fetch>`;

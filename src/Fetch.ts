@@ -83,6 +83,8 @@ export class Fetch {
  * var cond = {name:["contoso", "acme", "cycleworks"]};
  * @example <caption>To specify the null operator, use a null value next to the attribute name. The following will retrieve all the records where the name is null.</caption>
  * var cond = {name:null};
+ * @example <caption>To specify the Not Null operator, use a the "$notNull" value next to the attribute name. The following will retrieve all the records where the name is Not null.</caption>
+ * var cond = {name:"$notNull"};
  */
   public setFilter(filterConditions) {
     if (filterConditions != null) {
@@ -163,6 +165,7 @@ export class Fetch {
 
   private operatorNames: string[] = ['eq', 'neq', 'gt', 'ge', 'le', 'lt', 'like', 'not-like', 'in', 'not-in', 'between', 'not-between', 'null', 'not-null'];
   private operatorJsonNames: string[] = ['$eq', '$neq', '$gt', '$ge', '$le', '$lt', '$like', '$notlLike', '$in', '$notIn', '$between', '$notBetween', "",/*'null'*/, ""/*	'not-null'*/];
+  private NOT_NULL_OPERATOR = "$notNull";
 
   private convert(conditionExpression): Filter {
     var filter = new Filter();
@@ -171,6 +174,9 @@ export class Fetch {
       if (propValue == null) {
         filter.conditions.push(new Condition(propName, Operators.Null));
       }
+      else if (propValue == this.NOT_NULL_OPERATOR) {
+        filter.conditions.push(new Condition(propName, Operators.NotNull));
+      }      
       else if (typeof propValue === 'number' || propValue instanceof Number || typeof propValue === 'string' || propValue instanceof String ||
         typeof propValue === 'boolean' || propValue instanceof Date) {
         filter.conditions.push(new Condition(propName, Operators.Equal, [propValue]));
