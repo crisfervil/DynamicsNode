@@ -312,6 +312,19 @@ public class CRMBridge
                 ResponseName=rs.ResponseName };
         }
 
+        if (response != null && response.GetType() == typeof(RetrieveEntityResponse))
+        {
+            var rs = (RetrieveEntityResponse)response;
+            response = new
+            {
+                EntityMetadata = new {
+                    PrimaryIdAttribute = rs.EntityMetadata.PrimaryIdAttribute,
+                    SchemaName = rs.EntityMetadata.SchemaName,
+                    Attributes = rs.EntityMetadata.Attributes.Select(x => new { LogicalName = x.LogicalName, AttributeType = x.AttributeType })
+                }
+            };
+        }
+
         return response;
     }
 
