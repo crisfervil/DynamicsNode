@@ -9,6 +9,8 @@ No more .net console applications with all the boilerplate code just for creatin
 
 Github project: [https://github.com/crisfervil/DynamicsNode](https://github.com/crisfervil/DynamicsNode)
 
+Review the [changelog](//github.com/crisfervil/DynamicsNode/blob/master/changelog.md) to see the latest changes.
+
 # How to use it
 Create a new directory to store your scripts and cd into it
 

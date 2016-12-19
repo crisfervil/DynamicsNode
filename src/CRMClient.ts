@@ -23,18 +23,18 @@ export class CRMClient {
      * @param {string} connectionString Optional. A valid connection string or connection string name.
      * The connection string can be either a valid connection string or a name of an existing connection string in the file "config.json" at the root path of your application.
      * If no value is passed to the constructor, the "default" text will be assumed, which means that a connection string named "default" will be used.
-     * @see {@link https://msdn.microsoft.com/en-us/library/gg695810.aspx} for further information
+     * @see {@link https://msdn.microsoft.com/en-ie/library/mt608573.aspx} for further information
      * 
      * @example <caption>config.json file format</caption>
      * {
 	 *      "connectionStrings":
 	 *      {
-     *          "default":"Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode",
-     *          "connection2":"Url=http://crm.contoso.com/xrmContoso"
+     *          "default":"AuthType=Office365; Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode",
+     *          "connection2":"AuthType=AD; Url=http://crm.contoso.com/xrmContoso"
 	 *      }
      * }
      * @example <caption>Create a connection using a valid Connection String</caption>
-     * var crm = new CRMClient("Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode");
+     * var crm = new CRMClient("AuthType=Office365; Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode");
      * @example <caption>Create a connection using the connection string named "connection2" specified in the config.json file</caption>
      * var crm = new CRMClient("connection2");
      * @example <caption>Create a connection using the connection string named "default" specified in the config.json file</caption>

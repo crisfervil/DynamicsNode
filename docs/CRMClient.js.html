@@ -143,14 +143,16 @@ var CRMClient = (function () {
      */
     CRMClient.prototype.getBridge = function (fakeBridge) {
         var source = path.join(__dirname, "CRMBridge.cs");
-        var ref1 = path.join(__dirname, "bin/Microsoft.Crm.Sdk.Proxy.dll");
-        var ref2 = path.join(__dirname, "bin/Microsoft.Xrm.Client.dll");
-        var ref3 = path.join(__dirname, "bin/Microsoft.Xrm.Sdk.dll");
-        var ref4 = path.join("System.Runtime.Serialization.dll");
-        var ref5 = path.join(__dirname, "bin/Newtonsoft.Json.dll");
+        var refs = [path.join(__dirname, "bin/Microsoft.Crm.Sdk.Proxy.dll"),
+            path.join(__dirname, "bin/Microsoft.Xrm.Tooling.Connector.dll"),
+            path.join(__dirname, "bin/Microsoft.Xrm.Sdk.dll"),
+            "System.Runtime.Serialization.dll",
+            "System.ServiceModel.dll",
+            path.join(__dirname, "bin/Microsoft.IdentityModel.Clients.ActiveDirectory.dll")
+        ];
         var createBridge = edge.func({
             source: source,
-            references: [ref1, ref2, ref3, ref4, ref5]
+            references: refs
         });
         var bridge = createBridge({ connectionString: this.connectionString, useFake: fakeBridge }, true);
         return bridge;
@@ -402,20 +404,99 @@ var CRMClient = (function () {
      * console.log(accountid);
      */
     CRMClient.prototype.create = function (entityName, attributes) {
+        var entity = this.ConvertToEntity(entityName, attributes);
+        var createdGuid = this._crmBridge.Create(entity, true);
+        return createdGuid;
+    };
+    CRMClient.prototype.ConvertToEntity = function (entityName, attributes) {
         // perform some validations
         if (!entityName)
             throw "Entity name not specified";
         if (!attributes)
             throw "Attributes not specified";
         entityName = entityName.toLocaleLowerCase(); // normalize casing
-        var values = new Array();
+        var entity = new CRMDataTypes_1.Entity();
+        entity.LogicalName = entityName;
+        entity.Attributes = {};
         for (var prop in attributes) {
-            values.push(prop.toLocaleLowerCase()); // normalize casing
-            values.push(attributes[prop]);
+            var attributeName = prop.toLocaleLowerCase(); // normalize casing 
+            var attributeValue = null;
+            // get the attribute from metadata
+            var attributeMetadata = this.getAttributeMetadata(entityName, attributeName);
+            if (attributeMetadata) {
+                if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.String] ||
+                    attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Memo]) {
+                    if (!(typeof attributes[prop] == "string"))
+                        throw "Cannot convert attribute '" + attributeName + "' from '" + typeof attributes[prop] + "' to 'String'";
+                    attributeValue = attributes[prop];
+                }
+                else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.DateTime]) {
+                    if (attributes[prop] &amp;&amp; !(attributes[prop] instanceof Date))
+                        throw "Cannot convert attribute '" + attributeName + "' from '" + typeof attributes[prop] + "' to 'Date'";
+                    ;
+                    attributeValue = attributes[prop];
+                }
+                else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Lookup] ||
+                    attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Customer]) {
+                    attributeValue = this.ConvertToEntityReference(attributes[prop], attributeMetadata);
+                }
+                else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Picklist]) {
+                    attributeValue = this.ConvertToOptionset(attributes[prop], attributeMetadata);
+                }
+                else {
+                    attributeValue = attributes[prop];
+                }
+                // TODO: add the rest of value types
+                entity.Attributes[attributeName] = attributeValue;
+            }
+            else {
+                console.log("*** Attribute " + attributeName + " not found in metadata. Skipping...");
+            }
         }
-        var params = { entityName: entityName, values: values };
-        var createdGuid = this._crmBridge.Create(params, true);
-        return createdGuid;
+        // TODO: Set the Entity Id
+        return entity;
+    };
+    CRMClient.prototype.ConvertToOptionset = function (attributeValue, attributeMetadata) {
+        var optionset = null;
+        if (typeof attributeValue == "number") {
+            optionset = new CRMDataTypes_1.OptionSetValue(attributeValue);
+        }
+        else {
+            throw "Can't convert from " + typeof attributeValue + " to OptionsetValue";
+        }
+        return optionset;
+    };
+    CRMClient.prototype.ConvertToEntityReference = function (attributeValue, attributeMetadata) {
+        var er = null;
+        var target = null, id = null;
+        if (typeof attributeValue == "string") {
+            // TODO: If the value is not a GUID, find the value in the target entity
+            if (attributeMetadata.Targets.Length > 1)
+                throw "Too many targets";
+            target = attributeMetadata.Targets[0];
+            id = attributeValue;
+        }
+        else if (typeof attributeValue == "object") {
+            id = attributeValue.id;
+            target = attributeValue.type;
+        }
+        if (!(target &amp;&amp; id))
+            throw "Couldn't get value";
+        er = new CRMDataTypes_1.EntityReference(id, target);
+        return er;
+    };
+    CRMClient.prototype.getAttributeMetadata = function (entityName, attributeName) {
+        var attributeMetadata = null;
+        var entityMetadata = this.getEntityMetadata(entityName);
+        if (entityMetadata &amp;&amp; entityMetadata.Attributes &amp;&amp; entityMetadata.Attributes.length > 0) {
+            for (var i = 0; i &lt; entityMetadata.Attributes.length; i++) {
+                if (entityMetadata.Attributes[i].LogicalName == attributeName) {
+                    attributeMetadata = entityMetadata.Attributes[i];
+                    break;
+                }
+            }
+        }
+        return attributeMetadata;
     };
     /**
      * Deletes one on more records in CRM, and returns the number of records affected.
@@ -498,40 +579,25 @@ var CRMClient = (function () {
      */
     CRMClient.prototype.update = function (entityName, attributes, conditions) {
         var updatedRecordsCount = 0;
-        var values = new Array();
         if (!entityName)
             throw "Entity name not specified";
         entityName = entityName.toLowerCase(); // normalize casing
-        // prepare values
-        for (var prop in attributes) {
-            var attrName = prop.toLowerCase(); // normalize casing
-            values.push(attrName);
-            values.push(attributes[prop]);
-        }
         // get records GUIDS
         if (conditions != undefined) {
-            // The id field of an entity is always the entity name + "id"
-            // TODO: Except for activities
-            var idField = (entityName + "id").toLowerCase();
+            var idField = this.getIdField(entityName);
             var foundRecords = this.retrieveMultiple(entityName, conditions, idField);
-            var idFieldIndex = values.indexOf(idField);
-            if (idFieldIndex &lt; 0) {
-                // Add the id field to the values array and save the attribute index
-                idFieldIndex = values.push(idField) - 1;
-                values.push(null);
-            }
             for (var i = 0; i &lt; foundRecords.rows.length; i++) {
                 var foundRecordId = foundRecords.rows[i][idField];
-                values[idFieldIndex + 1] = foundRecordId;
-                var params = { entityName: entityName, values: values };
-                this._crmBridge.Update(params, true);
+                attributes[idField] = foundRecordId;
+                var entity = this.ConvertToEntity(entityName, attributes);
+                this._crmBridge.Update(entity, true);
             }
             updatedRecordsCount = foundRecords.rows.length;
         }
         else {
             // the attributes parameter must contain the entity id on it
-            var params = { entityName: entityName, values: values };
-            this._crmBridge.Update(params, true);
+            var entity = this.ConvertToEntity(entityName, attributes);
+            this._crmBridge.Update(entity, true);
             updatedRecordsCount = 1;
         }
         return updatedRecordsCount;
@@ -663,10 +729,9 @@ var CRMClient = (function () {
         return metadata;
     };
     CRMClient.prototype.getEntityMetadataFromCrm = function (entityName) {
-        var params = { entityName: entityName };
-        var metadataStr = this._crmBridge.GetEntityMetadata(params, true);
-        var metadata = JSON.parse(metadataStr);
-        return metadata;
+        var request = new Messages_1.RetrieveEntityRequest(entityName, CRMDataTypes_1.EntityFilters.All);
+        var response = this.Execute(request);
+        return response.EntityMetadata;
     };
     CRMClient.prototype.Execute = function (request) {
         var response = this._crmBridge.Execute(request, true);
@@ -760,7 +825,7 @@ exports.CRMClient = CRMClient;
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Thu Dec 8th 2016
+		on Mon Dec 19th 2016
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
