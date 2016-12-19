@@ -18,14 +18,14 @@ console.log(account2);
 
 var guid = crm.create("account",{name:"test account", description:"this is a test"});
 console.log("created account with id " + guid);
-delete("account",guid);
+crm.delete("account",guid);
 
 //var guid = crm.create("account",[{name:"account1"},{name:"account2"}]);
 
 for(var i=0;i<10;i++){
   guid = crm.create("account",{name:"test account "+i, description:"this is a test",AccountCategoryCode:1});
   console.log("created account with id " + guid);
-  delete("account",guid);
+  crm.delete("account",guid);
 }
 
 var accounts = DataTable.load("accounts.xml");
