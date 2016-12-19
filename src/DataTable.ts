@@ -2,6 +2,7 @@ import path = require("path");
 import fs = require("fs");
 import XMLWriter = require('xml-writer');
 import et = require('elementtree');
+import * as XLSX from 'xlsx';
 
 var debug = require("debug")("dynamicsnode");
 
@@ -54,15 +55,20 @@ export class DataTable {
         var ext = path.extname(fileName);
         if (ext != null) ext = ext.toLowerCase();
 
-        var strContent = fs.readFileSync(fileName, "utf8");
+        var strContent:string;
 
         if (ext == ".json") {
+            strContent = fs.readFileSync(fileName, "utf8")
             dt = JSON.parse(strContent, this.JSONDataReviver);
             if (dt && dt.rows === undefined) throw "The parsed file doesn't look like a DataTable";
         }
         else if (ext == ".xml") {
+            strContent = fs.readFileSync(fileName, "utf8")
             dt = this.parseXml(strContent);
         }
+        else if (ext == ".xlsx") {
+            dt = this.parseExcel(fileName);
+        }        
         else {
             throw new Error(`Format "${ext}" not supported`);
         }
@@ -123,7 +129,20 @@ export class DataTable {
         }
         return result;
     };
-    
+
+    private static parseExcel(fileName: string): DataTable {
+
+        var dt = new DataTable();
+        var workBook = XLSX.readFile(fileName);
+        var sheetName = workBook.SheetNames[0];
+        console.log(sheetName);
+        var workSheet = workBook.Sheets[sheetName];
+
+        console.log(workSheet);
+
+        return dt;
+    }
+
     private static parseXml(xmlContent: string): DataTable {
         var dt = new DataTable();
         var etree = et.parse(xmlContent);

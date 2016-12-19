@@ -52,4 +52,9 @@ describe("DataTable", function() {
         var d2 = DataTable.load(fileName);
         assert.deepEqual(d2, d1, JSON.stringify(d2, null, 4));
     });
+
+    it.only("Loads and reads Excel data", function() {
+        var fileName = "test/assets/book1.xlsx";
+        var dt = DataTable.load(fileName);
+    });    
 });
