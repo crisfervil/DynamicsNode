@@ -1,4 +1,4 @@
-import {EntityReference} from "./CRMDataTypes";
+import {EntityMetadata,EntityReference,EntityFilters} from "./CRMDataTypes";
 
 export class WhoAmIRequest{
     public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.WhoAmIRequest";
@@ -24,4 +24,14 @@ export class AssignRequest{
 
 export class AssignResponse{
 
+}
+
+export class RetrieveEntityRequest{
+    public __typeName="Microsoft.Xrm.Sdk,Microsoft.Xrm.Sdk.Messages.RetrieveEntityRequest";
+    constructor(public LogicalName:string, public EntityFilters:EntityFilters){
+    }
+}
+
+export class RetrieveEntityResponse{
+    public EntityMetadata:EntityMetadata;
 }

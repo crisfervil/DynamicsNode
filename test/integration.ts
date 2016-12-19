@@ -210,30 +210,23 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
 
     });    
 
+    // TODO: Merge this tests with create and update an account
     it('Creates and Updates a Lead',function (){
         // create a lead
-        var leadId = crm.create("lead",{description:"test", estimatedCloseDate:new Date()});
-        
+        // try different data types
+        var lead = {description:"test" // memo
+                    ,firstname:"test"// string
+                    ,estimatedCloseDate:new Date() //datetime
+                    ,donotfax:true // bolean
+                    ,address1_latitude:89.556 // double
+                    ,numberofemployees:100 // integer
+                    //,estimatedamount:150 // money
+                    //,budgetstatus:1 // picklist
+                    };
+        var leadId = crm.create("lead",lead);
         crm.update("lead",{leadid:leadId,estimatedCloseDate:null});
-
-        // delete created record
-        crm.delete("lead",leadId);
-
-    });
-
-    it('Creates a connection between a lead and an Account',function (){
-        // create a lead
-        var leadId = crm.create("lead",{description:"test"});
-        var accountId = crm.create("account",{name:"test"});
-
-        var connectionId = crm.create("connection", {record1id:{id:accountId,type:"account"}, record2id:{id:leadId,type:"lead"}});
-
-        // delete created record
-        crm.delete("connection",connectionId);
-        crm.delete("account",accountId);
         crm.delete("lead",leadId);
     });
-
 
     it('Associates and Disassociates a lead and an contact',function (){
         // create a lead
@@ -362,8 +355,5 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
       assert.deepEqual(users,users2);
 
     });
-
-
-
   });
 }

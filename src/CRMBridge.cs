@@ -1,10 +1,9 @@
 using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Client;
-using Microsoft.Xrm.Client.Services;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Tooling.Connector;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -19,14 +18,6 @@ public class Startup
     {
         string connectionString = options.connectionString;
         bool useFake = options.useFake;
-
-        //foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) Console.WriteLine(a.FullName);
-        System.AppDomain.CurrentDomain.UnhandledException += (x, y) => {
-            //Console.WriteLine(y.ExceptionObject.ToString());
-        };
-        System.AppDomain.CurrentDomain.FirstChanceException += (x, y) => {
-            //Console.WriteLine(y.Exception.ToString());
-        };
 
         CRMBridge bridge = new CRMBridge(connectionString, useFake);
         return new
@@ -52,7 +43,8 @@ public class Startup
             Update = (Func<object, Task<object>>)(
                 async (i) =>
                 {
-                    return bridge.Update(i);
+                    bridge.Update(i);
+                    return null;
                 }
             ),
             Delete = (Func<object, Task<object>>)(
@@ -73,12 +65,6 @@ public class Startup
                     return bridge.Disassociate(i);
                 }
             ),
-            GetEntityMetadata = (Func<object, Task<object>>)(
-                async (i) =>
-                {
-                    return bridge.GetEntityMetadata(i);
-                }
-            ),
             Execute = (Func<object, Task<object>>)(
                 async (i) =>
                 {
@@ -93,57 +79,54 @@ public class Startup
 public class CrmService : IOrganizationService
 {
     string _connectionString;
-    CrmConnection _connection;
-    OrganizationService _orgService;
+    CrmServiceClient _connection;
 
     public CrmService(string connectionString)
     {
         WebRequest.DefaultWebProxy = WebRequest.GetSystemWebProxy();
         WebRequest.DefaultWebProxy.Credentials = CredentialCache.DefaultNetworkCredentials;
         _connectionString = connectionString;
-        // Establish a connection to the organization web service using CrmConnection.
-        _connection = Microsoft.Xrm.Client.CrmConnection.Parse(_connectionString);
-        _orgService = new OrganizationService(_connection);
+        _connection = new CrmServiceClient(_connectionString);
     }
 
     public OrganizationResponse Execute(OrganizationRequest request)
     {
-        return _orgService.Execute(request);
+        return _connection.Execute(request);
     }
 
     public void Delete(string entityName, Guid id)
     {
-        _orgService.Delete(entityName, id);
+        _connection.Delete(entityName, id);
     }
 
     public void Associate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
     {
-        _orgService.Associate(entityName, entityId, relationship, relatedEntities);
+        _connection.Associate(entityName, entityId, relationship, relatedEntities);
     }
 
     public Guid Create(Entity entity)
     {
-        return _orgService.Create(entity);
+        return _connection.Create(entity);
     }
 
     public void Disassociate(string entityName, Guid entityId, Relationship relationship, EntityReferenceCollection relatedEntities)
     {
-        _orgService.Disassociate(entityName, entityId, relationship, relatedEntities);
+        _connection.Disassociate(entityName, entityId, relationship, relatedEntities);
     }
 
     public Entity Retrieve(string entityName, Guid id, ColumnSet columnSet)
     {
-        return _orgService.Retrieve(entityName, id, columnSet);
+        return _connection.Retrieve(entityName, id, columnSet);
     }
 
     public EntityCollection RetrieveMultiple(QueryBase query)
     {
-        return _orgService.RetrieveMultiple(query);
+        return _connection.RetrieveMultiple(query);
     }
 
     public void Update(Entity entity)
     {
-        _orgService.Update(entity);
+        _connection.Update(entity);
     }
 }
 
@@ -174,31 +157,19 @@ public class CRMBridge
         return null;
     }
 
-    public object Create(dynamic options)
+    public object Create(dynamic entity)
     {
         Guid createdId = Guid.Empty;
-
-        string entityName = options.entityName;
-        object[] values = options.values;
-
-        // convert the values to an entity type
-        var entity = Convert(entityName, values);
-
-        createdId = _service.Create(entity);
-
+        Entity e = ConvertFromDynamic(entity);
+        createdId = _service.Create(e);
         return createdId;
     }
 
-    public object Update(dynamic options)
+    public void Update(dynamic entity)
     {
-        string entityName = options.entityName;
-        object[] values = options.values;
-
         // convert the values to an entity type
-        var entity = Convert(entityName, values);
-        _service.Update(entity);
-
-        return null;
+        Entity e = ConvertFromDynamic(entity);
+        _service.Update(e);
     }
 
     public object Retrieve(dynamic options)
@@ -293,187 +264,6 @@ public class CRMBridge
         return null;
     }
 
-    public object GetEntityMetadata(dynamic options)
-    {
-        var entityName = options.entityName;
-        var metadata = GetMetadataFromCache(entityName);
-        var res = Newtonsoft.Json.JsonConvert.SerializeObject(metadata);
-        return res;
-    }
-
-    private Entity Convert(string entityName, object[] values)
-    {
-
-        var metadata = GetMetadataFromCache(entityName);
-        var entity = new Entity(entityName);
-
-        for (int i = 0; i < values.Length; i += 2)
-        {
-            string fieldName = (string)values[i];
-            fieldName = fieldName.ToLower();// Normalize casing in field names
-            object fieldValue = values[i + 1];
-            AttributeMetadata fieldMetadata = Array.Find(metadata.Attributes, x => string.Compare(x.LogicalName, fieldName) == 0);
-
-            if (fieldMetadata != null)
-            {
-                if (fieldMetadata.AttributeType != AttributeTypeCode.State && fieldMetadata.AttributeType != AttributeTypeCode.Status)
-                {
-                    object fieldConvertedValue = Convert(fieldValue, fieldMetadata);
-                    entity.Attributes.Add(fieldName.ToLower(), fieldConvertedValue);
-                }
-                else
-                {
-                    Console.WriteLine("Warning** {0} attribute ignored. To change the status, use the SetStatus operation", fieldName);
-                }
-            }
-            else
-            {
-                Console.WriteLine("Warning** attribute {0} not found in entity {1}", fieldName, entityName);
-            }
-        }
-
-        return entity;
-    }
-
-    private object Convert(object fieldValue, AttributeMetadata fieldMetadata)
-    {
-        object convertedValue = null;
-
-        switch (fieldMetadata.AttributeType)
-        {
-            case AttributeTypeCode.Picklist:
-                convertedValue = ConvertToOptionSet(fieldValue, fieldMetadata);
-                break;
-            case AttributeTypeCode.Uniqueidentifier:
-                convertedValue = ConvertToUniqueidentifier(fieldValue);
-                break;
-            case AttributeTypeCode.Customer:
-                convertedValue = ConvertToCustomer(fieldValue);
-                break;
-            case AttributeTypeCode.DateTime:
-                convertedValue = ConvertToDateTime(fieldValue);
-                break;
-            case AttributeTypeCode.Lookup:
-                convertedValue = ConvertToLookup(fieldValue, fieldMetadata);
-                break;
-            default:
-                // No conversion needed
-                convertedValue = fieldValue;
-                break;
-        }
-
-
-        return convertedValue;
-    }
-
-    private EntityReference ConvertToLookup(object fieldValue, AttributeMetadata fieldMetadata)
-    {
-        EntityReference lookupValue=null;
-        Guid guidValue;
-        string targetEntityName = null;
-
-        if (fieldValue != null)
-        {
-            if (fieldValue.GetType() == typeof(ExpandoObject))
-            {
-                dynamic expandoValue = (ExpandoObject)fieldValue;
-                targetEntityName = expandoValue.type;
-                guidValue = Guid.Parse(expandoValue.id);
-            }
-            else
-            {
-                var lookupMetadata = (LookupAttributeMetadata)fieldMetadata;
-                if (lookupMetadata.Targets.Length > 1) throw new Exception("Too many targets");
-
-                targetEntityName = lookupMetadata.Targets[0];
-
-
-                if (Guid.TryParse((string)fieldValue, out guidValue))
-                {
-                    // Is a Guid
-                }
-                else
-                {
-                    // Is a text, or something else, so we have to get its Id
-
-                    EntityMetadata targetEntityMetadata = GetMetadataFromCache(targetEntityName);
-                    var primaryNameAttribute = targetEntityMetadata.PrimaryNameAttribute;
-                    var targetEntityIdFieldName = targetEntityMetadata.PrimaryIdAttribute;
-                    QueryExpression qry = new QueryExpression(targetEntityName);
-                    qry.Criteria.AddCondition(new ConditionExpression(primaryNameAttribute, ConditionOperator.Equal, fieldValue));
-                    var lookupRecords = _service.RetrieveMultiple(qry);
-                    if (lookupRecords.Entities.Count == 0) throw new Exception("no records found");
-                    if (lookupRecords.Entities.Count > 1) throw new Exception("more than one record found");
-                    guidValue = (Guid)lookupRecords.Entities[0].Attributes[targetEntityIdFieldName];
-                }
-            }
-            lookupValue = new EntityReference(targetEntityName, guidValue);
-        }
-
-        return lookupValue;
-    }
-
-    private object ConvertToDateTime(object fieldValue)
-    {
-        object convertedValue = null;
-        if (fieldValue != null)
-        {
-            if (fieldValue.GetType() == typeof(DateTime))
-            {
-                return fieldValue;
-            }
-            else
-            {
-                return DateTime.Parse((string)fieldValue);
-            }
-        }
-        return convertedValue;
-    }
-
-    private Guid ConvertToUniqueidentifier(object value)
-    {
-        return Guid.Parse((string)value);
-    }
-
-    private EntityReference ConvertToCustomer(dynamic value)
-    {
-        string id = (string)value.id;
-        var guid = new Guid(id);
-        string customerType = value.type;
-        return new EntityReference(customerType,guid);
-    }
-
-
-    private OptionSetValue ConvertToOptionSet(object value, AttributeMetadata fieldMetadata)
-    {
-        OptionSetValue optionsetValue;
-        int intValue = default(int);
-
-        if (value.GetType() == typeof(int))
-        {
-            intValue = (int)value;
-        }
-        else
-        {
-            var found = false;
-            // try to get the optionset value from a string
-            PicklistAttributeMetadata optionsetMetadata = (PicklistAttributeMetadata)fieldMetadata;
-            foreach (var optionMetadata in optionsetMetadata.OptionSet.Options)
-            {
-                if (optionMetadata.Label.UserLocalizedLabel.Label == (string)value)
-                {
-                    intValue = optionMetadata.Value.Value;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) throw new Exception("Optionset value nor found");
-        }
-
-        optionsetValue = new OptionSetValue(intValue);
-        return optionsetValue;
-    }
-
     private object[] Convert(Entity entityRecord)
     {
         var values = new List<object>();
@@ -504,30 +294,6 @@ public class CRMBridge
         }
         return values.ToArray();
     }
-
-    private EntityMetadata GetMetadataFromCache(string entityName)
-    {
-        if (!_metadataCache.ContainsKey(entityName))
-        {
-            _metadataCache.Add(entityName, GetMetadata(entityName));
-        }
-        return _metadataCache[entityName];
-    }
-
-    /// <summary>
-    /// Retrieves an entity's metadata.
-    /// </summary>
-    /// <param name="entityName">entity's name</param>
-    /// <returns>Attribute Metadata for the specified entity</returns>
-    private EntityMetadata GetMetadata(string entityName)
-    {
-        RetrieveEntityRequest metaDataRequest = new RetrieveEntityRequest();
-        metaDataRequest.EntityFilters = EntityFilters.All;
-        metaDataRequest.LogicalName = entityName;
-        RetrieveEntityResponse metaDataResponse = (RetrieveEntityResponse)_service.Execute(metaDataRequest);
-
-        return metaDataResponse.EntityMetadata;
-    }
     
     public object Execute(dynamic request)
     {
@@ -542,7 +308,7 @@ public class CRMBridge
                 BusinessUnitId = rs.BusinessUnitId,
                 OrganizationId = rs.OrganizationId,
                 ExtensionData = rs.ExtensionData,
-                //Results = rs.Results,
+                Results = rs.Results,
                 ResponseName=rs.ResponseName };
         }
         return response;
@@ -574,7 +340,12 @@ public class CRMBridge
                 {
                     var propValue = prop.Value;
                     Type propValueType = prop.Value.GetType();
-                    if (propValueType == typeof(ExpandoObject))
+                    if (propDef.PropertyType == typeof(AttributeCollection))
+                    {
+                        if (propValueType != typeof(ExpandoObject)) throw new Exception(string.Format("Can't convert from {0} to AttributeCollection", propValueType.Name));
+                        propValue = ConvertFromDynamicToAttributeCollection((ExpandoObject)propValue);
+                    }
+                    else if (propValueType == typeof(ExpandoObject))
                     {
                         ExpandoObject propExpando = (ExpandoObject)propValue;
                         propValue = ConvertFromDynamic(propExpando);
@@ -589,6 +360,40 @@ public class CRMBridge
         }
 
         return converted;
+    }
+
+    private AttributeCollection ConvertFromDynamicToAttributeCollection(ExpandoObject value)
+    {
+        AttributeCollection retVal = null;
+        if (value != null)
+        {
+            var valueDictionary = (IDictionary<string, object>)value;
+            if (valueDictionary.Keys.Count > 0) retVal = new AttributeCollection();
+            foreach (var prop in valueDictionary)
+            {
+                if (prop.Value != null)
+                {
+                    // Convert values
+                    object convertedValue = prop.Value;
+                    var propValueType = prop.Value.GetType();
+
+                    if(propValueType == typeof(ExpandoObject))
+                    {
+                        convertedValue = ConvertFromDynamic((ExpandoObject)prop.Value);
+                    }
+                    else if (propValueType == typeof(string))
+                    {
+                        Guid guidValue;
+                        if(Guid.TryParse((string)prop.Value,out guidValue))
+                        {
+                            convertedValue = guidValue;
+                        }
+                    }
+                    retVal.Add(prop.Key, convertedValue);
+                }
+            }
+        }
+        return retVal;
     }
 
     private object GetTypeInstance(string typeFullName)
