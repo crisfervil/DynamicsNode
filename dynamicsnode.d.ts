@@ -113,6 +113,7 @@ declare module 'dynamicsnode' {
      * @param {string} connectionString Optional. A valid connection string or connection string name
      */
     export class CRMClient {
+        constructor(connectionString?: string, version?: string);
         whoAmI(): WhoAmIResponse;
         testConnection(): void;
         retrieve(entityName: string, idOrConditions: string | Guid | Object, pColumns?: string | string[] | boolean): any;
