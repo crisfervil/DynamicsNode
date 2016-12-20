@@ -42,17 +42,31 @@ declare module 'dynamicsnode' {
     }
 
     export class DataTable {
+        name: string;
         rows: Array<any>;
-        constructor(rows?: Array<any>);
-        lookup(columnName: string, updater: (row: any) => any): void;
+        /** Default constructor
+         * @class DataTable
+         * @classdesc Represents a DataTable object. Contains methods to save and load the row values from a file.
+         */
+        constructor(name?: string, rows?: Array<any>);
+        /** Method to convert all the existing values in a column.
+         * Iterates through all the existing rows, and for every value in the specified column calls to the specified callback method.
+         * Then, the returning value will be applied to the column.
+         *
+         */
+        lookup(columnName: string, updater: (row: any) => any, useCache?: boolean): void;
+        /** The path is relative to process.cwd() */
         save(fileName: string): void;
+        /** The path is relative to process.cwd() */
         static load(fileName: string): DataTable;
         private static parseNumbers(str);
         private static parseBooleans(str);
         private static parseDates(str);
         private static parseValue(str);
         private static JSONDataReviver(key, str);
+        private static parseExcel(fileName);
         private static parseXml(xmlContent);
+        private static parseXmlValue(strValue);
         private serializeXml(data);
         private serializeValue(value);
     }

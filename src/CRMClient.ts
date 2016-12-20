@@ -342,7 +342,31 @@ export class CRMClient {
      * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
      * console.log(accountid);
      */
-    create(entityName: string, attributes: any): string {
+    create(entity:string,attributes:any):string;
+    /**
+     * 
+     */
+    create(data:DataTable): void;
+    create(entityNameOrTable:string|DataTable,attributes?:any):any{
+        var retVal = null;
+        if(entityNameOrTable instanceof DataTable){
+            if(entityNameOrTable.name==null) throw new Error("Table name not specified");
+            var primaryAttribute = this.getIdField(entityNameOrTable.name);
+            for (var i = 0; i < entityNameOrTable.rows.length; i++) {
+                var row = entityNameOrTable.rows[i];
+                var recordId = this.createInternal(entityNameOrTable.name,row);
+                // update the record id in the table
+                row[primaryAttribute]==recordId;
+            }            
+        }
+        else {
+            if(attributes===undefined) throw new Error("The attributes parameter is required");
+            retVal = this.createInternal(entityNameOrTable,attributes);
+        }
+        return retVal;
+    }
+
+    private createInternal(entityName: string, attributes: any): string {
         var entity = this.ConvertToEntity(entityName,attributes);
         var createdGuid = this._crmBridge.Create(entity, true);
         return createdGuid;

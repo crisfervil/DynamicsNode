@@ -7,13 +7,13 @@
         "jsx": "react",
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "declaration": false,
+        "declaration": true,
         "noImplicitAny": false,
         "removeComments": false,
         "noLib": false,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
-        "sourceMap":false
+        "sourceMap":true
     },
     "exclude": [
         "node_modules",
@@ -21,8 +21,5 @@
         "typings/browser.d.ts"
     ],
     "compileOnSave": true,
-    "buildOnSave": false,
-    "atom": {
-        "rewriteTsconfig": false
-    }
+    "buildOnSave": false
 }

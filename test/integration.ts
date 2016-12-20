@@ -316,6 +316,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         var accountId = crm.create("acCount",account);
         assert.ok(accountId);
 
+
         // find the top business unit
         var topBu = crm.retrieve("businessunit",{parentbusinessunitid:null},["name","businessunitid"]);
         console.log(topBu);
@@ -354,6 +355,26 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
       var users2 = DataTable.load(fileName);
       assert.deepEqual(users,users2);
 
+    });
+
+    it.only("Looks up the parent account of a contact using the contact phone number",function(){
+
+        // create an account with a specific phone number
+        var phoneNumber = "555454-465454";
+        var accountId = crm.create("account",{name:"test account", telephone1:phoneNumber});
+
+        // create a contact using a data table and associate to the create account using the phone number
+        var dtContacts = new DataTable("contact");
+        dtContacts.rows.push({firstName:"testContact",telephone1:phoneNumber, parentaccountid:null});
+
+        // resolve the parentaccountid field
+        dtContacts.lookup("parentaccountid",row=>crm.retrieve("account",{telephone1:row.telephone1}));
+
+        crm.create(dtContacts);
+
+        // delete created records
+        crm.delete("contact",dtContacts.rows[0].contactid);
+        crm.delete("account",accountId);
     });
   });
 }
