@@ -103,18 +103,18 @@ var CRMClient = (function () {
      * @param {string} connectionString Optional. A valid connection string or connection string name.
      * The connection string can be either a valid connection string or a name of an existing connection string in the file "config.json" at the root path of your application.
      * If no value is passed to the constructor, the "default" text will be assumed, which means that a connection string named "default" will be used.
-     * @see {@link https://msdn.microsoft.com/en-us/library/gg695810.aspx} for further information
+     * @see {@link https://msdn.microsoft.com/en-ie/library/mt608573.aspx} for further information
      *
      * @example &lt;caption>config.json file format&lt;/caption>
      * {
      *      "connectionStrings":
      *      {
-     *          "default":"Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode",
-     *          "connection2":"Url=http://crm.contoso.com/xrmContoso"
+     *          "default":"AuthType=Office365; Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode",
+     *          "connection2":"AuthType=AD; Url=http://crm.contoso.com/xrmContoso"
      *      }
      * }
      * @example &lt;caption>Create a connection using a valid Connection String&lt;/caption>
-     * var crm = new CRMClient("Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode");
+     * var crm = new CRMClient("AuthType=Office365; Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode");
      * @example &lt;caption>Create a connection using the connection string named "connection2" specified in the config.json file&lt;/caption>
      * var crm = new CRMClient("connection2");
      * @example &lt;caption>Create a connection using the connection string named "default" specified in the config.json file&lt;/caption>
@@ -259,9 +259,9 @@ var CRMClient = (function () {
         var result;
         var columns;
         if (!entityName)
-            throw "Entity name not specified";
+            throw new Error("Entity name not specified");
         if (!idOrConditions)
-            throw "Id or Conditions not specified";
+            throw new Error("Id or Conditions not specified");
         entityName = entityName.toLocaleLowerCase(); // normalize casing
         // validate columns
         if (pColumns === undefined) {
@@ -284,7 +284,7 @@ var CRMClient = (function () {
         else if (typeof idOrConditions === "string" || idOrConditions instanceof String) {
             idValue = idOrConditions;
             if (!Guid_1.Guid.isGuid(idValue))
-                throw "Invalid GUID value";
+                throw new Error("Invalid GUID value");
         }
         else if (typeof idOrConditions === "object") {
             // Assume a conditions objet was passed
@@ -392,7 +392,8 @@ var CRMClient = (function () {
         return result;
     };
     /**
-     * Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before send the operation to Crm.
+     * Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before
+     * send the operation to Crm.
      * @method CRMClient#create
      * @param entityName {string} The name of the entity which record you want to create
      * @param attributes {object} Javascript object with the values the new record will have.
@@ -403,7 +404,39 @@ var CRMClient = (function () {
      * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
      * console.log(accountid);
      */
-    CRMClient.prototype.create = function (entityName, attributes) {
+    /**
+     * Creates records in CRM using the rows defined in the DataTable.
+     * The id attribute of every created record will be updated with the generated CRM GUID.
+     * You need to set the name of the table with the entity name that you want to create.
+     * @method CRMClient#create
+     * @param data {DataTable} DataTable with the data to be created in CRM.
+     *
+     * @example &lt;caption>Create a set of accounts using an excel file&lt;/caption>
+     * var accountsToLoad = DataTable.load("AccountsToLoad.xlsx");
+     * crm.create(accountsToLoad);
+     * console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record
+     */
+    CRMClient.prototype.create = function (entityNameOrTable, attributes) {
+        var retVal = null;
+        if (entityNameOrTable instanceof DataTable_1.DataTable) {
+            if (entityNameOrTable.name == null)
+                throw new Error("Table name not specified");
+            var primaryAttribute = this.getIdField(entityNameOrTable.name);
+            for (var i = 0; i &lt; entityNameOrTable.rows.length; i++) {
+                var row = entityNameOrTable.rows[i];
+                var recordId = this.createInternal(entityNameOrTable.name, row);
+                // update the record id in the table
+                row[primaryAttribute] = recordId;
+            }
+        }
+        else {
+            if (attributes === undefined)
+                throw new Error("The attributes parameter is required");
+            retVal = this.createInternal(entityNameOrTable, attributes);
+        }
+        return retVal;
+    };
+    CRMClient.prototype.createInternal = function (entityName, attributes) {
         var entity = this.ConvertToEntity(entityName, attributes);
         var createdGuid = this._crmBridge.Create(entity, true);
         return createdGuid;
@@ -411,9 +444,9 @@ var CRMClient = (function () {
     CRMClient.prototype.ConvertToEntity = function (entityName, attributes) {
         // perform some validations
         if (!entityName)
-            throw "Entity name not specified";
+            throw new Error("Entity name not specified");
         if (!attributes)
-            throw "Attributes not specified";
+            throw new Error("Attributes not specified");
         entityName = entityName.toLocaleLowerCase(); // normalize casing
         var entity = new CRMDataTypes_1.Entity();
         entity.LogicalName = entityName;
@@ -427,13 +460,12 @@ var CRMClient = (function () {
                 if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.String] ||
                     attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Memo]) {
                     if (!(typeof attributes[prop] == "string"))
-                        throw "Cannot convert attribute '" + attributeName + "' from '" + typeof attributes[prop] + "' to 'String'";
+                        throw new Error("Cannot convert attribute '" + attributeName + "' from '" + typeof attributes[prop] + "' to 'String'");
                     attributeValue = attributes[prop];
                 }
                 else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.DateTime]) {
                     if (attributes[prop] &amp;&amp; !(attributes[prop] instanceof Date))
-                        throw "Cannot convert attribute '" + attributeName + "' from '" + typeof attributes[prop] + "' to 'Date'";
-                    ;
+                        throw new Error("Cannot convert attribute '" + attributeName + "' from '" + typeof attributes[prop] + "' to 'Date'");
                     attributeValue = attributes[prop];
                 }
                 else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Lookup] ||
@@ -462,7 +494,7 @@ var CRMClient = (function () {
             optionset = new CRMDataTypes_1.OptionSetValue(attributeValue);
         }
         else {
-            throw "Can't convert from " + typeof attributeValue + " to OptionsetValue";
+            throw new Error("Can't convert from " + typeof attributeValue + " to OptionsetValue");
         }
         return optionset;
     };
@@ -471,8 +503,8 @@ var CRMClient = (function () {
         var target = null, id = null;
         if (typeof attributeValue == "string") {
             // TODO: If the value is not a GUID, find the value in the target entity
-            if (attributeMetadata.Targets.Length > 1)
-                throw "Too many targets";
+            if (attributeMetadata.Targets.length > 1)
+                throw new Error("Too many targets");
             target = attributeMetadata.Targets[0];
             id = attributeValue;
         }
@@ -481,7 +513,7 @@ var CRMClient = (function () {
             target = attributeValue.type;
         }
         if (!(target &amp;&amp; id))
-            throw "Couldn't get value";
+            throw new Error("Couldn't get value");
         er = new CRMDataTypes_1.EntityReference(id, target);
         return er;
     };
@@ -522,21 +554,21 @@ var CRMClient = (function () {
         var ids;
         var recordsAffected = 0;
         if (!entityName)
-            throw "Entity name not specified";
+            throw new Error("Entity name not specified");
         entityName = entityName.toLowerCase(); // normalize casing
         if (idsOrConditions instanceof Guid_1.Guid) {
             ids = [idsOrConditions.getValue()];
         }
         else if (typeof idsOrConditions == "string") {
             if (!Guid_1.Guid.isGuid(idsOrConditions))
-                throw "Invalid GUID value";
+                throw new Error("Invalid GUID value");
             ids = [idsOrConditions];
         }
         else if (Array.isArray(ids)) {
             for (var i = 0; i &lt; ids.length; i++) {
                 var item = ids[i];
                 if (!(item instanceof Guid_1.Guid) || Guid_1.Guid.isGuid(item)) {
-                    throw "Invalid GUID";
+                    throw new Error("Invalid GUID");
                 }
             }
             ids = idsOrConditions;
@@ -580,7 +612,7 @@ var CRMClient = (function () {
     CRMClient.prototype.update = function (entityName, attributes, conditions) {
         var updatedRecordsCount = 0;
         if (!entityName)
-            throw "Entity name not specified";
+            throw new Error("Entity name not specified");
         entityName = entityName.toLowerCase(); // normalize casing
         // get records GUIDS
         if (conditions != undefined) {
@@ -610,7 +642,7 @@ var CRMClient = (function () {
             idAttr = metadata.PrimaryIdAttribute;
         }
         if (idAttr == null)
-            throw "Primary Attribute not found for entity " + entityName;
+            throw new Error("Primary Attribute not found for entity " + entityName);
         debug("idAttr for entity '" + entityName + "': '" + idAttr + "'");
         // convert it to lowercase
         return idAttr.toLowerCase();
@@ -657,15 +689,15 @@ var CRMClient = (function () {
     CRMClient.prototype.associate = function (fromEntityName, fromEntityId, relationshipName, toEntityName, toEntityId) {
         // perform some validations
         if (!fromEntityName)
-            throw "From entity name not specified";
+            throw new Error("From entity name not specified");
         fromEntityName = fromEntityName.toLowerCase(); // normalize casing
         if (!toEntityName)
-            throw "To entity name not specified";
+            throw new Error("To entity name not specified");
         toEntityName = toEntityName.toLowerCase(); // normalize casing
         if (!fromEntityId)
-            throw "fromEntityId not specified";
+            throw new Error("fromEntityId not specified");
         if (!toEntityId)
-            throw "toEntityId not specified";
+            throw new Error("toEntityId not specified");
         var fromId, toId;
         if (fromEntityId instanceof Guid_1.Guid) {
             fromId = fromEntityId.getValue();
@@ -691,15 +723,15 @@ var CRMClient = (function () {
     CRMClient.prototype.disassociate = function (fromEntityName, fromEntityId, relationshipName, toEntityName, toEntityId) {
         // perform some validations
         if (!fromEntityName)
-            throw "From entity name not specified";
+            throw new Error("From entity name not specified");
         fromEntityName = fromEntityName.toLowerCase(); // normalize casing
         if (!toEntityName)
-            throw "To entity name not specified";
+            throw new Error("To entity name not specified");
         toEntityName = toEntityName.toLowerCase(); // normalize casing
         if (!fromEntityId)
-            throw "fromEntityId not specified";
+            throw new Error("fromEntityId not specified");
         if (!toEntityId)
-            throw "toEntityId not specified";
+            throw new Error("toEntityId not specified");
         var fromId, toId;
         if (fromEntityId instanceof Guid_1.Guid) {
             fromId = fromEntityId.getValue();
@@ -750,7 +782,7 @@ var CRMClient = (function () {
         debug("Exporting " + entityName + " to " + fileName + "...");
         // perform some validations
         if (!entityName)
-            throw "Entity name not specified";
+            throw new Error("Entity name not specified");
         entityName = entityName.toLowerCase(); // normalize casing
         debug("Getting metadata...");
         var metadata = this.getEntityMetadata(entityName);
@@ -780,7 +812,7 @@ var CRMClient = (function () {
     return CRMClient;
 }());
 exports.CRMClient = CRMClient;
-</pre>
+//# sourceMappingURL=CRMClient.js.map</pre>
     </article>
 </section>
 
@@ -825,7 +857,7 @@ exports.CRMClient = CRMClient;
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Mon Dec 19th 2016
+		on Wed Dec 21st 2016
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

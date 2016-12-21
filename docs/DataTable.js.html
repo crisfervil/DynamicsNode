@@ -89,6 +89,7 @@ var path = require("path");
 var fs = require("fs");
 var XMLWriter = require("xml-writer");
 var et = require("elementtree");
+var XLSX = require("xlsx");
 var debug = require("debug")("dynamicsnode");
 var DataTable = (function () {
     /** Default constructor
@@ -102,11 +103,48 @@ var DataTable = (function () {
             this.rows = rows;
         }
     }
-    DataTable.prototype.lookup = function (columnName, updater) {
+    /** Method to convert all the existing values in a column.
+     * Iterates through all the existing rows, and for every value in the specified column calls to the specified callback method.
+     * Then, the returning value will be applied to the column.
+     * The idea behind this functionality is that you can resolve the lookup data that you may have in a DataTable, before sending
+     * those values to CRM.
+     * For example, you may want to load a list of contacts, and you want to associate your contacts to existing parent accounts.
+     * What you can do, is use the phone number on the contact to try to find the parent account of the contact.
+     * @method DataTable#lookup
+     * @example &lt;caption>Lookup using simple values&lt;/caption>
+     *  var dt = new DataTable();
+     *  dt.rows.push({val1:1,val2:2},
+     *               {val1:2,val2:2});
+     *  dt.lookup("val1",row=>++row.val1);
+     *  console.log(dt.rows[0].val1); // prints out 2
+     *  console.log(dt.rows[1].val1); // prints out 3
+     * @example &lt;caption>Find the parent account of a contact using the phone number&lt;/caption>
+     *  // create a contact using a data table and associate to the create account using the phone number
+     *  var dtContacts = DataTable.load("MyContactsToLoad.json");
+     *
+     *  // resolve the parentcustomerid field
+     *  dtContacts.lookup("parentcustomerid",row=>{ return {id:crm.retrieve("account",{telephone1:row.telephone1}).accountid,type:"account"}});
+     *
+     *  // create the record
+     *  crm.create(dtContacts);
+     */
+    DataTable.prototype.lookup = function (columnName, updater, useCache) {
+        if (useCache === void 0) { useCache = false; }
+        var cache = {}; // Temporary cache 
         for (var i = 0; i &lt; this.rows.length; i++) {
             var currentRow = this.rows[i];
-            var value = updater(currentRow);
-            currentRow[columnName] = value;
+            var lookupValue = currentRow[columnName];
+            var resolvedValue = null;
+            if (useCache &amp;&amp; lookupValue !== undefined &amp;&amp; lookupValue !== undefined &amp;&amp; cache[lookupValue] !== undefined) {
+                resolvedValue = cache[lookupValue];
+            }
+            if (resolvedValue == null) {
+                resolvedValue = updater(currentRow);
+                if (useCache &amp;&amp; lookupValue !== undefined &amp;&amp; lookupValue !== undefined) {
+                    cache[lookupValue] = resolvedValue;
+                }
+            }
+            currentRow[columnName] = resolvedValue;
         }
     };
     /** The path is relative to process.cwd() */
@@ -137,14 +175,19 @@ var DataTable = (function () {
         var ext = path.extname(fileName);
         if (ext != null)
             ext = ext.toLowerCase();
-        var strContent = fs.readFileSync(fileName, "utf8");
+        var strContent;
         if (ext == ".json") {
+            strContent = fs.readFileSync(fileName, "utf8");
             dt = JSON.parse(strContent, this.JSONDataReviver);
             if (dt &amp;&amp; dt.rows === undefined)
                 throw "The parsed file doesn't look like a DataTable";
         }
         else if (ext == ".xml") {
+            strContent = fs.readFileSync(fileName, "utf8");
             dt = this.parseXml(strContent);
+        }
+        else if (ext == ".xlsx") {
+            dt = this.parseExcel(fileName);
         }
         else {
             throw new Error("Format \"" + ext + "\" not supported");
@@ -204,6 +247,33 @@ var DataTable = (function () {
         return result;
     };
     ;
+    DataTable.parseExcel = function (fileName) {
+        var dt = new DataTable();
+        var workBook = XLSX.readFile(fileName);
+        var sheetName = workBook.SheetNames[0];
+        var workSheet = workBook.Sheets[sheetName];
+        dt.name = sheetName;
+        var rangeName = workSheet["!ref"];
+        var range = XLSX.utils.decode_range(rangeName);
+        var from = range.s, to = range.e;
+        // Assume the firs row contains column names
+        for (var rowIndex = from.r + 1, tableRowIndex = 0; rowIndex &lt;= to.r; rowIndex++, tableRowIndex++) {
+            var row = {};
+            for (var colIndex = from.c, tableColIndex = 0; colIndex &lt;= to.c; colIndex++, tableColIndex++) {
+                // Get the column name
+                var nameColRange = XLSX.utils.encode_cell({ r: from.r, c: colIndex });
+                var colName = workSheet[nameColRange];
+                var currentRange = XLSX.utils.encode_cell({ r: rowIndex, c: colIndex });
+                var colValue = workSheet[currentRange];
+                if (colName !== undefined &amp;&amp; colName.v !== null &amp;&amp; colName.v !== null &amp;&amp;
+                    colValue !== undefined &amp;&amp; colValue.v !== undefined &amp;&amp; colValue.v !== null) {
+                    row[colName.v] = colValue.v;
+                }
+            }
+            dt.rows.push(row);
+        }
+        return dt;
+    };
     DataTable.parseXml = function (xmlContent) {
         var dt = new DataTable();
         var etree = et.parse(xmlContent);
@@ -289,7 +359,7 @@ var DataTable = (function () {
     return DataTable;
 }());
 exports.DataTable = DataTable;
-</pre>
+//# sourceMappingURL=DataTable.js.map</pre>
     </article>
 </section>
 
@@ -334,7 +404,7 @@ exports.DataTable = DataTable;
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Mon Dec 19th 2016
+		on Wed Dec 21st 2016
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

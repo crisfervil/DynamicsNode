@@ -26,6 +26,7 @@ export class DataTable {
      * those values to CRM.
      * For example, you may want to load a list of contacts, and you want to associate your contacts to existing parent accounts. 
      * What you can do, is use the phone number on the contact to try to find the parent account of the contact. 
+     * @method DataTable#lookup
      * @example <caption>Lookup using simple values</caption>
      *  var dt = new DataTable();
      *  dt.rows.push({val1:1,val2:2},
@@ -34,13 +35,14 @@ export class DataTable {
      *  console.log(dt.rows[0].val1); // prints out 2
      *  console.log(dt.rows[1].val1); // prints out 3
      * @example <caption>Find the parent account of a contact using the phone number</caption>
-     *   // create a contact using a data table and associate to the create account using the phone number
-     *   var dtContacts = DataTable.load("MyContactsToLoad.json");
+     *  // create a contact using a data table and associate to the create account using the phone number
+     *  var dtContacts = DataTable.load("MyContactsToLoad.json");
      * 
-     *   // resolve the parentaccountid field
-     *   dtContacts.lookup("parentcustomerid",row=>{ return {id:crm.retrieve("account",{telephone1:row.telephone1}).accountid,type:"account"}});
+     *  // resolve the parentcustomerid field
+     *  dtContacts.lookup("parentcustomerid",row=>{ return {id:crm.retrieve("account",{telephone1:row.telephone1}).accountid,type:"account"}});
      * 
-     *   crm.create(dtContacts);
+     *  // create the record
+     *  crm.create(dtContacts);
      */
     lookup(columnName: string, updater: (row: any) => any, useCache:boolean = false): void {
         var cache = {}; // Temporary cache 

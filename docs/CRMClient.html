@@ -217,7 +217,7 @@
 	<dt class="tag-see method-doc-label method-doc-details-label">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="https://msdn.microsoft.com/en-us/library/gg695810.aspx">https://msdn.microsoft.com/en-us/library/gg695810.aspx</a> for further information</li>
+			<li><a href="https://msdn.microsoft.com/en-ie/library/mt608573.aspx">https://msdn.microsoft.com/en-ie/library/mt608573.aspx</a> for further information</li>
 			</ul>
 	</dd>
 	
@@ -243,11 +243,11 @@
         
         <p class="code-caption">config.json file format</p>
     
-    <pre class="sunlight-highlight-javascript">{     &quot;connectionStrings&quot;:     {         &quot;default&quot;:&quot;Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode&quot;,         &quot;connection2&quot;:&quot;Url=http://crm.contoso.com/xrmContoso&quot;     }}</pre>
+    <pre class="sunlight-highlight-javascript">{     &quot;connectionStrings&quot;:     {         &quot;default&quot;:&quot;AuthType=Office365; Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode&quot;,         &quot;connection2&quot;:&quot;AuthType=AD; Url=http://crm.contoso.com/xrmContoso&quot;     }}</pre>
 
         <p class="code-caption">Create a connection using a valid Connection String</p>
     
-    <pre class="sunlight-highlight-javascript">var crm = new CRMClient(&quot;Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode&quot;);</pre>
+    <pre class="sunlight-highlight-javascript">var crm = new CRMClient(&quot;AuthType=Office365; Url=http://crm.contoso.com/xrmContoso; Domain=CONTOSO; Username=jsmith; Password=passcode&quot;);</pre>
 
         <p class="code-caption">Create a connection using the connection string named "connection2" specified in the config.json file</p>
     
@@ -287,6 +287,152 @@
             
 <hr>
 <dt>
+    <h4 class="name" id="create"><span class="type-signature"></span>create(data)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates records in CRM using the rows defined in the DataTable.<br>The id attribute of every created record will be updated with the generated CRM GUID.<br>You need to set the name of the table with the entity name that you want to create.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataTable.html">DataTable</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>DataTable with the data to be created in CRM.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="CRMClient.js.html">CRMClient.js</a>,
+				 <a href="CRMClient.js.html#sunlight-1-line-321">line 321</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+        <p class="code-caption">Create a set of accounts using an excel file</p>
+    
+    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.create(accountsToLoad);console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="create"><span class="type-signature"></span>create(entityName, attributes)</h4>
     
     
@@ -295,7 +441,7 @@
 
     
     <div class="description">
-        <p>Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before send the operation to Crm.</p>
+        <p>Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before<br>send the operation to Crm.</p>
     </div>
     
 
@@ -634,7 +780,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-532">line 532</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-564">line 564</a>
 			</li>
 		</ul>
 	</dd>
@@ -817,7 +963,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-415">line 415</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-447">line 447</a>
 			</li>
 		</ul>
 	</dd>
@@ -1953,7 +2099,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-479">line 479</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-511">line 511</a>
 			</li>
 		</ul>
 	</dd>
@@ -2179,7 +2325,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Mon Dec 19th 2016
+		on Wed Dec 21st 2016
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

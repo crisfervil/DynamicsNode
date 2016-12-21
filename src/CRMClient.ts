@@ -329,9 +329,11 @@ export class CRMClient {
         return result;
     }
 
-
+    create(entity:string,attributes:any):string;
+    create(data:DataTable): void;
     /**
-     * Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before send the operation to Crm.
+     * Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before 
+     * send the operation to Crm.
      * @method CRMClient#create
      * @param entityName {string} The name of the entity which record you want to create
      * @param attributes {object} Javascript object with the values the new record will have.
@@ -342,11 +344,18 @@ export class CRMClient {
      * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
      * console.log(accountid);
      */
-    create(entity:string,attributes:any):string;
     /**
+     * Creates records in CRM using the rows defined in the DataTable. 
+     * The id attribute of every created record will be updated with the generated CRM GUID.
+     * You need to set the name of the table with the entity name that you want to create.
+     * @method CRMClient#create
+     * @param data {DataTable} DataTable with the data to be created in CRM.
      * 
-     */
-    create(data:DataTable): void;
+     * @example <caption>Create a set of accounts using an excel file</caption>
+     * var accountsToLoad = DataTable.load("AccountsToLoad.xlsx");
+     * crm.create(accountsToLoad);
+     * console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record
+     */    
     create(entityNameOrTable:string|DataTable,attributes?:any):any{
         var retVal = null;
         if(entityNameOrTable instanceof DataTable){
