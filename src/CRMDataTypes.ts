@@ -25,10 +25,19 @@ export class EntityMetadata{
     public Attributes:AttributeMetadata[];
 }
 
+export class LocalizedLabel{
+    Label:string;
+}
+
+export class Label {
+    UserLocalizedLabel:LocalizedLabel;
+}
+
 export class AttributeMetadata{
     public LogicalName:string;
     public AttributeType:string;
     public Targets:string[];
+    public DisplayName:Label;
 }
 
 export enum AttributeTypeCode{

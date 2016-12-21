@@ -315,6 +315,9 @@ public class CRMBridge
         if (response != null && response.GetType() == typeof(RetrieveEntityResponse))
         {
             var getTargets = new Func<LookupAttributeMetadata, string[]>(x => x!=null ? x.Targets : null);
+            var getLabel = new Func<Label, object>(x => x != null ?
+                new { UserLocalizedLabel = x.UserLocalizedLabel != null ? new { Label = x.UserLocalizedLabel.Label } : null } : null
+            );
             var rs = (RetrieveEntityResponse)response;
             response = new
             {
@@ -324,6 +327,7 @@ public class CRMBridge
                     Attributes = 
                         rs.EntityMetadata.Attributes.Select(x => new { LogicalName = x.LogicalName,
                                                                        AttributeType = x.AttributeType,
+                                                                       DisplayName=getLabel(x.DisplayName),
                                                                        Targets = getTargets(x as LookupAttributeMetadata)})
                 }
             };

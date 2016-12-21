@@ -342,7 +342,7 @@ export class CRMClient {
      * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
      * console.log(accountid);
      */
-    create(entity: string, attributes: any): string;
+    create(entity: string, attributes: Object): string;
 
     /**
      * Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before 
@@ -384,7 +384,7 @@ export class CRMClient {
      * crm.create(accountsToLoad);
      * console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record
      */
-    create(entityNameOrTable: string | DataTable, attributes?: any): any {
+    create(entityNameOrTable: string | DataTable, attributes?: Object): any {
         var retVal = null;
         if (entityNameOrTable instanceof DataTable) {
             if (entityNameOrTable.name == null) throw new Error("Table name not specified");
@@ -422,20 +422,18 @@ export class CRMClient {
 
         for (var prop in attributes) {
 
-            var attributeName = prop.toLocaleLowerCase(); // normalize casing 
             var attributeValue = null;
 
             // get the attribute from metadata
-            var attributeMetadata = this.getAttributeMetadata(entityName, attributeName);
-
+            var attributeMetadata = this.getAttributeMetadata(entityName, prop.toLocaleLowerCase());
             if (attributeMetadata) {
                 if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.String] ||
                     attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Memo]) {
-                    if (!(typeof attributes[prop] == "string")) throw new Error(`Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'String'`);
+                    if (!(typeof attributes[prop] == "string")) throw new Error(`Cannot convert attribute '${prop}' from '${typeof attributes[prop]}' to 'String'`);
                     attributeValue = attributes[prop];
                 }
                 else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.DateTime]) {
-                    if (attributes[prop] && !(attributes[prop] instanceof Date)) throw new Error(`Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'Date'`);
+                    if (attributes[prop] && !(attributes[prop] instanceof Date)) throw new Error(`Cannot convert attribute '${prop}' from '${typeof attributes[prop]}' to 'Date'`);
                     attributeValue = attributes[prop];
                 }
                 else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Lookup] ||
@@ -451,10 +449,10 @@ export class CRMClient {
 
                 // TODO: add the rest of value types
 
-                entity.Attributes[attributeName] = attributeValue;
+                entity.Attributes[attributeMetadata.LogicalName] = attributeValue;
             }
             else {
-                console.log(`*** Attribute ${attributeName} not found in metadata. Skipping...`);
+                console.log(`*** Attribute ${prop} not found in metadata. Skipping...`);
             }
         }
         // TODO: Set the Entity Id
@@ -497,7 +495,11 @@ export class CRMClient {
         var entityMetadata = this.getEntityMetadata(entityName);
         if (entityMetadata && entityMetadata.Attributes && entityMetadata.Attributes.length > 0) {
             for (var i = 0; i < entityMetadata.Attributes.length; i++) {
-                if (entityMetadata.Attributes[i].LogicalName == attributeName) {
+                if (entityMetadata.Attributes[i].LogicalName == attributeName ||
+                    (entityMetadata.Attributes[i].DisplayName!=null&&
+                     entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel!=null&&
+                     entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label!=null&&
+                     entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label.toLowerCase()==attributeName)) {
                     attributeMetadata = entityMetadata.Attributes[i];
                     break;
                 }
@@ -637,19 +639,91 @@ export class CRMClient {
         return idAttr.toLowerCase();
     }
 
-    /** Takes a list of attributes and values, tries to find an existing record with those values in CRM, if it exists, then performs an update, otherwhise it creates it. 
+    /** Takes a list of attributes and values, tries to find an existing record with those values in CRM, if it exists, 
+     * then performs an update, otherwhise it creates it. 
      * @method CRMClient#createOrUpdate
      * @param entityName {string} Name of the entity which record you want to update.
      * @param attributes {object} Javascript object with the attributes you want to create or update.
      * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
      * The attributes specified in this parameter will be used to perform a {@link CRMClient#retrieve}. 
-     * @example <caption>Create an account named "contoso". In this case, a retrieve of an account with name="contoso" will be performed. If exists, then the name and description will be updated. If it doesn't exist, then the account will be created with the specified name and description. If theres more than one account with that name, an exception will be thrown</caption>
+     * @example <caption>Create an account named "contoso". In this case, a retrieve of an account with name="contoso" will be performed. 
+     * If exists, then the name and description will be updated. If it doesn't exist, then the account will be created with the specified 
+     * name and description. If theres more than one account with that name, an exception will be thrown</caption>
      * crm.createOrUpdate("account",{name:"contoso", description:"Account Updated"},["name"]);
      * @example <caption>Searches for an account named "contoso" owned by me. If exists, it updates it, otherwhise it creates a new one.</caption>
      * var me = crm.whoAmI().UserId;
      * crm.createOrUpdate("account",{name:"contoso", description:"Account Updated", ownerid:me},["name","ownerid"]);
     */
     createOrUpdate(entityName: string, attributes, matchFields: string[]): void {
+        this.createUpdate(entityName,attributes,matchFields);
+    }
+
+    /** For every record in the specified Table, tries to find out if it does exists, and if doesn't it creates it. 
+     * @method CRMClient#createIfDoesNotExist
+     * @param data {DataTable} DataTable with the entity name and the records to create in CRM.
+     * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
+     * The attributes specified in this parameter will be used to perform a {@link CRMClient#retrieve}. 
+     * @example <caption>Loads a list of accounts from an Excel file and creates only the ones that don't exist already in CRM.
+     * It uses the email address to know if the account exists or not.</caption>
+     * var accountsToLoad = DataTable.load("AccountsToLoad.xlsx");
+     * crm.createIfDoesNotExist(accountsToLoad,["emailaddress1"]);
+    */
+    createIfDoesNotExist(data:DataTable, matchFields: string[]):void;
+
+    /** Takes a list of attributes and values, tries to find an existing record with those values in CRM, and if doesn't exists it creates it. 
+     * @method CRMClient#createIfDoesNotExist
+     * @param entityName {string} Name of the entity which record you want to create.
+     * @param attributes {object} Javascript object with the attributes you want to create.
+     * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
+     * The attributes specified in this parameter will be used to perform a {@link CRMClient#retrieve}. 
+     * @example <caption>Create an account named "contoso" only if it doesn't exist one already with the specified email. 
+     * If theres more than one account with that email, an exception will be thrown</caption>
+     * crm.createIfDoesNotExist("account",{name:"contoso", description:"New Account Created", emailaddress1:"info@contoso.com"},["emailaddress1"]);
+     * @example <caption>Searches for an account named "contoso" owned by me. If it doesn't exist, it creates it.</caption>
+     * var me = crm.whoAmI().UserId;
+     * crm.createIfDoesNotExist("account",{name:"contoso", description:"Account Updated", ownerid:me},["name","ownerid"]);
+    */
+    createIfDoesNotExist(entityName: string, attributes:Object, matchFields: string[]):void;
+
+    /** For every record in the specified Table, tries to find out if it does exists, and if doesn't it creates it. 
+     * @method CRMClient#createIfDoesNotExist
+     * @param data {DataTable} DataTable with the entity name and the records to create in CRM.
+     * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
+     * The attributes specified in this parameter will be used to perform a {@link CRMClient#retrieve}. 
+     * @example <caption>Loads a list of accounts from an Excel file and creates only the ones that don't exist already in CRM.
+     * It uses the email address to know if the account exists or not.</caption>
+     * var accountsToLoad = DataTable.load("AccountsToLoad.xlsx");
+     * crm.createIfDoesNotExist(accountsToLoad,["emailaddress1"]);
+    */
+    /** Takes a list of attributes and values, tries to find an existing record with those values in CRM, and if doesn't exists it creates it. 
+     * @method CRMClient#createIfDoesNotExist
+     * @param entityName {string} Name of the entity which record you want to create.
+     * @param attributes {object} Javascript object with the attributes you want to create.
+     * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
+     * The attributes specified in this parameter will be used to perform a {@link CRMClient#retrieve}. 
+     * @example <caption>Create an account named "contoso" only if it doesn't exist one already with the specified email. 
+     * If theres more than one account with that email, an exception will be thrown</caption>
+     * crm.createIfDoesNotExist("account",{name:"contoso", description:"New Account Created", emailaddress1:"info@contoso.com"},["emailaddress1"]);
+     * @example <caption>Searches for an account named "contoso" owned by me. If it doesn't exist, it creates it.</caption>
+     * var me = crm.whoAmI().UserId;
+     * crm.createIfDoesNotExist("account",{name:"contoso", description:"Account Updated", ownerid:me},["name","ownerid"]);
+    */    
+    createIfDoesNotExist(entityNameOrDataTable:DataTable|string, attributesOrMatchfields:string[]|Object, matchFields?: string[]): void {
+
+        if(entityNameOrDataTable instanceof DataTable){
+            for (var i = 0; i < entityNameOrDataTable.rows.length; i++) {
+                var data:DataTable = entityNameOrDataTable;
+                this.createUpdate(data.name,data.rows[i],matchFields,false);    
+            }
+        }
+        else
+        {
+            if(matchFields===undefined||matchFields===null) throw new Error("matchFields not specified");
+            this.createUpdate(entityNameOrDataTable,attributesOrMatchfields,matchFields,false);    
+        }
+    }
+
+    private createUpdate(entityName: string, attributes:Object, matchFields: string[], create:boolean=true){
         var idField = this.getIdField(entityName);
         var conditions = {};
         for (var i = 0; i < matchFields.length; i++) {
@@ -668,7 +742,9 @@ export class CRMClient {
         }
         else {
             // The record doesn't exists. Create it
-            this.create(entityName, attributes);
+            if(create){
+                this.create(entityName, attributes);
+            }
         }
     }
 
