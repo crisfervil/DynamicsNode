@@ -4,3 +4,4 @@
 - Reduced the amount of code in the .net side, which will make easier to add new functionality to the framework and will increase testability. 
 - Added loading from Excel capabilities in the [DataTable](https://dynamicsnode.js.org/DataTable.html) object. Now, you can load your records from Excel. The Save to Excel is still to be added.
 - Added the [lookup](https://dynamicsnode.js.org/DataTable.html#lookup__anchor) methood in the DataTable object that allows to load records resolve the lookup columns before sending the information to CRM.
+- Added index.js file to the project, and index.d.ts in the package description to improve the intellisense experience.

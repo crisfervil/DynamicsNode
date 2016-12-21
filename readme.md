@@ -27,8 +27,6 @@ $  npm install dynamicsnode
 Create a new js file named myscript.js and start adding code
 
 ``` javascript
-/// <reference path="node_modules/dynamicsnode/dynamicsnode.d.ts" />
-
 var dn = require("dynamicsnode");
 
 // update this with your CRM url and credentials if needed

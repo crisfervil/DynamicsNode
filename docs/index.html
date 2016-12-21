@@ -109,9 +109,7 @@
 <h1>How to use it</h1><p>Create a new directory to store your scripts and cd into it</p>
 <pre class="prettyprint source"><code>$ mkdir MyScripts && cd MyScripts</code></pre><p>Install DynamicsNode</p>
 <pre class="prettyprint source"><code>$  npm install dynamicsnode</code></pre><h2>Writing code</h2><p>Create a new js file named myscript.js and start adding code</p>
-<pre class="prettyprint source lang-javascript"><code>/// &lt;reference path=&quot;node_modules/dynamicsnode/dynamicsnode.d.ts&quot; />
-
-var dn = require(&quot;dynamicsnode&quot;);
+<pre class="prettyprint source lang-javascript"><code>var dn = require(&quot;dynamicsnode&quot;);
 
 // update this with your CRM url and credentials if needed
 var crm = new dn.CRMClient(&quot;Url=http://crm.contoso.com/xrmContoso&quot;); 
