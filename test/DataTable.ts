@@ -87,7 +87,7 @@ describe("DataTable", function() {
     });
 
     it("Loads and reads Excel data", function() {
-        var fileName = "test/assets/book1.xlsx";
+        var fileName = "./test/assets/book1.xlsx";
         var dt = DataTable.load(fileName);
 
         assert.equal(dt.name,"Sheet1");
