@@ -318,6 +318,12 @@ public class CRMBridge
             var getLabel = new Func<Label, object>(x => x != null ?
                 new { UserLocalizedLabel = x.UserLocalizedLabel != null ? new { Label = x.UserLocalizedLabel.Label } : null } : null
             );
+
+            var getOptionSetItem = new Func<OptionMetadata[], object>(x => x.Select(y=> new { Label=getLabel(y.Label), Value=y.Value } ));
+
+            var getOptionSet = new Func<PicklistAttributeMetadata, object>(x => x != null ? 
+                new { Options=x.OptionSet.Options!=null?getOptionSetItem(x.OptionSet.Options.ToArray()):null } : null);
+
             var rs = (RetrieveEntityResponse)response;
             response = new
             {
@@ -328,6 +334,7 @@ public class CRMBridge
                         rs.EntityMetadata.Attributes.Select(x => new { LogicalName = x.LogicalName,
                                                                        AttributeType = x.AttributeType,
                                                                        DisplayName=getLabel(x.DisplayName),
+                                                                       OptionSet = getOptionSet(x as PicklistAttributeMetadata),
                                                                        Targets = getTargets(x as LookupAttributeMetadata)})
                 }
             };

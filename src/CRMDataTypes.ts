@@ -33,11 +33,21 @@ export class Label {
     UserLocalizedLabel:LocalizedLabel;
 }
 
+export class OptionMetadata{
+    public Label:Label;
+    public Value:number;
+}
+
+export class EnumAttributeMetadata{
+    public Options:OptionMetadata[];
+}
+
 export class AttributeMetadata{
     public LogicalName:string;
     public AttributeType:string;
     public Targets:string[];
     public DisplayName:Label;
+    public OptionSet:EnumAttributeMetadata;
 }
 
 export enum AttributeTypeCode{

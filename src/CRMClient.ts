@@ -427,46 +427,72 @@ export class CRMClient {
             // get the attribute from metadata
             var attributeMetadata = this.getAttributeMetadata(entityName, prop.toLocaleLowerCase());
             if (attributeMetadata) {
-                if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.String] ||
-                    attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Memo]) {
-                    if (!(typeof attributes[prop] == "string")) throw new Error(`Cannot convert attribute '${prop}' from '${typeof attributes[prop]}' to 'String'`);
-                    attributeValue = attributes[prop];
-                }
-                else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.DateTime]) {
-                    if (attributes[prop] && !(attributes[prop] instanceof Date)) throw new Error(`Cannot convert attribute '${prop}' from '${typeof attributes[prop]}' to 'Date'`);
-                    attributeValue = attributes[prop];
-                }
-                else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Lookup] ||
-                    attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Customer]) {
-                    attributeValue = this.ConvertToEntityReference(attributes[prop], attributeMetadata);
-                }
-                else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Picklist]) {
-                    attributeValue = this.ConvertToOptionset(attributes[prop], attributeMetadata);
-                }
-                else {
-                    attributeValue = attributes[prop];
+
+                if(attributes[prop]!==null){
+                    if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.String] ||
+                        attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Memo]) {
+                        if (!(typeof attributes[prop] == "string")) throw new Error(`Cannot convert attribute '${prop}' value '${attributes[prop]}' from '${typeof attributes[prop]}' to 'String'`);
+                        attributeValue = attributes[prop];
+                    }
+                    else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.DateTime]) {
+                        attributeValue = this.ConvertToDate(attributes[prop],attributeMetadata);
+                    }
+                    else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Lookup] ||
+                        attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Customer]) {
+                        attributeValue = this.ConvertToEntityReference(attributes[prop], attributeMetadata);
+                    }
+                    else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Picklist]) {
+                        attributeValue = this.ConvertToOptionset(attributes[prop], attributeMetadata);
+                    }
+                    else {
+                        attributeValue = attributes[prop];
+                    }
                 }
 
                 // TODO: add the rest of value types
-
                 entity.Attributes[attributeMetadata.LogicalName] = attributeValue;
             }
             else {
-                console.log(`*** Attribute ${prop} not found in metadata. Skipping...`);
+                console.log(`*** Attribute '${prop}' not found in metadata. Skipping...`);
             }
         }
         // TODO: Set the Entity Id
         return entity;
     }
 
-    private ConvertToOptionset(attributeValue, attributeMetadata): OptionSetValue {
+    private ConvertToDate(attributeValue, attributeMetadata:AttributeMetadata): Date {
+        var date:Date=null;
+
+        if (attributeValue instanceof Date) {
+            date=attributeValue;
+        }
+        else if (typeof attributeValue=="string"){
+            date = new Date(attributeValue);
+        }
+
+        if (date===null) throw new Error(`Cannot convert attribute '${attributeMetadata.LogicalName}' value '${attributeValue}' from '${typeof attributeValue}' to 'Date'`);
+
+        return date;    
+    }
+
+    private ConvertToOptionset(attributeValue, attributeMetadata:AttributeMetadata): OptionSetValue {
         var optionset = null;
 
         if (typeof attributeValue == "number") {
             optionset = new OptionSetValue(attributeValue);
         }
-        else {
-            throw new Error(`Can't convert from ${typeof attributeValue} to OptionsetValue`);
+        if (typeof attributeValue == "string") {
+            // Try to find the string as an Optionset Label
+            for (var i = 0; i < attributeMetadata.OptionSet.Options.length; i++) {
+                var option = attributeMetadata.OptionSet.Options[i];
+                if(option.Label.UserLocalizedLabel.Label.toLowerCase()==attributeValue.toLowerCase()){
+                    optionset = new OptionSetValue(option.Value);
+                    break;
+                }
+            }
+        }
+        if(optionset==null) {
+            throw new Error(`Can't convert attribute '${attributeMetadata.LogicalName}' value '${attributeValue}' from '${typeof attributeValue}' to OptionsetValue`);
         }
 
         return optionset;
@@ -477,7 +503,7 @@ export class CRMClient {
         var target = null, id = null;
         if (typeof attributeValue == "string") {
             // TODO: If the value is not a GUID, find the value in the target entity
-            if (attributeMetadata.Targets.length > 1) throw new Error("Too many targets");
+            if (attributeMetadata.Targets.length > 1) throw new Error(`Couldn't get a valid target for attribute '${attributeMetadata.LogicalName}'. Please specify a valid target using {id:string,type:string}`);
             target = attributeMetadata.Targets[0];
             id = attributeValue;
         }
@@ -485,7 +511,7 @@ export class CRMClient {
             id = attributeValue.id;
             target = attributeValue.type;
         }
-        if (!(target && id)) throw new Error("Couldn't get value");
+        if (!(target && id)) throw new Error(`Couldn't get a valid EntityReference value for attribute '${attributeMetadata.LogicalName}'. Please specify a valid target using {id:string,type:string}`);
         er = new EntityReference(id, target);
         return er;
     }
@@ -499,7 +525,7 @@ export class CRMClient {
                     (entityMetadata.Attributes[i].DisplayName!=null&&
                      entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel!=null&&
                      entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label!=null&&
-                     entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label.toLowerCase()==attributeName)) {
+                     entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label.toLowerCase()==attributeName.toLowerCase())) {
                     attributeMetadata = entityMetadata.Attributes[i];
                     break;
                 }
@@ -711,8 +737,13 @@ export class CRMClient {
     createIfDoesNotExist(entityNameOrDataTable:DataTable|string, attributesOrMatchfields:string[]|Object, matchFields?: string[]): void {
 
         if(entityNameOrDataTable instanceof DataTable){
+            var data:DataTable = entityNameOrDataTable;
+            if(data===undefined||data===null) throw new Error("DataTable not specified");
+            if(data.name===undefined||data.name===null) throw new Error("DataTable name not specified");
+            if(!Array.isArray(attributesOrMatchfields)) throw new Error("Wrong data type for the matchFields parameter");
+            var matchFields:string[]=attributesOrMatchfields;
+
             for (var i = 0; i < entityNameOrDataTable.rows.length; i++) {
-                var data:DataTable = entityNameOrDataTable;
                 this.createUpdate(data.name,data.rows[i],matchFields,false);    
             }
         }
@@ -723,28 +754,30 @@ export class CRMClient {
         }
     }
 
-    private createUpdate(entityName: string, attributes:Object, matchFields: string[], create:boolean=true){
+    private createUpdate(entityName: string, attributes:Object, matchFields: string[], update:boolean=true){
         var idField = this.getIdField(entityName);
         var conditions = {};
         for (var i = 0; i < matchFields.length; i++) {
             var matchField = matchFields[i];
+
+            var attr = this.getAttributeMetadata(entityName,matchField);
+            if(attr===null) throw new Error(`Attribute '${matchField}' not found in entity ${entityName}`);
+
             if (attributes[matchField] !== undefined && attributes[matchField] !== null) {
-                conditions[matchField] = attributes[matchField];
+                conditions[attr.LogicalName] = attributes[matchField];
             }
         }
 
         // check if the record exists
         var foundRecord = this.retrieve(entityName, conditions, idField);
-        if (foundRecord) {
+        if (foundRecord&&update) {
             // The record exists. Update it
             attributes[idField] = foundRecord[idField];
             this.update(entityName, attributes);
         }
         else {
             // The record doesn't exists. Create it
-            if(create){
-                this.create(entityName, attributes);
-            }
+            this.create(entityName, attributes);
         }
     }
 

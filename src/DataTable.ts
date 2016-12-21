@@ -63,6 +63,13 @@ export class DataTable {
         }
     }
 
+    /** Removes a column from the Table */
+    removeColumn(columnName:string){
+        for (var i = 0; i < this.rows.length; i++) {
+            delete this.rows[i][columnName];
+        }
+    }
+
     /** The path is relative to process.cwd() */
     save(fileName: string) {
         var strValue: string;
