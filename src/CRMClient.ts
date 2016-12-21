@@ -187,8 +187,8 @@ export class CRMClient {
         var result: any;
         var columns: any;
 
-        if (!entityName) throw "Entity name not specified";
-        if (!idOrConditions) throw "Id or Conditions not specified";
+        if (!entityName) throw new Error("Entity name not specified");
+        if (!idOrConditions) throw new Error("Id or Conditions not specified");
 
         entityName = entityName.toLocaleLowerCase(); // normalize casing
     
@@ -214,7 +214,7 @@ export class CRMClient {
         }
         else if (typeof idOrConditions === "string" || idOrConditions instanceof String) {
             idValue = <string>idOrConditions;
-            if (!Guid.isGuid(idValue)) throw "Invalid GUID value";
+            if (!Guid.isGuid(idValue)) throw new Error("Invalid GUID value");
         }
         else if (typeof idOrConditions === "object") {
             // Assume a conditions objet was passed
@@ -356,7 +356,7 @@ export class CRMClient {
                 var row = entityNameOrTable.rows[i];
                 var recordId = this.createInternal(entityNameOrTable.name,row);
                 // update the record id in the table
-                row[primaryAttribute]==recordId;
+                row[primaryAttribute]=recordId;
             }            
         }
         else {
@@ -374,8 +374,8 @@ export class CRMClient {
 
     private ConvertToEntity(entityName:string, attributes:any):Entity{
         // perform some validations
-        if (!entityName) throw "Entity name not specified";
-        if (!attributes) throw "Attributes not specified";
+        if (!entityName) throw new Error("Entity name not specified");
+        if (!attributes) throw new Error("Attributes not specified");
 
         entityName = entityName.toLocaleLowerCase(); // normalize casing
 
@@ -394,11 +394,11 @@ export class CRMClient {
             if(attributeMetadata){
                 if(attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.String]||
                     attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.Memo]) {
-                    if(!(typeof attributes[prop] == "string")) throw `Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'String'`;
+                    if(!(typeof attributes[prop] == "string")) throw new Error(`Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'String'`);
                     attributeValue = attributes[prop];
                 }
                 else if(attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.DateTime]) {
-                    if(attributes[prop] && !(attributes[prop] instanceof Date)) throw `Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'Date'`;;
+                    if(attributes[prop] && !(attributes[prop] instanceof Date)) throw new Error(`Cannot convert attribute '${attributeName}' from '${typeof attributes[prop]}' to 'Date'`);
                     attributeValue = attributes[prop];
                 }
                 else if(attributeMetadata.AttributeType==AttributeTypeCode[AttributeTypeCode.Lookup] ||
@@ -432,18 +432,18 @@ export class CRMClient {
             optionset=new OptionSetValue(attributeValue);
         }
         else{
-            throw `Can't convert from ${typeof attributeValue} to OptionsetValue`;
+            throw new Error(`Can't convert from ${typeof attributeValue} to OptionsetValue`);
         }
 
         return optionset;
     }
 
-    private ConvertToEntityReference(attributeValue,attributeMetadata):EntityReference{
+    private ConvertToEntityReference(attributeValue,attributeMetadata:AttributeMetadata):EntityReference{
         var er=null;
         var target=null, id=null;
         if(typeof attributeValue == "string"){
             // TODO: If the value is not a GUID, find the value in the target entity
-            if(attributeMetadata.Targets.Length>1) throw "Too many targets";
+            if(attributeMetadata.Targets.length>1) throw new Error("Too many targets");
             target=attributeMetadata.Targets[0];
             id=attributeValue;
         }
@@ -451,7 +451,7 @@ export class CRMClient {
             id=attributeValue.id;
             target=attributeValue.type;
         }
-        if(!(target&&id)) throw "Couldn't get value";
+        if(!(target&&id)) throw new Error("Couldn't get value");
         er=new EntityReference(id,target);
         return er;
     }
@@ -494,21 +494,21 @@ export class CRMClient {
         var ids: string[];
         var recordsAffected = 0;
 
-        if (!entityName) throw "Entity name not specified";
+        if (!entityName) throw new Error("Entity name not specified");
         entityName = entityName.toLowerCase(); // normalize casing
 
         if (idsOrConditions instanceof Guid) {
             ids = [idsOrConditions.getValue()];
         }
         else if (typeof idsOrConditions == "string") {
-            if (!Guid.isGuid(idsOrConditions)) throw "Invalid GUID value";
+            if (!Guid.isGuid(idsOrConditions)) throw new Error("Invalid GUID value");
             ids = [idsOrConditions];
         }
         else if (Array.isArray(ids)) {
             for (var i = 0; i < ids.length; i++) {
                 var item: any = ids[i];
                 if (!(item instanceof Guid) || Guid.isGuid(item)) {
-                    throw "Invalid GUID";
+                    throw new Error("Invalid GUID");
                 }
             }
             ids = idsOrConditions;
@@ -557,7 +557,7 @@ export class CRMClient {
 
         var updatedRecordsCount = 0;
 
-        if (!entityName) throw "Entity name not specified";
+        if (!entityName) throw new Error("Entity name not specified");
         entityName = entityName.toLowerCase(); // normalize casing
 
         // get records GUIDS
@@ -593,7 +593,7 @@ export class CRMClient {
             idAttr = metadata.PrimaryIdAttribute;
         }
 
-        if(idAttr==null) throw `Primary Attribute not found for entity ${entityName}`;
+        if(idAttr==null) throw new Error(`Primary Attribute not found for entity ${entityName}`);
 
         debug(`idAttr for entity '${entityName}': '${idAttr}'`);
 
@@ -646,14 +646,14 @@ export class CRMClient {
     associate(fromEntityName: string, fromEntityId: string | Guid, relationshipName: string, toEntityName: string, toEntityId: string | Guid) {
         
         // perform some validations
-        if (!fromEntityName) throw "From entity name not specified";
+        if (!fromEntityName) throw new Error("From entity name not specified");
         fromEntityName = fromEntityName.toLowerCase(); // normalize casing
         
-        if (!toEntityName) throw "To entity name not specified";
+        if (!toEntityName) throw new Error("To entity name not specified");
         toEntityName = toEntityName.toLowerCase(); // normalize casing
         
-        if (!fromEntityId) throw "fromEntityId not specified";
-        if (!toEntityId) throw "toEntityId not specified";
+        if (!fromEntityId) throw new Error("fromEntityId not specified");
+        if (!toEntityId) throw new Error("toEntityId not specified");
 
         var fromId: string, toId: string;
         if (fromEntityId instanceof Guid) {
@@ -683,14 +683,14 @@ export class CRMClient {
     disassociate(fromEntityName: string, fromEntityId: string | Guid, relationshipName: string, toEntityName: string, toEntityId: string | Guid) {
         
         // perform some validations
-        if (!fromEntityName) throw "From entity name not specified";
+        if (!fromEntityName) throw new Error("From entity name not specified");
         fromEntityName = fromEntityName.toLowerCase(); // normalize casing
         
-        if (!toEntityName) throw "To entity name not specified";
+        if (!toEntityName) throw new Error("To entity name not specified");
         toEntityName = toEntityName.toLowerCase(); // normalize casing
         
-        if (!fromEntityId) throw "fromEntityId not specified";
-        if (!toEntityId) throw "toEntityId not specified";
+        if (!fromEntityId) throw new Error("fromEntityId not specified");
+        if (!toEntityId) throw new Error("toEntityId not specified");
 
 
         var fromId: string, toId: string;
@@ -749,7 +749,7 @@ export class CRMClient {
         debug(`Exporting ${entityName} to ${fileName}...`);
         
         // perform some validations
-        if (!entityName) throw "Entity name not specified";
+        if (!entityName) throw new Error("Entity name not specified");
         entityName = entityName.toLowerCase(); // normalize casing
                 
         debug("Getting metadata...");

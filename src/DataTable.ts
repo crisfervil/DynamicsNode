@@ -34,7 +34,13 @@ export class DataTable {
      *  console.log(dt.rows[0].val1); // prints out 2
      *  console.log(dt.rows[1].val1); // prints out 3
      * @example <caption>Find the parent account of a contact using the phone number</caption>
+     *   // create a contact using a data table and associate to the create account using the phone number
+     *   var dtContacts = DataTable.load("MyContactsToLoad.json");
      * 
+     *   // resolve the parentaccountid field
+     *   dtContacts.lookup("parentcustomerid",row=>{ return {id:crm.retrieve("account",{telephone1:row.telephone1}).accountid,type:"account"}});
+     * 
+     *   crm.create(dtContacts);
      */
     lookup(columnName: string, updater: (row: any) => any, useCache:boolean = false): void {
         var cache = {}; // Temporary cache 

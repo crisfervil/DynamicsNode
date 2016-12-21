@@ -357,18 +357,18 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
 
     });
 
-    it.only("Looks up the parent account of a contact using the contact phone number",function(){
+    it("Looks up the parent account of a contact using the contact phone number",function(){
 
         // create an account with a specific phone number
-        var phoneNumber = "555454-465454";
+        var phoneNumber = "555454-"+Math.round(Math.random()*10000);
         var accountId = crm.create("account",{name:"test account", telephone1:phoneNumber});
 
         // create a contact using a data table and associate to the create account using the phone number
         var dtContacts = new DataTable("contact");
-        dtContacts.rows.push({firstName:"testContact",telephone1:phoneNumber, parentaccountid:null});
+        dtContacts.rows.push({firstName:"testContact",telephone1:phoneNumber, parentcustomerid:null});
 
         // resolve the parentaccountid field
-        dtContacts.lookup("parentaccountid",row=>crm.retrieve("account",{telephone1:row.telephone1}));
+        dtContacts.lookup("parentcustomerid",row=>{ return {id:crm.retrieve("account",{telephone1:row.telephone1}).accountid,type:"account"}});
 
         crm.create(dtContacts);
 

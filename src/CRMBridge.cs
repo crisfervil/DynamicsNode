@@ -314,13 +314,17 @@ public class CRMBridge
 
         if (response != null && response.GetType() == typeof(RetrieveEntityResponse))
         {
+            var getTargets = new Func<LookupAttributeMetadata, string[]>(x => x!=null ? x.Targets : null);
             var rs = (RetrieveEntityResponse)response;
             response = new
             {
                 EntityMetadata = new {
                     PrimaryIdAttribute = rs.EntityMetadata.PrimaryIdAttribute,
                     SchemaName = rs.EntityMetadata.SchemaName,
-                    Attributes = rs.EntityMetadata.Attributes.Select(x => new { LogicalName = x.LogicalName, AttributeType = x.AttributeType })
+                    Attributes = 
+                        rs.EntityMetadata.Attributes.Select(x => new { LogicalName = x.LogicalName,
+                                                                       AttributeType = x.AttributeType,
+                                                                       Targets = getTargets(x as LookupAttributeMetadata)})
                 }
             };
         }

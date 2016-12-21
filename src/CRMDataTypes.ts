@@ -16,7 +16,7 @@ export class Entity {
 
     public Id:string;
     public LogicalName:string;
-    public Attributes:any;    
+    public Attributes:any;
 }
 
 export class EntityMetadata{
@@ -28,6 +28,7 @@ export class EntityMetadata{
 export class AttributeMetadata{
     public LogicalName:string;
     public AttributeType:string;
+    public Targets:string[];
 }
 
 export enum AttributeTypeCode{
