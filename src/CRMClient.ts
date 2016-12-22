@@ -824,11 +824,15 @@ export class CRMClient {
         }
 
         // check if the record exists
-        var foundRecord = this.retrieve(entityName, conditions, idField);
-        if (foundRecord&&update) {
-            debug("The record exists. Update it");
-            attributes[idField] = foundRecord[idField];
-            this.update(entityName, attributes);
+        var foundRecords = this.retrieveMultiple(entityName, conditions, idField);
+        if (foundRecords&&foundRecords.rows.length>0) {
+            debug(`${foundRecords.rows.length} '${entityName}' records found`);
+            if(update){
+                if(foundRecords.rows.length>1) throw new Error("Too many records found");
+                var foundRecord = foundRecords.rows[0];
+                attributes[idField] = foundRecord[idField];
+                this.update(entityName, attributes);
+            }
         }
         else {
             debug("The record doesn't exists. Create it");
