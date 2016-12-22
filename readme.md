@@ -34,12 +34,12 @@ var crm = new dn.CRMClient("Url=http://crm.contoso.com/xrmContoso");
 
 // retrieve current user information
 var who = crm.whoAmI();
-var myUserInfo = crm.retrieve("systemuser",who);
-console.log(myUserInfo.UserId);
+var myUserInfo = crm.retrieve("systemuser",who.UserId);
+console.log(myUserInfo.fullname); // prints your user name
 
 // retrieve a user named John Doe
 var anotherUser = crm.retrieve("systemuser",{fullname:"John Doe"});
-console.log(anotherUser);
+console.log(anotherUser); // prints all the attributes of the user
 
 ```
 
