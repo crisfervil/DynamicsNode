@@ -44,18 +44,23 @@ export class DataTable {
      *  // create the record
      *  crm.create(dtContacts);
      */
-    lookup(columnName: string, updater: (row: any) => any, useCache:boolean = false): void {
+    lookup(columnName: string, updater: (row: any) => any, useCache:boolean = true): void {
         var cache = {}; // Temporary cache 
+        debug(`Resolving lookups for columm '${columnName}'. ${useCache?"Using Cache":""}...`);
         for(var i = 0; i < this.rows.length; i++) {
+            debug(`${i} of ${this.rows.length}`);
             var currentRow = this.rows[i];
             var lookupValue = currentRow[columnName];
             var resolvedValue=null;
-            if(useCache&&lookupValue!==undefined&&lookupValue!==undefined&&cache[lookupValue]!==undefined){
+            if(useCache&&lookupValue!==undefined&&lookupValue!==null&&cache[lookupValue]!==undefined){
+                debug(`Resolved Lookup '${columnName}' value '${lookupValue}' using cache`);
                 resolvedValue=cache[lookupValue];
+                debug(`resolved value: '${resolvedValue}'`);
             }
-            if(resolvedValue==null){
+            else {
                 resolvedValue = updater(currentRow);
-                if(useCache&&lookupValue!==undefined&&lookupValue!==undefined){
+                if(useCache&&lookupValue!==undefined&&lookupValue!==null){
+                    // add the resolved value to the cache
                     cache[lookupValue] = resolvedValue;
                 } 
             }
@@ -65,6 +70,13 @@ export class DataTable {
 
     /** Removes a column from the Table */
     removeColumn(columnName:string){
+        for (var i = 0; i < this.rows.length; i++) {
+            delete this.rows[i][columnName];
+        }
+    }
+
+    /** Removes a column from the Table */
+    addColumn(columnName:string){
         for (var i = 0; i < this.rows.length; i++) {
             delete this.rows[i][columnName];
         }

@@ -38,8 +38,13 @@ export class OptionMetadata{
     public Value:number;
 }
 
-export class EnumAttributeMetadata{
+export class OptionsetMetadata{
     public Options:OptionMetadata[];
+}
+
+export class BooleanOptionsetMetadata{
+    public TrueOption:OptionMetadata;
+    public FalseOption:OptionMetadata;
 }
 
 export class AttributeMetadata{
@@ -47,7 +52,7 @@ export class AttributeMetadata{
     public AttributeType:string;
     public Targets:string[];
     public DisplayName:Label;
-    public OptionSet:EnumAttributeMetadata;
+    public OptionSet:OptionsetMetadata|BooleanOptionsetMetadata;
 }
 
 export enum AttributeTypeCode{

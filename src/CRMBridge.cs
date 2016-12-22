@@ -319,10 +319,19 @@ public class CRMBridge
                 new { UserLocalizedLabel = x.UserLocalizedLabel != null ? new { Label = x.UserLocalizedLabel.Label } : null } : null
             );
 
-            var getOptionSetItem = new Func<OptionMetadata[], object>(x => x.Select(y=> new { Label=getLabel(y.Label), Value=y.Value } ));
+            var getOptionSetOptionItem = new Func<OptionMetadata, object>(x => new { Label = getLabel(x.Label), Value = x.Value });
+            var getOptionOptions = new Func<OptionMetadata[], object>(x => x.Select(getOptionSetOptionItem));
 
-            var getOptionSet = new Func<PicklistAttributeMetadata, object>(x => x != null ? 
-                new { Options=x.OptionSet.Options!=null?getOptionSetItem(x.OptionSet.Options.ToArray()):null } : null);
+            var getPicklistOptionset = new Func<PicklistAttributeMetadata, object>(x => x != null ? 
+                new { Options=x.OptionSet.Options!=null?getOptionOptions(x.OptionSet.Options.ToArray()):null } : null);
+
+            var getBooleanOptionset = new Func<BooleanAttributeMetadata, object>(x => x != null ?
+                new { TrueOption= x.OptionSet.TrueOption != null ? getOptionSetOptionItem(x.OptionSet.TrueOption) : null,
+                      FalseOption = x.OptionSet.FalseOption != null ? getOptionSetOptionItem(x.OptionSet.FalseOption) : null
+                    } : null);
+
+            var getOptionSet = new Func<AttributeMetadata, object>(x=> x.GetType()==typeof(PicklistAttributeMetadata)?
+                                    getPicklistOptionset(x as PicklistAttributeMetadata):x.GetType()==typeof(BooleanAttributeMetadata)?getBooleanOptionset(x as BooleanAttributeMetadata) :null);
 
             var rs = (RetrieveEntityResponse)response;
             response = new
@@ -334,7 +343,7 @@ public class CRMBridge
                         rs.EntityMetadata.Attributes.Select(x => new { LogicalName = x.LogicalName,
                                                                        AttributeType = x.AttributeType,
                                                                        DisplayName=getLabel(x.DisplayName),
-                                                                       OptionSet = getOptionSet(x as PicklistAttributeMetadata),
+                                                                       OptionSet = getOptionSet(x),
                                                                        Targets = getTargets(x as LookupAttributeMetadata)})
                 }
             };

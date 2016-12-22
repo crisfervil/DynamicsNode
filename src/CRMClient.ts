@@ -4,7 +4,7 @@ import { Guid } from "./Guid";
 import { Fetch } from "./Fetch";
 import { Dictionary } from "./Dictionary";
 import { AssignRequest, WhoAmIRequest, WhoAmIResponse, RetrieveEntityRequest, RetrieveEntityResponse } from "./Messages";
-import { Entity, EntityReference, OptionSetValue, AttributeTypeCode, EntityFilters, EntityMetadata, AttributeMetadata } from "./CRMDataTypes";
+import { Entity, EntityReference, OptionSetValue, AttributeTypeCode, EntityFilters, EntityMetadata, AttributeMetadata, BooleanOptionsetMetadata, OptionsetMetadata } from "./CRMDataTypes";
 
 import path = require("path");
 import edge = require("edge");
@@ -386,10 +386,14 @@ export class CRMClient {
      */
     create(entityNameOrTable: string | DataTable, attributes?: Object): any {
         var retVal = null;
+
         if (entityNameOrTable instanceof DataTable) {
             if (entityNameOrTable.name == null) throw new Error("Table name not specified");
+            debug(`Preparing to create ${entityNameOrTable.rows.length} records from a DataTable. Entity ${entityNameOrTable.name}...`);
             var primaryAttribute = this.getIdField(entityNameOrTable.name);
+            debug(`Primary Attribute:${primaryAttribute}`);
             for (var i = 0; i < entityNameOrTable.rows.length; i++) {
+                debug(`${i} of ${entityNameOrTable.rows.length}...`);
                 var row = entityNameOrTable.rows[i];
                 var recordId = this.createInternal(entityNameOrTable.name, row);
                 // update the record id in the table
@@ -398,6 +402,7 @@ export class CRMClient {
         }
         else {
             if (attributes === undefined) throw new Error("The attributes parameter is required");
+            debug(`Preparing to create a ${entityNameOrTable} record...`);
             retVal = this.createInternal(entityNameOrTable, attributes);
         }
         return retVal;
@@ -416,6 +421,7 @@ export class CRMClient {
 
         entityName = entityName.toLocaleLowerCase(); // normalize casing
 
+        debug("Converting attributes to CRM Entity type...");
         var entity = new Entity();
         entity.LogicalName = entityName;
         entity.Attributes = {};
@@ -444,7 +450,11 @@ export class CRMClient {
                     else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Picklist]) {
                         attributeValue = this.ConvertToOptionset(attributes[prop], attributeMetadata);
                     }
+                    else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Boolean]) {
+                        attributeValue = this.ConvertToBoolean(attributes[prop], attributeMetadata);
+                    }
                     else {
+                        debug(`Attribute '${prop}' type '${attributeMetadata.AttributeType}' not converted. Using the raw value`);
                         attributeValue = attributes[prop];
                     }
                 }
@@ -457,6 +467,8 @@ export class CRMClient {
             }
         }
         // TODO: Set the Entity Id
+        debug(`Converted value:`);
+        debug(entity);
         return entity;
     }
 
@@ -475,27 +487,63 @@ export class CRMClient {
         return date;    
     }
 
+    private ConvertToBoolean(attributeValue, attributeMetadata:AttributeMetadata): boolean {
+        var boolVal = null;
+
+        if (typeof attributeValue == "boolean") {
+            boolVal=attributeValue;
+        }
+        else if (typeof attributeValue == "number") {
+
+            if(attributeValue==0){
+                boolVal=false;
+            }
+            else{
+                boolVal=true;
+            }
+        }
+        else if (typeof attributeValue == "string") {
+            // Try to find the string as an Optionset Label
+            var optionSet = <BooleanOptionsetMetadata>attributeMetadata.OptionSet;
+
+            if(optionSet.TrueOption.Label.UserLocalizedLabel.Label.toLowerCase()==attributeValue.toLowerCase() || 
+                attributeValue.toLowerCase()=="yes"){
+                boolVal=true;
+            }
+            else if(optionSet.FalseOption.Label.UserLocalizedLabel.Label.toLowerCase()==attributeValue.toLowerCase() ||
+                attributeValue.toLowerCase()=="no"){
+                boolVal=false;
+            }
+        }
+        if(boolVal==null) {
+            throw new Error(`Can't convert attribute '${attributeMetadata.LogicalName}' value '${attributeValue}' from '${typeof attributeValue}' to Boolean`);
+        }
+
+        return boolVal;
+    }
+
     private ConvertToOptionset(attributeValue, attributeMetadata:AttributeMetadata): OptionSetValue {
-        var optionset = null;
+        var optionSet = null;
 
         if (typeof attributeValue == "number") {
-            optionset = new OptionSetValue(attributeValue);
+            optionSet = new OptionSetValue(attributeValue);
         }
         if (typeof attributeValue == "string") {
             // Try to find the string as an Optionset Label
-            for (var i = 0; i < attributeMetadata.OptionSet.Options.length; i++) {
-                var option = attributeMetadata.OptionSet.Options[i];
+            var optionSetMetadata = <OptionsetMetadata>attributeMetadata.OptionSet;
+            for (var i = 0; i < optionSetMetadata.Options.length; i++) {
+                var option = optionSetMetadata.Options[i];
                 if(option.Label.UserLocalizedLabel.Label.toLowerCase()==attributeValue.toLowerCase()){
-                    optionset = new OptionSetValue(option.Value);
+                    optionSet = new OptionSetValue(option.Value);
                     break;
                 }
             }
         }
-        if(optionset==null) {
+        if(optionSet==null) {
             throw new Error(`Can't convert attribute '${attributeMetadata.LogicalName}' value '${attributeValue}' from '${typeof attributeValue}' to OptionsetValue`);
         }
 
-        return optionset;
+        return optionSet;
     }
 
     private ConvertToEntityReference(attributeValue, attributeMetadata: AttributeMetadata): EntityReference {
@@ -624,11 +672,16 @@ export class CRMClient {
         if (!entityName) throw new Error("Entity name not specified");
         entityName = entityName.toLowerCase(); // normalize casing
 
+        debug("Preparing to update a record...");
+
         // get records GUIDS
         if (conditions != undefined) {
             var idField = this.getIdField(entityName);
+            debug("Conditions specified. Trying to find which records that meets conditions to update...");
             var foundRecords = this.retrieveMultiple(entityName, conditions, idField);
+            debug(`${foundRecords.rows.length} records found`);
             for (var i = 0; i < foundRecords.rows.length; i++) {
+                debug(`updating ${i} of ${foundRecords.rows.length}`);
                 var foundRecordId = foundRecords.rows[i][idField];
                 attributes[idField] = foundRecordId;
                 var entity = this.ConvertToEntity(entityName, attributes);
@@ -637,7 +690,6 @@ export class CRMClient {
             updatedRecordsCount = foundRecords.rows.length;
         }
         else {
-
             // the attributes parameter must contain the entity id on it
             var entity = this.ConvertToEntity(entityName, attributes);
             this._crmBridge.Update(entity, true);
@@ -743,12 +795,13 @@ export class CRMClient {
             if(!Array.isArray(attributesOrMatchfields)) throw new Error("Wrong data type for the matchFields parameter");
             var matchFields:string[]=attributesOrMatchfields;
 
-            for (var i = 0; i < entityNameOrDataTable.rows.length; i++) {
+            debug(`About to create if does not exits ${data.rows.length} records from a DataTable...`);
+            for (var i = 0; i < data.rows.length; i++) {
+                debug(`${i} of ${data.rows.length}...`);
                 this.createUpdate(data.name,data.rows[i],matchFields,false);    
             }
         }
-        else
-        {
+        else {
             if(matchFields===undefined||matchFields===null) throw new Error("matchFields not specified");
             this.createUpdate(entityNameOrDataTable,attributesOrMatchfields,matchFields,false);    
         }
@@ -757,9 +810,11 @@ export class CRMClient {
     private createUpdate(entityName: string, attributes:Object, matchFields: string[], update:boolean=true){
         var idField = this.getIdField(entityName);
         var conditions = {};
+
+        debug("About to create or update a record...");
         for (var i = 0; i < matchFields.length; i++) {
             var matchField = matchFields[i];
-
+            debug("Preparing query to know if the record exists...");
             var attr = this.getAttributeMetadata(entityName,matchField);
             if(attr===null) throw new Error(`Attribute '${matchField}' not found in entity ${entityName}`);
 
@@ -771,16 +826,17 @@ export class CRMClient {
         // check if the record exists
         var foundRecord = this.retrieve(entityName, conditions, idField);
         if (foundRecord&&update) {
-            // The record exists. Update it
+            debug("The record exists. Update it");
             attributes[idField] = foundRecord[idField];
             this.update(entityName, attributes);
         }
         else {
-            // The record doesn't exists. Create it
+            debug("The record doesn't exists. Create it");
             this.create(entityName, attributes);
         }
     }
 
+    /** */
     associateData(data: DataTable) {
         for (var i = 0; i < data.rows.length; i++) {
             var row = data.rows[i];
