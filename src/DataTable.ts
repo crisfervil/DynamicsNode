@@ -75,10 +75,13 @@ export class DataTable {
         }
     }
 
-    /** Removes a column from the Table */
-    addColumn(columnName:string){
+    /** Renames a column from in the Table */
+    renameColumn(columnName:string, newName:string){
         for (var i = 0; i < this.rows.length; i++) {
-            delete this.rows[i][columnName];
+            if(this.rows[i][columnName]!==undefined){
+                this.rows[i][newName]=this.rows[i][columnName];
+                delete this.rows[i][columnName];
+            }
         }
     }
 
