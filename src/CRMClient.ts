@@ -444,7 +444,8 @@ export class CRMClient {
                         attributeValue = this.ConvertToDate(attributes[prop],attributeMetadata);
                     }
                     else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Lookup] ||
-                        attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Customer]) {
+                        attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Customer] || 
+                        attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Owner]) {
                         attributeValue = this.ConvertToEntityReference(attributes[prop], attributeMetadata);
                     }
                     else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Picklist]) {
