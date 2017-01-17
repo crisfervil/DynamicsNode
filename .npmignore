@@ -7,11 +7,12 @@ coverage
 .nyc_output
 tmp
 docs
-*.d.ts
-!dynamicsnode.d.ts
 .vscode
 npm-debug.log
 .travis.yml
 .npmignore
 .gitattributes
 tsconfig.json
+*.ts
+!*.d.ts
+*.js.map
