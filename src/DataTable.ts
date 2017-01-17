@@ -64,7 +64,14 @@ export class DataTable {
                     cache[lookupValue] = resolvedValue;
                 } 
             }
-            currentRow[columnName] = resolvedValue;
+            if(resolvedValue===undefined){
+                if(currentRow[columnName]!==undefined){
+                    delete currentRow[columnName];
+                }
+            }
+            else {
+                currentRow[columnName] = resolvedValue;
+            }
         }
     }
 

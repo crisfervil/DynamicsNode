@@ -86,6 +86,19 @@ describe("DataTable", function() {
         assert.notEqual(dt.rows[0].val1,dt.rows[1].val1);
     });
 
+    it("Looks up with undefined values", function(){
+
+        var dt = new DataTable();
+        dt.rows.push({val1:1,val2:2},
+                     {val1:2,val2:2});
+        // returns a random value
+        dt.lookup("val1",row=>row.val1==1?undefined:3);
+        // The values in both rows must match
+        assert.deepEqual(dt.rows[0].val1,undefined);
+        assert.deepEqual(dt.rows[1].val1,3);
+    });
+
+
     it("Loads and reads Excel data", function() {
         var fileName = "test/assets/Book1.xlsx";
         var dt = DataTable.load(fileName);
