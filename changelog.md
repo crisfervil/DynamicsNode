@@ -16,3 +16,4 @@ The reference tag is no required any more.
 - Now the CRMClient.getAttributeMetadata finds the attribute by the DisplayName of the attribute as well as by the Logical Name.
 - Now the RetrieveEntityResponse contains information about the DisplayName of attributes, and about the Optionset and Boolean strings.
 - Now in the Create/Update methods of CRMClient, you can specify your Optionset and Boolean attribute values using the string value of the optionset.
+- Added support for ActivityParty fields

@@ -341,6 +341,19 @@ export class CRMClient {
      * @example <caption>Create an account named "Contoso"</caption>
      * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
      * console.log(accountid);
+     * @Example <caption>Creates an email with activity parties</caption>
+     * 
+     *  var contact1Id = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
+     *  var contact2Id = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
+     *  var userId = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
+     *  var email = {
+     *                To : [{id:contact1Id,type:"contact"},{id:contact2Id,type:"contact"}],
+     *                From : [{id:userId,type:"systemuser"}],
+     *                Subject : "Test Email",
+     *                Description : "Test Email",
+     *                DirectionCode : true
+     *               };
+     *  var emailId = crm.create("email",email);
      */
     create(entity: string, attributes: Object): string;
 
@@ -420,6 +433,7 @@ export class CRMClient {
         if (!attributes) throw new Error("Attributes not specified");
 
         entityName = entityName.toLocaleLowerCase(); // normalize casing
+        var entityMetadata = this.getEntityMetadata(entityName);
 
         debug("Converting attributes to CRM Entity type...");
         var entity = new Entity();
@@ -454,6 +468,9 @@ export class CRMClient {
                     else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Boolean]) {
                         attributeValue = this.ConvertToBoolean(attributes[prop], attributeMetadata);
                     }
+                    else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.PartyList]) {
+                        attributeValue = this.ConvertToPartyList(attributes[prop], attributeMetadata);
+                    }
                     else {
                         debug(`Attribute '${prop}' type '${attributeMetadata.AttributeType}' not converted. Using the raw value`);
                         attributeValue = attributes[prop];
@@ -471,6 +488,24 @@ export class CRMClient {
         debug(`Converted value:`);
         debug(entity);
         return entity;
+    }
+
+    private ConvertToPartyList(attributeValue, attributeMetadata:AttributeMetadata):Array<Object> {
+        var partyList=[];
+
+        if (attributeValue instanceof Array) {
+            for (var i = 0; i < attributeValue.length; i++) {
+                var partyItem = attributeValue[i];
+                var partyItemRecord = {partyid:partyItem};
+                var convertedPartyItem = this.ConvertToEntity("activityparty",partyItemRecord);
+                partyList.push(convertedPartyItem);
+            }
+        } 
+        else {
+            throw new Error(`Cannot convert attribute '${attributeMetadata.LogicalName}' value '${attributeValue}' from '${typeof attributeValue}' to 'ActivityParty'`);
+        }
+        
+        return partyList;    
     }
 
     private ConvertToDate(attributeValue, attributeMetadata:AttributeMetadata): Date {
@@ -570,16 +605,26 @@ export class CRMClient {
         var entityMetadata = this.getEntityMetadata(entityName);
         if (entityMetadata && entityMetadata.Attributes && entityMetadata.Attributes.length > 0) {
             for (var i = 0; i < entityMetadata.Attributes.length; i++) {
-                if (entityMetadata.Attributes[i].LogicalName == attributeName ||
-                    (entityMetadata.Attributes[i].DisplayName!=null&&
-                     entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel!=null&&
-                     entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label!=null&&
-                     entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label.toLowerCase()==attributeName.toLowerCase())) {
+                if (entityMetadata.Attributes[i].LogicalName == attributeName) {
                     attributeMetadata = entityMetadata.Attributes[i];
                     break;
                 }
             }
+
+            // In case there isn't an attribute with the specified name, then try to find it by displayname
+            if(attributeMetadata===null) {
+                for (var i = 0; i < entityMetadata.Attributes.length; i++) {
+                    if (entityMetadata.Attributes[i].DisplayName!=null&&
+                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel!=null&&
+                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label!=null&&
+                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label.toLowerCase()==attributeName.toLowerCase()) {
+                        attributeMetadata = entityMetadata.Attributes[i];
+                        break;
+                    }
+                }                
+            }
         }
+
         return attributeMetadata;
     }
 

@@ -339,6 +339,7 @@ public class CRMBridge
                 EntityMetadata = new {
                     PrimaryIdAttribute = rs.EntityMetadata.PrimaryIdAttribute,
                     SchemaName = rs.EntityMetadata.SchemaName,
+                    IsActivity = rs.EntityMetadata.IsActivity,
                     Attributes = 
                         rs.EntityMetadata.Attributes.Select(x => new { LogicalName = x.LogicalName,
                                                                        AttributeType = x.AttributeType,
@@ -396,7 +397,6 @@ public class CRMBridge
                 }
             }
         }
-
         return converted;
     }
 
@@ -419,6 +419,10 @@ public class CRMBridge
                     {
                         convertedValue = ConvertFromDynamic((ExpandoObject)prop.Value);
                     }
+                    else if (propValueType.IsArray)
+                    {
+                        convertedValue = ConvertFromArray((Array)prop.Value);
+                    }
                     else if (propValueType == typeof(string))
                     {
                         Guid guidValue;
@@ -431,6 +435,47 @@ public class CRMBridge
                 }
             }
         }
+        return retVal;
+    }
+
+    private object ConvertFromArray(Array arrayToConvert)
+    {
+        object retVal = null;
+
+        if (arrayToConvert != null)
+        {
+            var convertedItems = new List<object>();
+
+            Type lastItemType = null;
+            bool sameTypeArray = true;
+            foreach (var item in arrayToConvert)
+            {
+                object convertedValue = null;
+                if (item != null)
+                {
+                    if (item.GetType() != typeof(ExpandoObject)) throw new Exception("The element in the array is not an ExpandoObject.Check the PartyList attributes in your entity");
+                    var expandoItem = (ExpandoObject)item;
+                    convertedValue = ConvertFromDynamic(expandoItem);
+                    if (convertedValue != null)
+                    {
+                        if (lastItemType != null && lastItemType != convertedValue.GetType()) sameTypeArray = false;
+                        lastItemType = convertedValue.GetType();
+                    }
+                }
+                convertedItems.Add(convertedValue);
+            }
+            if (sameTypeArray && lastItemType != null)
+            {
+                // If all the items in the array are ExpandoObjects and their underlying type is the same, then return a specific type array
+                retVal = Array.CreateInstance(lastItemType, convertedItems.Count);
+                Array.Copy(convertedItems.ToArray(), (Array)retVal, convertedItems.Count);
+            }
+            else
+            {
+                retVal = convertedItems.ToArray();
+            }
+        }
+
         return retVal;
     }
 

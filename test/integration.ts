@@ -270,9 +270,19 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
     });
 
     it('Gets entity metadata',function (){
+        var metadata = crm.getEntityMetadata("email");
+        // save the data to review it later
+        fs.writeFile("test/tmp/email-metadata.json", JSON.stringify(metadata,null,4));
+        assert.ok(metadata,JSON.stringify(metadata));
+        assert.equal(metadata.SchemaName,"Email");
+        assert.equal(metadata.IsActivity,true);
+        assert.equal(metadata.PrimaryIdAttribute,"activityid");
+    });
+
+    it('Gets entity metadata',function (){
         var metadata = crm.getEntityMetadata("account");
         // save the data to review it later
-        fs.writeFile("test/tmp/metadata.json", JSON.stringify(metadata,null,4));
+        fs.writeFile("test/tmp/account-metadata.json", JSON.stringify(metadata,null,4));
         assert.ok(metadata,JSON.stringify(metadata));
         assert.equal(metadata.SchemaName,"Account");
         assert.equal(metadata.PrimaryIdAttribute,"accountid");
@@ -286,6 +296,26 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         assert.ok(response.BusinessUnitId);
     });
     
+    it('Creates an Email',function (){   
+            var contactId = crm.create("contact",{firstname:"test"});
+            var who = crm.whoAmI();
+
+            // Create an e-mail message.
+            var email = {
+                To : [{id:contactId,type:"contact"}],
+                From : [{id:who.UserId,type:"systemuser"}],
+                Subject : "Test Email",
+                Description : "Test Email",
+                DirectionCode : true
+            };
+            var emailId = crm.create("email",email);
+            assert.ok(emailId!==null);
+
+            // delete created records
+            crm.delete("email",emailId);
+            crm.delete("contact",contactId);
+    });
+
     it('Assigns a record',function (){   
 
         var account:any = {name:"test account", description:"this is a test", AccountCategoryCode:1};

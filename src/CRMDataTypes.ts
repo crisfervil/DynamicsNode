@@ -23,6 +23,7 @@ export class EntityMetadata{
     public PrimaryIdAttribute:string;
     public SchemaName:string;
     public Attributes:AttributeMetadata[];
+    public IsActivity:boolean;
 }
 
 export class LocalizedLabel{
