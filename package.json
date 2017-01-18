@@ -38,7 +38,7 @@
     "integration-test": "mocha test/integration",
     "build": "typings install && tsc",
     "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive",
-    "doc": "jsdoc -c jsdoc.json"
+    "doc": "tsc && jsdoc -c jsdoc.json"
   },
   "keywords": [
     "Dynamics",

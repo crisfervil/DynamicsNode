@@ -287,152 +287,6 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="create"><span class="type-signature"></span>create(data)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Creates records in CRM using the rows defined in the DataTable.<br>The id attribute of every created record will be updated with the generated CRM GUID.<br>You need to set the name of the table with the entity name that you want to create.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="DataTable.html">DataTable</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>DataTable with the data to be created in CRM.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-321">line 321</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Example</h5>
-        
-        <p class="code-caption">Create a set of accounts using an excel file</p>
-    
-    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.create(accountsToLoad);console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record</pre>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
     <h4 class="name" id="create"><span class="type-signature"></span>create(entityName, attributes)</h4>
     
     
@@ -613,11 +467,529 @@
         
 
     
-        <h5>Example</h5>
+        <h5>Examples</h5>
         
         <p class="code-caption">Create an account named "Contoso"</p>
     
     <pre class="sunlight-highlight-javascript">var accountid = crm.create(&quot;account&quot;,{name:&quot;contoso&quot;,description:&quot;this is a test&quot;,AccountCategoryCode:1});console.log(accountid);</pre>
+
+        <p class="code-caption">Create an email with activity parties</p>
+    
+    <pre class="sunlight-highlight-javascript">var contact1Id = &quot;{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}&quot;var contact2Id = &quot;{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}&quot;var userId = &quot;{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}&quot;var email = {              To : [{id:contact1Id,type:&quot;contact&quot;},{id:contact2Id,type:&quot;contact&quot;}],              From : [{id:userId,type:&quot;systemuser&quot;}],              Subject : &quot;Test Email&quot;,              Description : &quot;Test Email&quot;,              DirectionCode : true             };var emailId = crm.create(&quot;email&quot;,email);</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="create"><span class="type-signature"></span>create(data)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates records in CRM using the rows defined in the DataTable.<br>The id attribute of every created record will be updated with the generated CRM GUID.<br>You need to set the name of the table with the entity name that you want to create.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataTable.html">DataTable</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>DataTable with the data to be created in CRM.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="CRMClient.js.html">CRMClient.js</a>,
+				 <a href="CRMClient.js.html#sunlight-1-line-333">line 333</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+        <p class="code-caption">Create a set of accounts using an excel file</p>
+    
+    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.create(accountsToLoad);console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="createIfDoesNotExist"><span class="type-signature"></span>createIfDoesNotExist(entityName, attributes, matchFields)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Takes a list of attributes and values, tries to find an existing record with those values in CRM, and if doesn't exists it creates it.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>entityName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the entity which record you want to create.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>attributes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Javascript object with the attributes you want to create.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>matchFields</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>List of fields in the attributes parameter you want to use to know if the record exists in CRM.<br>The attributes specified in this parameter will be used to perform a <a href="CRMClient.html#retrieve">CRMClient#retrieve</a>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="CRMClient.js.html">CRMClient.js</a>,
+				 <a href="CRMClient.js.html#sunlight-1-line-703">line 703</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Examples</h5>
+        
+        <p class="code-caption">Create an account named "contoso" only if it doesn't exist one already with the specified email.If theres more than one account with that email, an exception will be thrown</p>
+    
+    <pre class="sunlight-highlight-javascript">crm.createIfDoesNotExist(&quot;account&quot;,{name:&quot;contoso&quot;, description:&quot;New Account Created&quot;, emailaddress1:&quot;info@contoso.com&quot;},[&quot;emailaddress1&quot;]);</pre>
+
+        <p class="code-caption">Searches for an account named "contoso" owned by me. If it doesn't exist, it creates it.</p>
+    
+    <pre class="sunlight-highlight-javascript">var me = crm.whoAmI().UserId;crm.createIfDoesNotExist(&quot;account&quot;,{name:&quot;contoso&quot;, description:&quot;Account Updated&quot;, ownerid:me},[&quot;name&quot;,&quot;ownerid&quot;]);</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="createIfDoesNotExist"><span class="type-signature"></span>createIfDoesNotExist(data, matchFields)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>For every record in the specified Table, tries to find out if it does exists, and if doesn't it creates it.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataTable.html">DataTable</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>DataTable with the entity name and the records to create in CRM.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>matchFields</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>List of fields in the attributes parameter you want to use to know if the record exists in CRM.<br>The attributes specified in this parameter will be used to perform a <a href="CRMClient.html#retrieve">CRMClient#retrieve</a>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="CRMClient.js.html">CRMClient.js</a>,
+				 <a href="CRMClient.js.html#sunlight-1-line-693">line 693</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+        <p class="code-caption">Loads a list of accounts from an Excel file and creates only the ones that don't exist already in CRM.It uses the email address to know if the account exists or not.</p>
+    
+    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.createIfDoesNotExist(accountsToLoad,[&quot;emailaddress1&quot;]);</pre>
 
 
     
@@ -635,7 +1007,7 @@
 
     
     <div class="description">
-        <p>Takes a list of attributes and values, tries to find an existing record with those values in CRM, if it exists, then performs an update, otherwhise it creates it.</p>
+        <p>Takes a list of attributes and values, tries to find an existing record with those values in CRM, if it exists,<br>then performs an update, otherwhise it creates it.</p>
     </div>
     
 
@@ -780,7 +1152,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-564">line 564</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-675">line 675</a>
 			</li>
 		</ul>
 	</dd>
@@ -809,7 +1181,7 @@
     
         <h5>Examples</h5>
         
-        <p class="code-caption">Create an account named "contoso". In this case, a retrieve of an account with name="contoso" will be performed. If exists, then the name and description will be updated. If it doesn't exist, then the account will be created with the specified name and description. If theres more than one account with that name, an exception will be thrown</p>
+        <p class="code-caption">Create an account named "contoso". In this case, a retrieve of an account with name="contoso" will be performed.If exists, then the name and description will be updated. If it doesn't exist, then the account will be created with the specifiedname and description. If theres more than one account with that name, an exception will be thrown</p>
     
     <pre class="sunlight-highlight-javascript">crm.createOrUpdate(&quot;account&quot;,{name:&quot;contoso&quot;, description:&quot;Account Updated&quot;},[&quot;name&quot;]);</pre>
 
@@ -963,7 +1335,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-447">line 447</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-554">line 554</a>
 			</li>
 		</ul>
 	</dd>
@@ -2099,7 +2471,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-511">line 511</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-618">line 618</a>
 			</li>
 		</ul>
 	</dd>
@@ -2325,7 +2697,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Wed Dec 21st 2016
+		on Wed Jan 18th 2017
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

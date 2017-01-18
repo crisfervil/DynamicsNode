@@ -337,23 +337,6 @@ export class CRMClient {
      * @param attributes {object} Javascript object with the values the new record will have.
      * 
      * @returns {string} GUID of the record created.
-     * 
-     * @example <caption>Create an account named "Contoso"</caption>
-     * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
-     * console.log(accountid);
-     * @Example <caption>Creates an email with activity parties</caption>
-     * 
-     *  var contact1Id = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
-     *  var contact2Id = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
-     *  var userId = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
-     *  var email = {
-     *                To : [{id:contact1Id,type:"contact"},{id:contact2Id,type:"contact"}],
-     *                From : [{id:userId,type:"systemuser"}],
-     *                Subject : "Test Email",
-     *                Description : "Test Email",
-     *                DirectionCode : true
-     *               };
-     *  var emailId = crm.create("email",email);
      */
     create(entity: string, attributes: Object): string;
 
@@ -365,14 +348,10 @@ export class CRMClient {
      * @param attributes {object} Javascript object with the values the new record will have.
      * 
      * @returns {string} GUID of the record created.
-     * 
-     * @example <caption>Create an account named "Contoso"</caption>
-     * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
-     * console.log(accountid);
      */
     create(data: DataTable): void;
     /**
-     * Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before 
+     *  Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before 
      * send the operation to Crm.
      * @method CRMClient#create
      * @param entityName {string} The name of the entity which record you want to create
@@ -383,6 +362,18 @@ export class CRMClient {
      * @example <caption>Create an account named "Contoso"</caption>
      * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
      * console.log(accountid);
+     * @example <caption>Create an email with activity parties</caption>
+     * var contact1Id = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
+     * var contact2Id = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
+     * var userId = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
+     * var email = {
+     *               To : [{id:contact1Id,type:"contact"},{id:contact2Id,type:"contact"}],
+     *               From : [{id:userId,type:"systemuser"}],
+     *               Subject : "Test Email",
+     *               Description : "Test Email",
+     *               DirectionCode : true
+     *              };
+     * var emailId = crm.create("email",email);
      */
 
     /**

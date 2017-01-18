@@ -392,7 +392,7 @@ var CRMClient = (function () {
         return result;
     };
     /**
-     * Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before
+     *  Creates a record in CRM. The names in the entity or attributes are case insensitive, so all the names will be lowercased before
      * send the operation to Crm.
      * @method CRMClient#create
      * @param entityName {string} The name of the entity which record you want to create
@@ -403,6 +403,18 @@ var CRMClient = (function () {
      * @example &lt;caption>Create an account named "Contoso"&lt;/caption>
      * var accountid = crm.create("account",{name:"contoso",description:"this is a test",AccountCategoryCode:1});
      * console.log(accountid);
+     * @example &lt;caption>Create an email with activity parties&lt;/caption>
+     * var contact1Id = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
+     * var contact2Id = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
+     * var userId = "{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}"
+     * var email = {
+     *               To : [{id:contact1Id,type:"contact"},{id:contact2Id,type:"contact"}],
+     *               From : [{id:userId,type:"systemuser"}],
+     *               Subject : "Test Email",
+     *               Description : "Test Email",
+     *               DirectionCode : true
+     *              };
+     * var emailId = crm.create("email",email);
      */
     /**
      * Creates records in CRM using the rows defined in the DataTable.
@@ -421,8 +433,11 @@ var CRMClient = (function () {
         if (entityNameOrTable instanceof DataTable_1.DataTable) {
             if (entityNameOrTable.name == null)
                 throw new Error("Table name not specified");
+            debug("Preparing to create " + entityNameOrTable.rows.length + " records from a DataTable. Entity " + entityNameOrTable.name + "...");
             var primaryAttribute = this.getIdField(entityNameOrTable.name);
+            debug("Primary Attribute:" + primaryAttribute);
             for (var i = 0; i &lt; entityNameOrTable.rows.length; i++) {
+                debug(i + " of " + entityNameOrTable.rows.length + "...");
                 var row = entityNameOrTable.rows[i];
                 var recordId = this.createInternal(entityNameOrTable.name, row);
                 // update the record id in the table
@@ -432,6 +447,7 @@ var CRMClient = (function () {
         else {
             if (attributes === undefined)
                 throw new Error("The attributes parameter is required");
+            debug("Preparing to create a " + entityNameOrTable + " record...");
             retVal = this.createInternal(entityNameOrTable, attributes);
         }
         return retVal;
@@ -448,55 +464,134 @@ var CRMClient = (function () {
         if (!attributes)
             throw new Error("Attributes not specified");
         entityName = entityName.toLocaleLowerCase(); // normalize casing
+        var entityMetadata = this.getEntityMetadata(entityName);
+        debug("Converting attributes to CRM Entity type...");
         var entity = new CRMDataTypes_1.Entity();
         entity.LogicalName = entityName;
         entity.Attributes = {};
         for (var prop in attributes) {
-            var attributeName = prop.toLocaleLowerCase(); // normalize casing 
             var attributeValue = null;
             // get the attribute from metadata
-            var attributeMetadata = this.getAttributeMetadata(entityName, attributeName);
+            var attributeMetadata = this.getAttributeMetadata(entityName, prop.toLocaleLowerCase());
             if (attributeMetadata) {
-                if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.String] ||
-                    attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Memo]) {
-                    if (!(typeof attributes[prop] == "string"))
-                        throw new Error("Cannot convert attribute '" + attributeName + "' from '" + typeof attributes[prop] + "' to 'String'");
-                    attributeValue = attributes[prop];
-                }
-                else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.DateTime]) {
-                    if (attributes[prop] &amp;&amp; !(attributes[prop] instanceof Date))
-                        throw new Error("Cannot convert attribute '" + attributeName + "' from '" + typeof attributes[prop] + "' to 'Date'");
-                    attributeValue = attributes[prop];
-                }
-                else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Lookup] ||
-                    attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Customer]) {
-                    attributeValue = this.ConvertToEntityReference(attributes[prop], attributeMetadata);
-                }
-                else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Picklist]) {
-                    attributeValue = this.ConvertToOptionset(attributes[prop], attributeMetadata);
-                }
-                else {
-                    attributeValue = attributes[prop];
+                if (attributes[prop] !== null) {
+                    if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.String] ||
+                        attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Memo]) {
+                        if (!(typeof attributes[prop] == "string"))
+                            throw new Error("Cannot convert attribute '" + prop + "' value '" + attributes[prop] + "' from '" + typeof attributes[prop] + "' to 'String'");
+                        attributeValue = attributes[prop];
+                    }
+                    else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.DateTime]) {
+                        attributeValue = this.ConvertToDate(attributes[prop], attributeMetadata);
+                    }
+                    else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Lookup] ||
+                        attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Customer] ||
+                        attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Owner]) {
+                        attributeValue = this.ConvertToEntityReference(attributes[prop], attributeMetadata);
+                    }
+                    else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Picklist]) {
+                        attributeValue = this.ConvertToOptionset(attributes[prop], attributeMetadata);
+                    }
+                    else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Boolean]) {
+                        attributeValue = this.ConvertToBoolean(attributes[prop], attributeMetadata);
+                    }
+                    else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.PartyList]) {
+                        attributeValue = this.ConvertToPartyList(attributes[prop], attributeMetadata);
+                    }
+                    else {
+                        debug("Attribute '" + prop + "' type '" + attributeMetadata.AttributeType + "' not converted. Using the raw value");
+                        attributeValue = attributes[prop];
+                    }
                 }
                 // TODO: add the rest of value types
-                entity.Attributes[attributeName] = attributeValue;
+                entity.Attributes[attributeMetadata.LogicalName] = attributeValue;
             }
             else {
-                console.log("*** Attribute " + attributeName + " not found in metadata. Skipping...");
+                console.log("*** Attribute '" + prop + "' not found in metadata. Skipping...");
             }
         }
         // TODO: Set the Entity Id
+        debug("Converted value:");
+        debug(entity);
         return entity;
     };
-    CRMClient.prototype.ConvertToOptionset = function (attributeValue, attributeMetadata) {
-        var optionset = null;
-        if (typeof attributeValue == "number") {
-            optionset = new CRMDataTypes_1.OptionSetValue(attributeValue);
+    CRMClient.prototype.ConvertToPartyList = function (attributeValue, attributeMetadata) {
+        var partyList = [];
+        if (attributeValue instanceof Array) {
+            for (var i = 0; i &lt; attributeValue.length; i++) {
+                var partyItem = attributeValue[i];
+                var partyItemRecord = { partyid: partyItem };
+                var convertedPartyItem = this.ConvertToEntity("activityparty", partyItemRecord);
+                partyList.push(convertedPartyItem);
+            }
         }
         else {
-            throw new Error("Can't convert from " + typeof attributeValue + " to OptionsetValue");
+            throw new Error("Cannot convert attribute '" + attributeMetadata.LogicalName + "' value '" + attributeValue + "' from '" + typeof attributeValue + "' to 'ActivityParty'");
         }
-        return optionset;
+        return partyList;
+    };
+    CRMClient.prototype.ConvertToDate = function (attributeValue, attributeMetadata) {
+        var date = null;
+        if (attributeValue instanceof Date) {
+            date = attributeValue;
+        }
+        else if (typeof attributeValue == "string") {
+            date = new Date(attributeValue);
+        }
+        if (date === null)
+            throw new Error("Cannot convert attribute '" + attributeMetadata.LogicalName + "' value '" + attributeValue + "' from '" + typeof attributeValue + "' to 'Date'");
+        return date;
+    };
+    CRMClient.prototype.ConvertToBoolean = function (attributeValue, attributeMetadata) {
+        var boolVal = null;
+        if (typeof attributeValue == "boolean") {
+            boolVal = attributeValue;
+        }
+        else if (typeof attributeValue == "number") {
+            if (attributeValue == 0) {
+                boolVal = false;
+            }
+            else {
+                boolVal = true;
+            }
+        }
+        else if (typeof attributeValue == "string") {
+            // Try to find the string as an Optionset Label
+            var optionSet = attributeMetadata.OptionSet;
+            if (optionSet.TrueOption.Label.UserLocalizedLabel.Label.toLowerCase() == attributeValue.toLowerCase() ||
+                attributeValue.toLowerCase() == "yes") {
+                boolVal = true;
+            }
+            else if (optionSet.FalseOption.Label.UserLocalizedLabel.Label.toLowerCase() == attributeValue.toLowerCase() ||
+                attributeValue.toLowerCase() == "no") {
+                boolVal = false;
+            }
+        }
+        if (boolVal == null) {
+            throw new Error("Can't convert attribute '" + attributeMetadata.LogicalName + "' value '" + attributeValue + "' from '" + typeof attributeValue + "' to Boolean");
+        }
+        return boolVal;
+    };
+    CRMClient.prototype.ConvertToOptionset = function (attributeValue, attributeMetadata) {
+        var optionSet = null;
+        if (typeof attributeValue == "number") {
+            optionSet = new CRMDataTypes_1.OptionSetValue(attributeValue);
+        }
+        if (typeof attributeValue == "string") {
+            // Try to find the string as an Optionset Label
+            var optionSetMetadata = attributeMetadata.OptionSet;
+            for (var i = 0; i &lt; optionSetMetadata.Options.length; i++) {
+                var option = optionSetMetadata.Options[i];
+                if (option.Label.UserLocalizedLabel.Label.toLowerCase() == attributeValue.toLowerCase()) {
+                    optionSet = new CRMDataTypes_1.OptionSetValue(option.Value);
+                    break;
+                }
+            }
+        }
+        if (optionSet == null) {
+            throw new Error("Can't convert attribute '" + attributeMetadata.LogicalName + "' value '" + attributeValue + "' from '" + typeof attributeValue + "' to OptionsetValue");
+        }
+        return optionSet;
     };
     CRMClient.prototype.ConvertToEntityReference = function (attributeValue, attributeMetadata) {
         var er = null;
@@ -504,7 +599,7 @@ var CRMClient = (function () {
         if (typeof attributeValue == "string") {
             // TODO: If the value is not a GUID, find the value in the target entity
             if (attributeMetadata.Targets.length > 1)
-                throw new Error("Too many targets");
+                throw new Error("Couldn't get a valid target for attribute '" + attributeMetadata.LogicalName + "'. Please specify a valid target using {id:string,type:string}");
             target = attributeMetadata.Targets[0];
             id = attributeValue;
         }
@@ -513,7 +608,7 @@ var CRMClient = (function () {
             target = attributeValue.type;
         }
         if (!(target &amp;&amp; id))
-            throw new Error("Couldn't get value");
+            throw new Error("Couldn't get a valid EntityReference value for attribute '" + attributeMetadata.LogicalName + "'. Please specify a valid target using {id:string,type:string}");
         er = new CRMDataTypes_1.EntityReference(id, target);
         return er;
     };
@@ -525,6 +620,18 @@ var CRMClient = (function () {
                 if (entityMetadata.Attributes[i].LogicalName == attributeName) {
                     attributeMetadata = entityMetadata.Attributes[i];
                     break;
+                }
+            }
+            // In case there isn't an attribute with the specified name, then try to find it by displayname
+            if (attributeMetadata === null) {
+                for (var i = 0; i &lt; entityMetadata.Attributes.length; i++) {
+                    if (entityMetadata.Attributes[i].DisplayName != null &amp;&amp;
+                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel != null &amp;&amp;
+                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label != null &amp;&amp;
+                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label.toLowerCase() == attributeName.toLowerCase()) {
+                        attributeMetadata = entityMetadata.Attributes[i];
+                        break;
+                    }
                 }
             }
         }
@@ -614,11 +721,15 @@ var CRMClient = (function () {
         if (!entityName)
             throw new Error("Entity name not specified");
         entityName = entityName.toLowerCase(); // normalize casing
+        debug("Preparing to update a record...");
         // get records GUIDS
         if (conditions != undefined) {
             var idField = this.getIdField(entityName);
+            debug("Conditions specified. Trying to find which records that meets conditions to update...");
             var foundRecords = this.retrieveMultiple(entityName, conditions, idField);
+            debug(foundRecords.rows.length + " records found");
             for (var i = 0; i &lt; foundRecords.rows.length; i++) {
+                debug("updating " + i + " of " + foundRecords.rows.length);
                 var foundRecordId = foundRecords.rows[i][idField];
                 attributes[idField] = foundRecordId;
                 var entity = this.ConvertToEntity(entityName, attributes);
@@ -647,39 +758,102 @@ var CRMClient = (function () {
         // convert it to lowercase
         return idAttr.toLowerCase();
     };
-    /** Takes a list of attributes and values, tries to find an existing record with those values in CRM, if it exists, then performs an update, otherwhise it creates it.
+    /** Takes a list of attributes and values, tries to find an existing record with those values in CRM, if it exists,
+     * then performs an update, otherwhise it creates it.
      * @method CRMClient#createOrUpdate
      * @param entityName {string} Name of the entity which record you want to update.
      * @param attributes {object} Javascript object with the attributes you want to create or update.
      * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
      * The attributes specified in this parameter will be used to perform a {@link CRMClient#retrieve}.
-     * @example &lt;caption>Create an account named "contoso". In this case, a retrieve of an account with name="contoso" will be performed. If exists, then the name and description will be updated. If it doesn't exist, then the account will be created with the specified name and description. If theres more than one account with that name, an exception will be thrown&lt;/caption>
+     * @example &lt;caption>Create an account named "contoso". In this case, a retrieve of an account with name="contoso" will be performed.
+     * If exists, then the name and description will be updated. If it doesn't exist, then the account will be created with the specified
+     * name and description. If theres more than one account with that name, an exception will be thrown&lt;/caption>
      * crm.createOrUpdate("account",{name:"contoso", description:"Account Updated"},["name"]);
      * @example &lt;caption>Searches for an account named "contoso" owned by me. If exists, it updates it, otherwhise it creates a new one.&lt;/caption>
      * var me = crm.whoAmI().UserId;
      * crm.createOrUpdate("account",{name:"contoso", description:"Account Updated", ownerid:me},["name","ownerid"]);
     */
     CRMClient.prototype.createOrUpdate = function (entityName, attributes, matchFields) {
+        this.createUpdate(entityName, attributes, matchFields);
+    };
+    /** For every record in the specified Table, tries to find out if it does exists, and if doesn't it creates it.
+     * @method CRMClient#createIfDoesNotExist
+     * @param data {DataTable} DataTable with the entity name and the records to create in CRM.
+     * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
+     * The attributes specified in this parameter will be used to perform a {@link CRMClient#retrieve}.
+     * @example &lt;caption>Loads a list of accounts from an Excel file and creates only the ones that don't exist already in CRM.
+     * It uses the email address to know if the account exists or not.&lt;/caption>
+     * var accountsToLoad = DataTable.load("AccountsToLoad.xlsx");
+     * crm.createIfDoesNotExist(accountsToLoad,["emailaddress1"]);
+    */
+    /** Takes a list of attributes and values, tries to find an existing record with those values in CRM, and if doesn't exists it creates it.
+     * @method CRMClient#createIfDoesNotExist
+     * @param entityName {string} Name of the entity which record you want to create.
+     * @param attributes {object} Javascript object with the attributes you want to create.
+     * @param matchFields {string[]} List of fields in the attributes parameter you want to use to know if the record exists in CRM.
+     * The attributes specified in this parameter will be used to perform a {@link CRMClient#retrieve}.
+     * @example &lt;caption>Create an account named "contoso" only if it doesn't exist one already with the specified email.
+     * If theres more than one account with that email, an exception will be thrown&lt;/caption>
+     * crm.createIfDoesNotExist("account",{name:"contoso", description:"New Account Created", emailaddress1:"info@contoso.com"},["emailaddress1"]);
+     * @example &lt;caption>Searches for an account named "contoso" owned by me. If it doesn't exist, it creates it.&lt;/caption>
+     * var me = crm.whoAmI().UserId;
+     * crm.createIfDoesNotExist("account",{name:"contoso", description:"Account Updated", ownerid:me},["name","ownerid"]);
+    */
+    CRMClient.prototype.createIfDoesNotExist = function (entityNameOrDataTable, attributesOrMatchfields, matchFields) {
+        if (entityNameOrDataTable instanceof DataTable_1.DataTable) {
+            var data = entityNameOrDataTable;
+            if (data === undefined || data === null)
+                throw new Error("DataTable not specified");
+            if (data.name === undefined || data.name === null)
+                throw new Error("DataTable name not specified");
+            if (!Array.isArray(attributesOrMatchfields))
+                throw new Error("Wrong data type for the matchFields parameter");
+            var matchFields = attributesOrMatchfields;
+            debug("About to create if does not exits " + data.rows.length + " records from a DataTable...");
+            for (var i = 0; i &lt; data.rows.length; i++) {
+                debug(i + " of " + data.rows.length + "...");
+                this.createUpdate(data.name, data.rows[i], matchFields, false);
+            }
+        }
+        else {
+            if (matchFields === undefined || matchFields === null)
+                throw new Error("matchFields not specified");
+            this.createUpdate(entityNameOrDataTable, attributesOrMatchfields, matchFields, false);
+        }
+    };
+    CRMClient.prototype.createUpdate = function (entityName, attributes, matchFields, update) {
+        if (update === void 0) { update = true; }
         var idField = this.getIdField(entityName);
         var conditions = {};
+        debug("About to create or update a record...");
         for (var i = 0; i &lt; matchFields.length; i++) {
             var matchField = matchFields[i];
+            debug("Preparing query to know if the record exists...");
+            var attr = this.getAttributeMetadata(entityName, matchField);
+            if (attr === null)
+                throw new Error("Attribute '" + matchField + "' not found in entity " + entityName);
             if (attributes[matchField] !== undefined &amp;&amp; attributes[matchField] !== null) {
-                conditions[matchField] = attributes[matchField];
+                conditions[attr.LogicalName] = attributes[matchField];
             }
         }
         // check if the record exists
-        var foundRecord = this.retrieve(entityName, conditions, idField);
-        if (foundRecord) {
-            // The record exists. Update it
-            attributes[idField] = foundRecord[idField];
-            this.update(entityName, attributes);
+        var foundRecords = this.retrieveMultiple(entityName, conditions, idField);
+        if (foundRecords &amp;&amp; foundRecords.rows.length > 0) {
+            debug(foundRecords.rows.length + " '" + entityName + "' records found");
+            if (update) {
+                if (foundRecords.rows.length > 1)
+                    throw new Error("Too many records found");
+                var foundRecord = foundRecords.rows[0];
+                attributes[idField] = foundRecord[idField];
+                this.update(entityName, attributes);
+            }
         }
         else {
-            // The record doesn't exists. Create it
+            debug("The record doesn't exists. Create it");
             this.create(entityName, attributes);
         }
     };
+    /** */
     CRMClient.prototype.associateData = function (data) {
         for (var i = 0; i &lt; data.rows.length; i++) {
             var row = data.rows[i];
@@ -857,7 +1031,7 @@ exports.CRMClient = CRMClient;
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Wed Dec 21st 2016
+		on Wed Jan 18th 2017
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
