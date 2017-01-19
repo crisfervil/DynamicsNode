@@ -16,9 +16,7 @@
         "sourceMap":true
     },
     "exclude": [
-        "node_modules",
-        "typings/browser",
-        "tsexamples.ts"
+        "node_modules"
     ],
     "compileOnSave": true,
     "buildOnSave": false
