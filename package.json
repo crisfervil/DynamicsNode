@@ -32,8 +32,7 @@
     "istanbul": "^0.4.5",
     "jsdoc": "^3.4.1",
     "mocha": "^3.1.0",
-    "typescript": "^2.1.4",
-    "typings": "^1.4.0"
+    "typescript": "^2.1.4"
   },
   "scripts": {
     "test": "mocha --recursive",
