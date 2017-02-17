@@ -16,3 +16,4 @@ tsconfig.json
 *.ts
 !*.d.ts
 *.js.map
+src/cs
