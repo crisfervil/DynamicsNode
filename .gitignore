@@ -59,8 +59,7 @@ npm-debug.log
 tmp
 #imdone tasks
 .imdone/
-src/bin/*.xml
-src/bin/*.pdb
+src/bin
 .nyc_output
 *.suo
 *.csproj.user
