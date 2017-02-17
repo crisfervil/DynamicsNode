@@ -4,6 +4,7 @@ import { Guid } from "./Guid";
 import { Fetch } from "./Fetch";
 import { AssignRequest, WhoAmIRequest, WhoAmIResponse, RetrieveEntityRequest, RetrieveEntityResponse } from "./Messages";
 import { Entity, EntityReference, OptionSetValue, AttributeTypeCode, EntityFilters, EntityMetadata, AttributeMetadata, BooleanOptionsetMetadata, OptionsetMetadata } from "./CRMDataTypes";
+import { ImportExportUtil } from "./ImportExportUtil";
 
 import path = require("path");
 import edge = require("edge");
@@ -998,44 +999,10 @@ export class CRMClient {
     }
 
     export(entityName: string, fileName: string) {
-
-        debug(`Exporting ${entityName} to ${fileName}...`);
-
-        // perform some validations
-        if (!entityName) throw new Error("Entity name not specified");
-        entityName = entityName.toLowerCase(); // normalize casing
-
-        debug("Getting metadata...");
-        var metadata = this.getEntityMetadata(entityName);
-        debug("Getting data...");
-        var data = this.retrieveMultiple(entityName, {});
-        var rowsCount = data ? data.rows ? data.rows.length : 0 : 0;
-        debug(`Retrieved ${rowsCount} records`);
-        debug("Saving...");
-        data.save(fileName);
-        debug("done!");
+        ImportExportUtil.export(this,entityName,fileName);
     }
 
     import(fileName: string) {
-
-        debug(`Importing ${fileName}...`);
-
-        debug("Loading data table...");
-        var dt = DataTable.load(fileName);
-        debug(`${dt.rows.length} records found`);
-
-        debug(`Getting metadata for entity ${dt.name}...`);
-        var metadata = this.getEntityMetadata(dt.name);
-
-        var idField = this.getIdField(dt.name);
-
-        debug("Importing...");
-
-        for (let i = 0; i < dt.rows.length; i++) {
-            debug(`record ${i + 1} of ${dt.rows.length}...`);
-            this.createOrUpdate(dt.name, dt.rows[i], [idField]);
-        }
-
-        debug("done!");
+        ImportExportUtil.import(this,fileName);
     }
 }
