@@ -19,6 +19,7 @@ install:
   - sudo sh -c "echo 'deb http://download.mono-project.com/repo/debian wheezy-libtiff-compat main' >> /etc/apt/sources.list.d/mono-xamarin.list"
   - sudo apt-get update
   - sudo apt-get install mono-devel
+  - sudo apt install nuget
   - npm install -g grunt-cli
   - npm install -g codecov
   - npm install -g nyc
@@ -26,7 +27,7 @@ install:
   - npm install
   - npm install mocha-lcov-reporter
 
-before_script: npm run build
+before_script: npm run build-linux
 
 script:
   - npm run cover
