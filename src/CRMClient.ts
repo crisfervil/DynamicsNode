@@ -2,7 +2,6 @@
 import { DataTable } from "./DataTable";
 import { Guid } from "./Guid";
 import { Fetch } from "./Fetch";
-import { Dictionary } from "./Dictionary";
 import { AssignRequest, WhoAmIRequest, WhoAmIResponse, RetrieveEntityRequest, RetrieveEntityResponse } from "./Messages";
 import { Entity, EntityReference, OptionSetValue, AttributeTypeCode, EntityFilters, EntityMetadata, AttributeMetadata, BooleanOptionsetMetadata, OptionsetMetadata } from "./CRMDataTypes";
 
@@ -14,7 +13,7 @@ var debugQueries = require("debug")("dynamicsnode:queries");
 export class CRMClient {
 
     private _crmBridge: any;
-    private _metadataCache = new Dictionary();
+    private _metadataCache = {};
 
     /**
      * Default constructor
@@ -954,16 +953,13 @@ export class CRMClient {
     }
 
     getEntityMetadata(entityName: string): EntityMetadata {
-        var ndx = this._metadataCache.indexOf(entityName);
-        var metadata = null;
-        if (ndx > -1) {
-            metadata = this._metadataCache.getValue(ndx);
+
+        if(this._metadataCache[entityName]===undefined){
+            var metadata = this.getEntityMetadataFromCrm(entityName);
+            this._metadataCache[entityName] = metadata;
         }
-        else {
-            metadata = this.getEntityMetadataFromCrm(entityName);
-            this._metadataCache.push(entityName, metadata);
-        }
-        return metadata;
+
+        return this._metadataCache[entityName];
     }
 
     private getEntityMetadataFromCrm(entityName: string): EntityMetadata {
