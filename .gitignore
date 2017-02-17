@@ -62,3 +62,8 @@ tmp
 src/bin/*.xml
 src/bin/*.pdb
 .nyc_output
+*.suo
+*.csproj.user
+src/cs/packages
+src/cs/DynamicsNode/bin
+src/cs/DynamicsNode/obj
