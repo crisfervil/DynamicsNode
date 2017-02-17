@@ -441,8 +441,7 @@ export class CRMClient {
                 if(attributes[prop]!==null){
                     if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.String] ||
                         attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Memo]) {
-                        if (!(typeof attributes[prop] == "string")) throw new Error(`Cannot convert attribute '${prop}' value '${attributes[prop]}' from '${typeof attributes[prop]}' to 'String'`);
-                        attributeValue = attributes[prop];
+                        attributeValue = this.ConvertToString(prop,attributes[prop]);
                     }
                     else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.DateTime]) {
                         attributeValue = this.ConvertToDate(attributes[prop],attributeMetadata);
@@ -478,6 +477,22 @@ export class CRMClient {
         debug(`Converted value:`);
         debug(entity);
         return entity;
+    }
+
+    private ConvertToString(attributeName, attributeValue):string{
+        var strValue:string=null;
+        if(attributeValue!==null&&attributeValue!==undefined){
+            if(typeof attributeValue==="string"){
+                strValue=attributeValue;
+            }
+            else if (attributeValue.toString!==undefined&&typeof attributeValue.toString==="function") {
+                strValue=attributeValue.toString();
+            }
+            else {
+                throw new Error(`Cannot convert attribute '${attributeName}' value '${attributeValue}' from '${typeof attributeValue}' to 'String'`);                
+            }
+        }
+        return strValue;
     }
 
     private ConvertToPartyList(attributeValue, attributeMetadata:AttributeMetadata):Array<Object> {

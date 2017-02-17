@@ -216,6 +216,7 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
         // try different data types
         var lead = {description:"test" // memo
                     ,firstname:"test"// string
+                    ,lastname:123123 // test number to string conversion
                     ,estimatedCloseDate:new Date() //datetime
                     ,donotfax:true // bolean
                     ,address1_latitude:89.556 // double
