@@ -288,18 +288,23 @@ export class DataTable {
                 for (var propName in rowItem) {
                     var propValue = rowItem[propName];
                     if (propValue != null) {
-                        xw.startElement(propName);
-                        var strValue;
-                        if (typeof propValue == "object" && !(propValue instanceof Date) && propValue.type) {
+                        var strValue=null, propType=null;
+                        if (typeof propValue == "object" && !(propValue instanceof Date) && propValue.type!==null && propValue.type!==undefined) {
                             // this value must contain typeinfo
-                            xw.writeAttribute("type",propValue.type);    
+                            propType = propValue.type;
                             strValue = this.serializeValue(propValue.value);
                         }
                         else {
                             strValue = this.serializeValue(propValue);
                         }
-                        xw.text(strValue);
-                        xw.endElement();
+                        if(strValue!==null){
+                            xw.startElement(propName);
+                            if(propType!==null&&propType!==undefined){
+                                xw.writeAttribute("type",propValue.type);    
+                            }
+                            xw.text(strValue);
+                            xw.endElement();
+                        }
                     }
                 }
                 xw.endElement(); // row
@@ -311,9 +316,15 @@ export class DataTable {
     }
 
     private serializeValue(value) {
-        var result = value.toString();
-        if (value != null && value instanceof Date) {
-            result = JSON.stringify(value).replace(/\"/g, "");
+        var result = null;
+        if(value!==null&&value!==undefined){
+            if (value instanceof Date) {
+                result = JSON.stringify(value).replace(/\"/g, "");
+            }
+            else
+            {
+                result = value.toString();
+            }
         }
         return result;
     }
