@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("DynamicsNode")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("DynamicsNode")]
+[assembly: AssemblyCompany("Dynamics Node")]
 [assembly: AssemblyProduct("DynamicsNode")]
-[assembly: AssemblyCopyright("Copyright © Cristhian Fernandez")]
+[assembly: AssemblyCopyright("Copyright © Cristhian Fernandez 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("cf009d54-e2e0-4628-8391-1c99d0acc7cc")]
+[assembly: Guid("269cac73-64d6-4bbc-a794-03f74a7c72a4")]
 
 // Version information for an assembly consists of the following four values:
 //
