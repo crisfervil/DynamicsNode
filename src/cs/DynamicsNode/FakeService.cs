@@ -39,7 +39,7 @@ namespace DynamicsNode
                                                 .Invoke(new Object[] { AttributeTypeCode.Integer, "prop1" });
                     attr1.LogicalName = "prop1";
                     var attrs = new AttributeMetadata[] { attr1 };
-                    em.GetType().GetProperty("Attributes").SetValue(em, attrs);
+                    em.GetType().GetProperty("Attributes").SetValue((object)em, (object)attrs);
                     res = new RetrieveEntityResponse();
                     res["EntityMetadata"] = em;
                 }

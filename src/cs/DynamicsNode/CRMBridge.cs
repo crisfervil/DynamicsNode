@@ -266,7 +266,7 @@ namespace DynamicsNode
                     var propDef = convertedType.GetProperty(prop.Key);
                     if (propDef != null)
                     {
-                        var propValue = prop.Value;
+                        object propValue = prop.Value;
                         Type propValueType = prop.Value.GetType();
                         if (propDef.PropertyType == typeof(AttributeCollection))
                         {
