@@ -97,13 +97,6 @@
     <DynamicsNodeOutputFiles Include="$(ProjectDir)$(OutDir)*.dll"/>  
   </ItemGroup> 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <PropertyGroup>
-      <!--
-      <PostBuildEvent Condition="'$(OS)' == 'Windows_NT'">xcopy "$(ProjectDir)$(OutDir)*.dll" "$(ProjectDir)..\..\bin\" /Y /R</PostBuildEvent>
-      -->
-    </PropertyGroup>
-    <Target Name="BeforeBuild">
-    </Target>
     <Target Name="AfterBuild">
       <Copy SourceFiles="@(DynamicsNodeOutputFiles)" DestinationFolder="$(ProjectDir)..\..\bin\" />
     </Target>
