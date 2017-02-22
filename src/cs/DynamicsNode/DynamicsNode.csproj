@@ -93,15 +93,18 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>  
+    <DynamicsNodeOutputFiles Include="$(ProjectDir)$(OutDir)*.dll"/>  
+  </ItemGroup> 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)*.dll" "$(ProjectDir)..\..\bin\" /Y /R</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+      <!--
+      <PostBuildEvent Condition="'$(OS)' == 'Windows_NT'">xcopy "$(ProjectDir)$(OutDir)*.dll" "$(ProjectDir)..\..\bin\" /Y /R</PostBuildEvent>
+      -->
+    </PropertyGroup>
+    <Target Name="BeforeBuild">
+    </Target>
+    <Target Name="AfterBuild">
+      <Copy SourceFiles="@(DynamicsNodeOutputFiles)" DestinationFolder="$(ProjectDir)..\..\bin\" />
+    </Target>
 </Project>
