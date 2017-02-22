@@ -3,8 +3,10 @@
 - Updated CRM Dlls to the latest SDK version. This is a breaking change in the Connections String, that now have to 
 specify the authentication typefor office 365 (AuthType=Office365)
 See https://msdn.microsoft.com/en-ie/library/mt608573.aspx
+If your code uses several connections in the same script, add the RequireNewInstance=True parameter in the connection string.
+See http://crmtipoftheday.com/tag/requirenewinstance/
 - Removed the dependency on Newtonsoft.Json.dll 
-- Restructured the .net code. Now the code is splitted in different files, and a solution file was added.
+- Restructured the .net code. Now the code is splitted in different files, and a solution file was added. This removes the need of compiling code in each run and improves performance.
 - Added loading from Excel capabilities in the [DataTable](https://dynamicsnode.js.org/DataTable.html) object. 
 Now, you can load your records from Excel. The Save to Excel is still pending to be added.
 - Added the [lookup](https://dynamicsnode.js.org/DataTable.html#lookup__anchor) method in the DataTable object that allows 
