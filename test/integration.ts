@@ -8,6 +8,12 @@ import fs = require("fs");
 import {WhoAmIRequest,WhoAmIResponse} from "../src/Messages";
 
 
+    // Asserts that there is a value in the specified field in the specified record
+    function checkFieldValue(dataTable,index,fieldName){
+        assert.ok(dataTable.rows[index][fieldName]!==undefined,
+            `record[${index}].'${fieldName}' undefined.\n${JSON.stringify(dataTable.rows[index])}`); 
+    } 
+
 before(function(){
   // create temp dir if doesn't exist
   if(!fs.existsSync("test/tmp")) fs.mkdirSync("test/tmp");
@@ -152,33 +158,37 @@ function addTestsFor(connectionStringName:string, connectionStringValue:string):
     });
 
     it('Performs a "retrieve all" of an entity',function (){
-        //this.timeout(15000); // aplyies only to this test
-        var records = crm.retrieveAll("buSineSSunit");// the entity name must be lowercased
+        var records = crm.retrieveAll("sysTEMuSEr");// the entity name must be lowercased
+        
         assert.ok(records);
         assert.ok(records.rows.length>0);
+
         for(var i=0;i<records.rows.length;i++){
-          assert.ok(records.rows[i].businessunitid!=undefined,`item#:${i}->${JSON.stringify(records[i])}`);
-          assert.ok(records.rows[i].organizationid);
-          assert.ok(records.rows[i].organizationid_name);
-          assert.ok(records.rows[i].organizationid_type);
-          assert.ok(records.rows[i].name);
-          assert.ok(records.rows[i].createdon);
+            checkFieldValue(records,i,"businessunitid");
+            checkFieldValue(records,i,"businessunitid_name");
+            checkFieldValue(records,i,"businessunitid_type");
+            checkFieldValue(records,i,"fullname");
+            checkFieldValue(records,i,"domainname");
+            checkFieldValue(records,i,"createdon");
         }
+
     });
 
     it('Performs a simple retrieve multiple',function (){
-      var who = crm.whoAmI();
-      assert.ok(who);
-      var fetch = new Fetch("SystemUser","*",{systemuserid:who.UserId});
-      var fetchXml = fetch.toString();
-      // Use different casing in entity and field names
-      var records = crm.retrieveMultiple(fetchXml);
-      assert.ok(records);
-      assert.ok(records.rows.length==1);
-      assert.ok(records.rows[0].domainname!=undefined,`${JSON.stringify(records[0])}`);
-      assert.ok(records.rows[0].systemuserid);
-      assert.ok(records.rows[0].businessunitid);
-      assert.ok(records.rows[0].fullname);
+        var who = crm.whoAmI();
+        assert.ok(who);
+
+        var fetch = new Fetch("SystemUser","*",{systemuserid:who.UserId});
+        var fetchXml = fetch.toString();
+        var records = crm.retrieveMultiple(fetchXml);
+
+        assert.ok(records);
+        assert.ok(records.rows.length==1);
+
+        checkFieldValue(records,0,"domainname");
+        checkFieldValue(records,0,"systemuserid");
+        checkFieldValue(records,0,"businessunitid");
+        checkFieldValue(records,0,"fullname");
     });
     
     it('Performs a retrieve all',function (){
