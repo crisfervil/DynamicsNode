@@ -1,5 +1,5 @@
 build:
-    project: \src\cs\DynamicsNode.sln
+    project: src\cs\DynamicsNode.sln
 
 before_build:
-    - nuget restore \src\cs\DynamicsNode.sln
+    - nuget restore src\cs\DynamicsNode.sln
