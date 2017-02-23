@@ -7,6 +7,7 @@ before_build:
     - nuget restore src\cs\DynamicsNode.sln
 
 after_build:
+    - xcopy "src\cs\DynamicsNode\bin\release\*.dll" "src\bin\" /Y /R
     - npm install
     - npm run build
     - npm test
