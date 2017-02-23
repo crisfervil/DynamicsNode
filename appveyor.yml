@@ -3,3 +3,7 @@ build:
 
 before_build:
     - nuget restore src\cs\DynamicsNode.sln
+
+after_build:
+    - npm run build
+    - npm test
