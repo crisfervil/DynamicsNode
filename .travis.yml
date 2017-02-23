@@ -19,7 +19,7 @@ install:
   # https://bugzilla.xamarin.com/show_bug.cgi?id=42169
   # https://bugzilla.xamarin.com/show_bug.cgi?id=43473
   # https://github.com/tjanczuk/edge/issues/449
-  - sudo sh -c "echo 'deb http://download.mono-project.com/repo/debian alpha main' >> /etc/apt/sources.list.d/mono-xamarin.list"
+  - sudo sh -c "echo 'deb http://download.mono-project.com/repo/debian wheezy/snapshots/4.2.4 main' >> /etc/apt/sources.list.d/mono-xamarin.list"
   - sudo sh -c "echo 'deb http://download.mono-project.com/repo/debian wheezy-libtiff-compat main' >> /etc/apt/sources.list.d/mono-xamarin.list"
   - sudo apt-get update
   - sudo apt-get install mono-complete
