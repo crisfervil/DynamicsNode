@@ -1,3 +1,5 @@
+configuration: Release
+
 build:
     project: src\cs\DynamicsNode.sln
 
