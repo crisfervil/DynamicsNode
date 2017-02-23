@@ -9,7 +9,8 @@ before_build:
 after_build:
     - xcopy "src\cs\DynamicsNode\bin\release\*.dll" "src\bin\" /Y /R
     - npm install
-    - npm install coveralls
-    - npm install mocha-lcov-reporter
+    - npm install coveralls mocha-lcov-reporter
+    - npm install -g nyc
     - npm run build
     - npm run cover
+    - nyc report --reporter=text-lcov | coveralls
