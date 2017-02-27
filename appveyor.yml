@@ -12,5 +12,5 @@ after_build:
     - npm install mocha-lcov-reporter
     - npm install -g nyc coveralls
     - npm run build
-    - npm run test
+    - npm run cover
     - nyc report --reporter=text-lcov | coveralls
