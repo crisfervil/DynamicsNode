@@ -13,4 +13,4 @@ after_build:
     - npm install -g nyc coveralls
     - npm run build
     - npm run test
-    #- nyc report --reporter=text-lcov | coveralls
+    - nyc report --reporter=text-lcov | coveralls
