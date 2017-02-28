@@ -1,5 +1,9 @@
 configuration: Release
 
+environment: 
+    COVERALLS_REPO_TOKEN:
+        secure: 8yfAeAF3llD64/UGPX8zgr81zAk7oUGwmymum7VJFcMXpLjAPJsZtXkBnv/aT4LO
+
 build:
     project: src\cs\DynamicsNode.sln
 
