@@ -1,4 +1,4 @@
-import {EntityMetadata,EntityReference,EntityFilters} from "./CRMDataTypes";
+import {EntityMetadata,EntityReference,EntityFilters,OptionSetValue} from "./CRMDataTypes";
 
 export class WhoAmIRequest{
     public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.WhoAmIRequest";
@@ -34,4 +34,11 @@ export class RetrieveEntityRequest{
 
 export class RetrieveEntityResponse{
     public EntityMetadata:EntityMetadata;
+}
+
+export class SetStateRequest{
+    public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.SetStateRequest";
+    public EntityMoniker:EntityReference;
+    public State:OptionSetValue;
+    public Status:OptionSetValue;
 }

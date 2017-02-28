@@ -20,3 +20,4 @@ The reference tag is no required any more.
 - Now in the Create/Update methods of CRMClient, you can specify your Optionset and Boolean attribute values using the string value of the optionset.
 - Added support for ActivityParty fields
 - Removed dependency on typings package
+- Added SetState method

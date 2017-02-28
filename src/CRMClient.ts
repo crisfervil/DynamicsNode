@@ -5,6 +5,7 @@ import { Fetch } from "./Fetch";
 import { AssignRequest, WhoAmIRequest, WhoAmIResponse, RetrieveEntityRequest, RetrieveEntityResponse } from "./Messages";
 import { Entity, EntityReference, OptionSetValue, AttributeTypeCode, EntityFilters, EntityMetadata, AttributeMetadata, BooleanOptionsetMetadata, OptionsetMetadata } from "./CRMDataTypes";
 import { ImportExportUtil } from "./ImportExportUtil";
+import { StateUtil } from "./StateUtil";
 
 import path = require("path");
 import edge = require("edge");
@@ -1005,4 +1006,9 @@ export class CRMClient {
     import(fileName: string) {
         ImportExportUtil.import(this,fileName);
     }
+
+    setState(entityName:string, entityId:string, state:number|string, status:number|string) {
+        StateUtil.setState(this, entityName, entityId, state, status);
+    }
+
 }
