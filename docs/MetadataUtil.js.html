@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>DynamicsNode Tutorial: CommandsAndRepl</title>
+	<title>DynamicsNode Source: MetadataUtil.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -77,42 +77,84 @@
 	<div class="col-md-12">
 	
 		<div id="main">
-			<section class="tutorial-section">
+			
 
-<header>
+		<h1 class="page-title">Source: MetadataUtil.js</h1>
     
-
-    <h2>CommandsAndRepl</h2>
-</header>
-
-<article>
-    <h1>Commands</h1><p>Commands are a way to use Dynamics Node from command line. </p>
-<p>In order to use those commands, you have to install DynamicsNode in global mode. </p>
-<p>To install DynamicsNode in global mode use the following command.</p>
-<pre class="prettyprint source"><code>$  npm install -g dynamicsnode</code></pre><h2>Export</h2><p>Exports the data of the specified entity to the specified file using the specified connection. </p>
-<p>Usage:</p>
-<pre class="prettyprint source"><code>$ dynamicsnode export -e [entityName] -f [file] -c [connection]</code></pre><p>This will export all the existing accounts to the accounts.xml file.</p>
-<p>You can specify either an xml or a json file.</p>
-<p>CRMOnline is the connection string or the connection name to use. </p>
-<p>In order to reference connections using a name, create a file config.json at the root of your scripts folder.</p>
-<p>The config.json must have the following format:</p>
-<pre class="prettyprint source lang-json"><code>{
-    &quot;connectionStrings&quot;:
-    {
-        &quot;default&quot;:&quot;Url=https://contoso.crm4.dynamics.com&quot;,
-        &quot;CRMOnline&quot;:&quot;Url=https://contoso.crm4.dynamics.com; Username=admin@contoso.onmicrosoft.com; Password=YourPassword;&quot;
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+var CRMDataTypes_1 = require("./CRMDataTypes");
+var Messages_1 = require("./Messages");
+var MetadataUtil = (function () {
+    function MetadataUtil() {
     }
-}</code></pre><p>Each name inside connectionStrings is a name you can use in your export command.</p>
-<h2>Import</h2><pre class="prettyprint source"><code>$ dynamicsnode import -f [fileName] -c [connection]</code></pre><p>This command imports the contents of the specified file into CRM.</p>
-<p>As in the export command, you can specify any connection name in the config.json file.</p>
-<p>The specified file can be an .xml or .json file. </p>
-<p>Each one has a very specific format. </p>
-<p>The easiest way to review this format is generate it through the export command.</p>
-<h1>Repl integration</h1><pre class="prettyprint source"><code>$ dynamicsnode repl</code></pre><p>This command initiates Dynamics Node in repl mode. </p>
-<p>This means, that you can interact with CRM using the existing API and evaluating the code as you type it.</p>
-</article>
-
+    MetadataUtil.getEntityMetadataFromCrm = function (crm, entityName) {
+        var request = new Messages_1.RetrieveEntityRequest(entityName, CRMDataTypes_1.EntityFilters.All);
+        var response = crm.Execute(request);
+        return response.EntityMetadata;
+    };
+    MetadataUtil.getEntityMetadata = function (crm, entityName) {
+        if (this._metadataCache[entityName] === undefined) {
+            var metadata = this.getEntityMetadataFromCrm(crm, entityName);
+            this._metadataCache[entityName] = metadata;
+        }
+        return this._metadataCache[entityName];
+    };
+    MetadataUtil.getAttributeMetadata = function (crm, entityName, attributeName) {
+        var attributeMetadata = null;
+        var entityMetadata = this.getEntityMetadata(crm, entityName);
+        if (entityMetadata &amp;&amp; entityMetadata.Attributes &amp;&amp; entityMetadata.Attributes.length > 0) {
+            for (var i = 0; i &lt; entityMetadata.Attributes.length; i++) {
+                if (entityMetadata.Attributes[i].LogicalName == attributeName) {
+                    attributeMetadata = entityMetadata.Attributes[i];
+                    break;
+                }
+            }
+            // In case there isn't an attribute with the specified name, then try to find it by displayname
+            if (attributeMetadata === null) {
+                for (var i = 0; i &lt; entityMetadata.Attributes.length; i++) {
+                    if (entityMetadata.Attributes[i].DisplayName != null &amp;&amp;
+                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel != null &amp;&amp;
+                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label != null &amp;&amp;
+                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label.toLowerCase() == attributeName.toLowerCase()) {
+                        attributeMetadata = entityMetadata.Attributes[i];
+                        break;
+                    }
+                }
+            }
+        }
+        return attributeMetadata;
+    };
+    /** Gets the optionset number value from its label value. If not found returns null */
+    MetadataUtil.getOptionsetValue = function (crm, entityName, attributeName, optionsetText) {
+        var optionsetValue = null;
+        var attribute = this.getAttributeMetadata(crm, entityName, attributeName);
+        if (attribute === null)
+            throw new Error("Attribute " + attributeName + " not found in entity '" + entityName + "'");
+        var options = attribute.OptionSet.Options;
+        for (var i = 0; i &lt; options.length; i++) {
+            var option = options[i];
+            if (option &amp;&amp; option.Label &amp;&amp; option.Label.UserLocalizedLabel &amp;&amp; option.Label.UserLocalizedLabel.Label &amp;&amp;
+                option.Label.UserLocalizedLabel.Label === optionsetText) {
+                optionsetValue = option.Value;
+                break;
+            }
+        }
+        return optionsetValue;
+    };
+    return MetadataUtil;
+}());
+MetadataUtil._metadataCache = {};
+exports.MetadataUtil = MetadataUtil;
+//# sourceMappingURL=MetadataUtil.js.map</pre>
+    </article>
 </section>
+
+
+
+
 
 		</div>
 	</div>

@@ -88,9 +88,11 @@
 var DataTable_1 = require("./DataTable");
 var Guid_1 = require("./Guid");
 var Fetch_1 = require("./Fetch");
-var Dictionary_1 = require("./Dictionary");
 var Messages_1 = require("./Messages");
 var CRMDataTypes_1 = require("./CRMDataTypes");
+var ImportExportUtil_1 = require("./ImportExportUtil");
+var StateUtil_1 = require("./StateUtil");
+var MetadataUtil_1 = require("./MetadataUtil");
 var path = require("path");
 var edge = require("edge");
 var debug = require("debug")("dynamicsnode");
@@ -126,7 +128,6 @@ var CRMClient = (function () {
         if (connectionString === void 0) { connectionString = "default"; }
         if (fakeBridge === void 0) { fakeBridge = false; }
         this.connectionString = connectionString;
-        this._metadataCache = new Dictionary_1.Dictionary();
         var config = this.tryGetModule(path.join(process.cwd(), "config.json"));
         if (config &amp;&amp; config.connectionStrings &amp;&amp; config.connectionStrings[connectionString]) {
             this.connectionString = config.connectionStrings[connectionString];
@@ -142,7 +143,7 @@ var CRMClient = (function () {
      * @returns a .net bridge that allows node to interact with .net
      */
     CRMClient.prototype.getBridge = function (fakeBridge) {
-        var source = path.join(__dirname, "CRMBridge.cs");
+        var assemblyFile = path.join(__dirname, "bin/DynamicsNode.dll");
         var refs = [path.join(__dirname, "bin/Microsoft.Crm.Sdk.Proxy.dll"),
             path.join(__dirname, "bin/Microsoft.Xrm.Tooling.Connector.dll"),
             path.join(__dirname, "bin/Microsoft.Xrm.Sdk.dll"),
@@ -151,7 +152,7 @@ var CRMClient = (function () {
             path.join(__dirname, "bin/Microsoft.IdentityModel.Clients.ActiveDirectory.dll")
         ];
         var createBridge = edge.func({
-            source: source,
+            assemblyFile: assemblyFile,
             references: refs
         });
         var bridge = createBridge({ connectionString: this.connectionString, useFake: fakeBridge }, true);
@@ -472,14 +473,12 @@ var CRMClient = (function () {
         for (var prop in attributes) {
             var attributeValue = null;
             // get the attribute from metadata
-            var attributeMetadata = this.getAttributeMetadata(entityName, prop.toLocaleLowerCase());
+            var attributeMetadata = MetadataUtil_1.MetadataUtil.getAttributeMetadata(this, entityName, prop.toLocaleLowerCase());
             if (attributeMetadata) {
                 if (attributes[prop] !== null) {
                     if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.String] ||
                         attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.Memo]) {
-                        if (!(typeof attributes[prop] == "string"))
-                            throw new Error("Cannot convert attribute '" + prop + "' value '" + attributes[prop] + "' from '" + typeof attributes[prop] + "' to 'String'");
-                        attributeValue = attributes[prop];
+                        attributeValue = this.ConvertToString(prop, attributes[prop]);
                     }
                     else if (attributeMetadata.AttributeType == CRMDataTypes_1.AttributeTypeCode[CRMDataTypes_1.AttributeTypeCode.DateTime]) {
                         attributeValue = this.ConvertToDate(attributes[prop], attributeMetadata);
@@ -514,6 +513,21 @@ var CRMClient = (function () {
         debug("Converted value:");
         debug(entity);
         return entity;
+    };
+    CRMClient.prototype.ConvertToString = function (attributeName, attributeValue) {
+        var strValue = null;
+        if (attributeValue !== null &amp;&amp; attributeValue !== undefined) {
+            if (typeof attributeValue === "string") {
+                strValue = attributeValue;
+            }
+            else if (attributeValue.toString !== undefined &amp;&amp; typeof attributeValue.toString === "function") {
+                strValue = attributeValue.toString();
+            }
+            else {
+                throw new Error("Cannot convert attribute '" + attributeName + "' value '" + attributeValue + "' from '" + typeof attributeValue + "' to 'String'");
+            }
+        }
+        return strValue;
     };
     CRMClient.prototype.ConvertToPartyList = function (attributeValue, attributeMetadata) {
         var partyList = [];
@@ -611,31 +625,6 @@ var CRMClient = (function () {
             throw new Error("Couldn't get a valid EntityReference value for attribute '" + attributeMetadata.LogicalName + "'. Please specify a valid target using {id:string,type:string}");
         er = new CRMDataTypes_1.EntityReference(id, target);
         return er;
-    };
-    CRMClient.prototype.getAttributeMetadata = function (entityName, attributeName) {
-        var attributeMetadata = null;
-        var entityMetadata = this.getEntityMetadata(entityName);
-        if (entityMetadata &amp;&amp; entityMetadata.Attributes &amp;&amp; entityMetadata.Attributes.length > 0) {
-            for (var i = 0; i &lt; entityMetadata.Attributes.length; i++) {
-                if (entityMetadata.Attributes[i].LogicalName == attributeName) {
-                    attributeMetadata = entityMetadata.Attributes[i];
-                    break;
-                }
-            }
-            // In case there isn't an attribute with the specified name, then try to find it by displayname
-            if (attributeMetadata === null) {
-                for (var i = 0; i &lt; entityMetadata.Attributes.length; i++) {
-                    if (entityMetadata.Attributes[i].DisplayName != null &amp;&amp;
-                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel != null &amp;&amp;
-                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label != null &amp;&amp;
-                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label.toLowerCase() == attributeName.toLowerCase()) {
-                        attributeMetadata = entityMetadata.Attributes[i];
-                        break;
-                    }
-                }
-            }
-        }
-        return attributeMetadata;
     };
     /**
      * Deletes one on more records in CRM, and returns the number of records affected.
@@ -829,7 +818,7 @@ var CRMClient = (function () {
         for (var i = 0; i &lt; matchFields.length; i++) {
             var matchField = matchFields[i];
             debug("Preparing query to know if the record exists...");
-            var attr = this.getAttributeMetadata(entityName, matchField);
+            var attr = MetadataUtil_1.MetadataUtil.getAttributeMetadata(this, entityName, matchField);
             if (attr === null)
                 throw new Error("Attribute '" + matchField + "' not found in entity " + entityName);
             if (attributes[matchField] !== undefined &amp;&amp; attributes[matchField] !== null) {
@@ -922,22 +911,14 @@ var CRMClient = (function () {
         var params = { entityName: fromEntityName, entityId: fromId, relationship: relationshipName, relatedEntities: [{ entityName: toEntityName, entityId: toId }] };
         this._crmBridge.Disassociate(params, true);
     };
+    /** Gets metadata information for a particular CRM Entity.
+     * @method CRMClient#getEntityMetadata
+     * @param entityName {string} Name of the entity which metadata information you want to get
+     * @example &lt;caption>Retrieve metadata information of the account entity&lt;/caption>
+     * var metadata = crm.getEntityMetadata("account");
+     */
     CRMClient.prototype.getEntityMetadata = function (entityName) {
-        var ndx = this._metadataCache.indexOf(entityName);
-        var metadata = null;
-        if (ndx > -1) {
-            metadata = this._metadataCache.getValue(ndx);
-        }
-        else {
-            metadata = this.getEntityMetadataFromCrm(entityName);
-            this._metadataCache.push(entityName, metadata);
-        }
-        return metadata;
-    };
-    CRMClient.prototype.getEntityMetadataFromCrm = function (entityName) {
-        var request = new Messages_1.RetrieveEntityRequest(entityName, CRMDataTypes_1.EntityFilters.All);
-        var response = this.Execute(request);
-        return response.EntityMetadata;
+        return MetadataUtil_1.MetadataUtil.getEntityMetadata(this, entityName);
     };
     CRMClient.prototype.Execute = function (request) {
         var response = this._crmBridge.Execute(request, true);
@@ -953,35 +934,24 @@ var CRMClient = (function () {
         var response = this.Execute(request);
     };
     CRMClient.prototype.export = function (entityName, fileName) {
-        debug("Exporting " + entityName + " to " + fileName + "...");
-        // perform some validations
-        if (!entityName)
-            throw new Error("Entity name not specified");
-        entityName = entityName.toLowerCase(); // normalize casing
-        debug("Getting metadata...");
-        var metadata = this.getEntityMetadata(entityName);
-        debug("Getting data...");
-        var data = this.retrieveMultiple(entityName, {});
-        var rowsCount = data ? data.rows ? data.rows.length : 0 : 0;
-        debug("Retrieved " + rowsCount + " records");
-        debug("Saving...");
-        data.save(fileName);
-        debug("done!");
+        ImportExportUtil_1.ImportExportUtil.export(this, entityName, fileName);
     };
     CRMClient.prototype.import = function (fileName) {
-        debug("Importing " + fileName + "...");
-        debug("Loading data table...");
-        var dt = DataTable_1.DataTable.load(fileName);
-        debug(dt.rows.length + " records found");
-        debug("Getting metadata for entity " + dt.name + "...");
-        var metadata = this.getEntityMetadata(dt.name);
-        var idField = this.getIdField(dt.name);
-        debug("Importing...");
-        for (var i = 0; i &lt; dt.rows.length; i++) {
-            debug("record " + (i + 1) + " of " + dt.rows.length + "...");
-            this.createOrUpdate(dt.name, dt.rows[i], [idField]);
-        }
-        debug("done!");
+        ImportExportUtil_1.ImportExportUtil.import(this, fileName);
+    };
+    /** Sets the state and status of a record.
+     * @method CRMClient#setState
+     * @param entityName {string} Name of the entity which state or status you want to set
+     * @param entityId {Guid|string} GUID of the record which state or status you want to set
+     * @param state {number|string} Name or Value of the State you want to set
+     * @param statis {number|string} Name or Value of the Status you want to set
+     * @example &lt;caption>Set the state of a task to Completed (1) and the Status to Completed (5)&lt;/caption>
+     * crm.setState('task','6fefeb79-5447-e511-a5db-0050568a69e2',1,5);
+     * @example &lt;caption>Set the state of a task using the text values&lt;/caption>
+     * crm.setState('task','6fefeb79-5447-e511-a5db-0050568a69e2','Completed','Completed');
+     * */
+    CRMClient.prototype.setState = function (entityName, entityId, state, status) {
+        StateUtil_1.StateUtil.setState(this, entityName, entityId, state, status);
     };
     return CRMClient;
 }());
@@ -1031,7 +1001,7 @@ exports.CRMClient = CRMClient;
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Wed Jan 18th 2017
+		on Wed Mar 1st 2017
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
