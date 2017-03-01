@@ -6,6 +6,8 @@ import { AssignRequest, WhoAmIRequest, WhoAmIResponse, RetrieveEntityRequest, Re
 import { Entity, EntityReference, OptionSetValue, AttributeTypeCode, EntityFilters, EntityMetadata, AttributeMetadata, BooleanOptionsetMetadata, OptionsetMetadata } from "./CRMDataTypes";
 import { ImportExportUtil } from "./ImportExportUtil";
 import { StateUtil } from "./StateUtil";
+import { MetadataUtil } from "./MetadataUtil";
+
 
 import path = require("path");
 import edge = require("edge");
@@ -15,7 +17,6 @@ var debugQueries = require("debug")("dynamicsnode:queries");
 export class CRMClient {
 
     private _crmBridge: any;
-    private _metadataCache = {};
 
     /**
      * Default constructor
@@ -437,7 +438,7 @@ export class CRMClient {
             var attributeValue = null;
 
             // get the attribute from metadata
-            var attributeMetadata = this.getAttributeMetadata(entityName, prop.toLocaleLowerCase());
+            var attributeMetadata = MetadataUtil.getAttributeMetadata(this,entityName, prop.toLocaleLowerCase());
             if (attributeMetadata) {
 
                 if(attributes[prop]!==null){
@@ -605,34 +606,6 @@ export class CRMClient {
         if (!(target && id)) throw new Error(`Couldn't get a valid EntityReference value for attribute '${attributeMetadata.LogicalName}'. Please specify a valid target using {id:string,type:string}`);
         er = new EntityReference(id, target);
         return er;
-    }
-
-    private getAttributeMetadata(entityName: string, attributeName: string): AttributeMetadata {
-        var attributeMetadata: AttributeMetadata = null;
-        var entityMetadata = this.getEntityMetadata(entityName);
-        if (entityMetadata && entityMetadata.Attributes && entityMetadata.Attributes.length > 0) {
-            for (var i = 0; i < entityMetadata.Attributes.length; i++) {
-                if (entityMetadata.Attributes[i].LogicalName == attributeName) {
-                    attributeMetadata = entityMetadata.Attributes[i];
-                    break;
-                }
-            }
-
-            // In case there isn't an attribute with the specified name, then try to find it by displayname
-            if(attributeMetadata===null) {
-                for (var i = 0; i < entityMetadata.Attributes.length; i++) {
-                    if (entityMetadata.Attributes[i].DisplayName!=null&&
-                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel!=null&&
-                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label!=null&&
-                        entityMetadata.Attributes[i].DisplayName.UserLocalizedLabel.Label.toLowerCase()==attributeName.toLowerCase()) {
-                        attributeMetadata = entityMetadata.Attributes[i];
-                        break;
-                    }
-                }                
-            }
-        }
-
-        return attributeMetadata;
     }
 
     /**
@@ -868,7 +841,7 @@ export class CRMClient {
         for (var i = 0; i < matchFields.length; i++) {
             var matchField = matchFields[i];
             debug("Preparing query to know if the record exists...");
-            var attr = this.getAttributeMetadata(entityName,matchField);
+            var attr = MetadataUtil.getAttributeMetadata(this,entityName,matchField);
             if(attr===null) throw new Error(`Attribute '${matchField}' not found in entity ${entityName}`);
 
             if (attributes[matchField] !== undefined && attributes[matchField] !== null) {
@@ -969,20 +942,14 @@ export class CRMClient {
         this._crmBridge.Disassociate(params, true);
     }
 
+    /** Gets metadata information for a particular CRM Entity.
+     * @method CRMClient#getEntityMetadata
+     * @param entityName {string} Name of the entity which metadata information you want to get
+     * @example <caption>Retrieve metadata information of the account entity</caption>
+     * var metadata = crm.getEntityMetadata("account");
+     */
     getEntityMetadata(entityName: string): EntityMetadata {
-
-        if(this._metadataCache[entityName]===undefined){
-            var metadata = this.getEntityMetadataFromCrm(entityName);
-            this._metadataCache[entityName] = metadata;
-        }
-
-        return this._metadataCache[entityName];
-    }
-
-    private getEntityMetadataFromCrm(entityName: string): EntityMetadata {
-        var request = new RetrieveEntityRequest(entityName, EntityFilters.All);
-        var response: RetrieveEntityResponse = this.Execute(request);
-        return response.EntityMetadata;
+        return MetadataUtil.getEntityMetadata(this,entityName);
     }
 
     public Execute(request) {
@@ -1007,8 +974,18 @@ export class CRMClient {
         ImportExportUtil.import(this,fileName);
     }
 
-    setState(entityName:string, entityId:string, state:number|string, status:number|string) {
+    /** Sets the state and status of a record.  
+     * @method CRMClient#setState
+     * @param entityName {string} Name of the entity which state or status you want to set
+     * @param entityId {Guid|string} GUID of the record which state or status you want to set
+     * @param state {number|string} Name or Value of the State you want to set 
+     * @param statis {number|string} Name or Value of the Status you want to set 
+     * @example <caption>Set the state of a task to Completed (1) and the Status to Completed (5)</caption>
+     * crm.setState('task','6fefeb79-5447-e511-a5db-0050568a69e2',1,5);
+     * @example <caption>Set the state of a task using the text values</caption>
+     * crm.setState('task','6fefeb79-5447-e511-a5db-0050568a69e2','Completed','Completed');
+     * */
+    setState(entityName:string, entityId:Guid|string, state:number|string, status:number|string) {
         StateUtil.setState(this, entityName, entityId, state, status);
     }
-
 }

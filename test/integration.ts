@@ -437,5 +437,24 @@ function addTestsFor(connectionStringName: string, connectionStringValue: string
             // delete created task
             crm.delete('task',taskId);
         });
+
+        it ('Changes the status of a Phone Call to Completed using Status Labels', function(){
+
+            var stateCode = 'Completed';
+            var statusCode = 'Received';
+
+            var callId = crm.create('phonecall',{subject:'test'});
+            crm.setState('phonecall',callId,stateCode,statusCode);
+
+            // Check the status of the task
+            var phoneCall = crm.retrieve('phonecall',callId,['statecode','statuscode'])
+
+            assert.equal(phoneCall.statuscode,4);
+            assert.equal(phoneCall.statecode,1);
+
+            // delete created task
+            crm.delete('phonecall',callId);
+        });
+
     });
 }

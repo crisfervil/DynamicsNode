@@ -176,69 +176,10 @@ namespace DynamicsNode
             return values.ToArray();
         }
 
-        public object Execute(dynamic request)
+        public OrganizationResponse Execute(dynamic request)
         {
             OrganizationRequest objRequest = ConvertFromDynamic(request);
-            object response = _service.Execute(objRequest);
-
-            if (response != null && response.GetType() == typeof(WhoAmIResponse))
-            {
-                var rs = (WhoAmIResponse)response;
-                response = new
-                {
-                    UserId = rs.UserId,
-                    BusinessUnitId = rs.BusinessUnitId,
-                    OrganizationId = rs.OrganizationId,
-                    ExtensionData = rs.ExtensionData,
-                    //Results = rs.Results,
-                    ResponseName = rs.ResponseName
-                };
-            }
-
-            if (response != null && response.GetType() == typeof(RetrieveEntityResponse))
-            {
-                var getTargets = new Func<LookupAttributeMetadata, string[]>(x => x != null ? x.Targets : null);
-                var getLabel = new Func<Label, object>(x => x != null ?
-                    new { UserLocalizedLabel = x.UserLocalizedLabel != null ? new { Label = x.UserLocalizedLabel.Label } : null } : null
-                );
-
-                var getOptionSetOptionItem = new Func<OptionMetadata, object>(x => new { Label = getLabel(x.Label), Value = x.Value });
-                var getOptionOptions = new Func<OptionMetadata[], object>(x => x.Select(getOptionSetOptionItem));
-
-                var getPicklistOptionset = new Func<PicklistAttributeMetadata, object>(x => x != null ?
-                    new { Options = x.OptionSet.Options != null ? getOptionOptions(x.OptionSet.Options.ToArray()) : null } : null);
-
-                var getBooleanOptionset = new Func<BooleanAttributeMetadata, object>(x => x != null ?
-                    new
-                    {
-                        TrueOption = x.OptionSet.TrueOption != null ? getOptionSetOptionItem(x.OptionSet.TrueOption) : null,
-                        FalseOption = x.OptionSet.FalseOption != null ? getOptionSetOptionItem(x.OptionSet.FalseOption) : null
-                    } : null);
-
-                var getOptionSet = new Func<AttributeMetadata, object>(x => x.GetType() == typeof(PicklistAttributeMetadata) ?
-                                        getPicklistOptionset(x as PicklistAttributeMetadata) : x.GetType() == typeof(BooleanAttributeMetadata) ? getBooleanOptionset(x as BooleanAttributeMetadata) : null);
-
-                var rs = (RetrieveEntityResponse)response;
-                response = new
-                {
-                    EntityMetadata = new
-                    {
-                        PrimaryIdAttribute = rs.EntityMetadata.PrimaryIdAttribute,
-                        SchemaName = rs.EntityMetadata.SchemaName,
-                        IsActivity = rs.EntityMetadata.IsActivity,
-                        Attributes =
-                            rs.EntityMetadata.Attributes.Select(x => new
-                            {
-                                LogicalName = x.LogicalName,
-                                AttributeType = x.AttributeType,
-                                DisplayName = getLabel(x.DisplayName),
-                                OptionSet = getOptionSet(x),
-                                Targets = getTargets(x as LookupAttributeMetadata)
-                            })
-                    }
-                };
-            }
-
+            OrganizationResponse response = _service.Execute(objRequest);
             return response;
         }
 
