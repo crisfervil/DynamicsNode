@@ -287,6 +287,152 @@
             
 <hr>
 <dt>
+    <h4 class="name" id="create"><span class="type-signature"></span>create(data)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates records in CRM using the rows defined in the DataTable.<br>The id attribute of every created record will be updated with the generated CRM GUID.<br>You need to set the name of the table with the entity name that you want to create.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataTable.html">DataTable</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>DataTable with the data to be created in CRM.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="CRMClient.js.html">CRMClient.js</a>,
+				 <a href="CRMClient.js.html#sunlight-1-line-334">line 334</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+        <p class="code-caption">Create a set of accounts using an excel file</p>
+    
+    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.create(accountsToLoad);console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
     <h4 class="name" id="create"><span class="type-signature"></span>create(entityName, attributes)</h4>
     
     
@@ -485,7 +631,7 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="create"><span class="type-signature"></span>create(data)</h4>
+    <h4 class="name" id="createIfDoesNotExist"><span class="type-signature"></span>createIfDoesNotExist(data, matchFields)</h4>
     
     
 </dt>
@@ -493,7 +639,7 @@
 
     
     <div class="description">
-        <p>Creates records in CRM using the rows defined in the DataTable.<br>The id attribute of every created record will be updated with the generated CRM GUID.<br>You need to set the name of the table with the entity name that you want to create.</p>
+        <p>For every record in the specified Table, tries to find out if it does exists, and if doesn't it creates it.</p>
     </div>
     
 
@@ -545,7 +691,31 @@
 
             
 
-            <td class="description last"><p>DataTable with the data to be created in CRM.</p></td>
+            <td class="description last"><p>DataTable with the entity name and the records to create in CRM.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>matchFields</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>List of fields in the attributes parameter you want to use to know if the record exists in CRM.<br>The attributes specified in this parameter will be used to perform a <a href="CRMClient.html#retrieve">CRMClient#retrieve</a>.</p></td>
         </tr>
 
     
@@ -590,7 +760,7 @@
 		<ul class="dummy">
 			<li>
 				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-334">line 334</a>
+				 <a href="CRMClient.js.html#sunlight-1-line-682">line 682</a>
 			</li>
 		</ul>
 	</dd>
@@ -619,9 +789,9 @@
     
         <h5>Example</h5>
         
-        <p class="code-caption">Create a set of accounts using an excel file</p>
+        <p class="code-caption">Loads a list of accounts from an Excel file and creates only the ones that don't exist already in CRM.It uses the email address to know if the account exists or not.</p>
     
-    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.create(accountsToLoad);console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record</pre>
+    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.createIfDoesNotExist(accountsToLoad,[&quot;emailaddress1&quot;]);</pre>
 
 
     
@@ -820,176 +990,6 @@
         <p class="code-caption">Searches for an account named "contoso" owned by me. If it doesn't exist, it creates it.</p>
     
     <pre class="sunlight-highlight-javascript">var me = crm.whoAmI().UserId;crm.createIfDoesNotExist(&quot;account&quot;,{name:&quot;contoso&quot;, description:&quot;Account Updated&quot;, ownerid:me},[&quot;name&quot;,&quot;ownerid&quot;]);</pre>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
-    <h4 class="name" id="createIfDoesNotExist"><span class="type-signature"></span>createIfDoesNotExist(data, matchFields)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>For every record in the specified Table, tries to find out if it does exists, and if doesn't it creates it.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="DataTable.html">DataTable</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>DataTable with the entity name and the records to create in CRM.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>matchFields</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;string></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>List of fields in the attributes parameter you want to use to know if the record exists in CRM.<br>The attributes specified in this parameter will be used to perform a <a href="CRMClient.html#retrieve">CRMClient#retrieve</a>.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-682">line 682</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Example</h5>
-        
-        <p class="code-caption">Loads a list of accounts from an Excel file and creates only the ones that don't exist already in CRM.It uses the email address to know if the account exists or not.</p>
-    
-    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.createIfDoesNotExist(accountsToLoad,[&quot;emailaddress1&quot;]);</pre>
 
 
     

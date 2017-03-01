@@ -26,6 +26,8 @@ export class DataTable {
      * those values to CRM.
      * For example, you may want to load a list of contacts, and you want to associate your contacts to existing parent accounts. 
      * What you can do, is use the phone number on the contact to try to find the parent account of the contact. 
+     * @columnName {string} Name of the column which values are going to be updated
+     * @updater {function} Function that will process every record in the Table.
      * @method DataTable#lookup
      * @example <caption>Lookup using simple values</caption>
      *  var dt = new DataTable();
@@ -75,14 +77,41 @@ export class DataTable {
         }
     }
 
-    /** Removes a column from the Table */
+    /** Removes a column from the Table
+     * @param columnName {string} Name of the column to remove 
+     * @method DataTable#removeColumn
+     * @example <caption>Remove an existing column</caption>
+     *  var dt = new DataTable();
+     *  dt.rows.push({val1:1,val2:2},
+     *               {val1:2,val2:2});
+     *  dt.removeColumn('val1');
+     *  console.log(dt.rows[0].val1); // prints undefined
+     *  console.log(dt.rows[1].val1); // prints undefined
+     *  console.log(dt.rows[0].val2); // prints 2
+     *  console.log(dt.rows[1].val2); // prints 2
+    */
     removeColumn(columnName:string){
         for (var i = 0; i < this.rows.length; i++) {
             delete this.rows[i][columnName];
         }
     }
 
-    /** Renames a column from in the Table */
+    /** Renames an existing column in the Table 
+     * @method DataTable#rename
+     * @param columnName {string} Name of the existing column to rename
+     * @param newName {string} New Name to apply to the column
+     * @example <caption>Rename an existing column</caption>
+     *  var dt = new DataTable();
+     *  dt.rows.push({val1:1,val2:2},
+     *               {val1:2,val2:2});
+     *  dt.renameColumn('val1','val3');
+     *  console.log(dt.rows[0].val1); // prints undefined
+     *  console.log(dt.rows[1].val1); // prints undefined
+     *  console.log(dt.rows[0].val2); // prints 2
+     *  console.log(dt.rows[1].val2); // prints 2
+     *  console.log(dt.rows[0].val3); // prints 1
+     *  console.log(dt.rows[1].val3); // prints 2
+    */
     renameColumn(columnName:string, newName:string){
         for (var i = 0; i < this.rows.length; i++) {
             if(this.rows[i][columnName]!==undefined){

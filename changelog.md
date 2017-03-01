@@ -6,18 +6,20 @@ See https://msdn.microsoft.com/en-ie/library/mt608573.aspx
 If your code uses several connections in the same script, add the RequireNewInstance=True parameter in the connection string.
 See http://crmtipoftheday.com/tag/requirenewinstance/
 - Removed the dependency on Newtonsoft.Json.dll 
-- Restructured the .net code. Now the code is splitted in different files, and a solution file was added. This removes the need of compiling code in each run and improves performance.
-- Added loading from Excel capabilities in the [DataTable](https://dynamicsnode.js.org/DataTable.html) object. 
+- Restructured the .net code. Now the code is splitted in different files, and a solution file was added. 
+This removes the need of compiling code in each run and improves performance.
+- Added loading from Excel capabilities to the [DataTable](https://dynamicsnode.js.org/DataTable.html) object. 
 Now, you can load your records from Excel. The Save to Excel is still pending to be added.
 - Added the [lookup](https://dynamicsnode.js.org/DataTable.html#lookup__anchor) method in the DataTable object that allows 
 to load records resolve the lookup columns before sending the information to CRM.
 - Added index.js file to the project, and index.d.ts in the package description to improve the intellisense experience. 
 The reference tag is no required any more.
-- Added the removeColumn, and renameColumn methods in the DataTable object
-- Added the createIfDoesNotExist in the CRMClient object
-- Now the CRMClient.getAttributeMetadata finds the attribute by the DisplayName of the attribute as well as by the Logical Name.
+- Added the [removeColumn](https://dynamicsnode.js.org/DataTable.html#removeColumn__anchor), and [renameColumn](https://dynamicsnode.js.org/DataTable.html#renameColumn__anchor) methods in the DataTable object
+- Added the [createIfDoesNotExist](https://dynamicsnode.js.org/CRMClient.html#createIfDoesNotExist__anchor) to the [CRMClient](https://dynamicsnode.js.org/CRMClient.html) class.
+- Now the MetadataUtil.getAttributeMetadata finds the attribute by the DisplayName of the attribute as well as by the Logical Name.
 - Now the RetrieveEntityResponse contains information about the DisplayName of attributes, and about the Optionset and Boolean strings.
-- Now in the Create/Update methods of CRMClient, you can specify your Optionset and Boolean attribute values using the string value of the optionset.
+- Now in the Create/Update methods of [CRMClient](https://dynamicsnode.js.org/CRMClient.html), you can specify your Optionset and Boolean attribute values using the string value of the optionset.
 - Added support for ActivityParty fields
 - Removed dependency on typings package
-- Added SetState method
+- Added [SetState](https://dynamicsnode.js.org/CRMClient.html#setState__anchor) method
+- Updated documentation

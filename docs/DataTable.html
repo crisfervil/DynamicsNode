@@ -302,6 +302,322 @@
     
 </dd>
 
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="removeColumn"><span class="type-signature"></span>removeColumn(columnName)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Removes a column from the Table</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>columnName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the column to remove</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="DataTable.js.html">DataTable.js</a>,
+				 <a href="DataTable.js.html#sunlight-1-line-78">line 78</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+        <p class="code-caption">Remove an existing column</p>
+    
+    <pre class="sunlight-highlight-javascript">var dt = new DataTable(); dt.rows.push({val1:1,val2:2},              {val1:2,val2:2}); dt.removeColumn(&#x27;val1&#x27;); console.log(dt.rows[0].val1); // prints undefined console.log(dt.rows[1].val1); // prints undefined console.log(dt.rows[0].val2); // prints 2 console.log(dt.rows[1].val2); // prints 2</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="rename"><span class="type-signature"></span>rename(columnName, newName)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Renames an existing column in the Table</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>columnName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the existing column to rename</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>newName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>New Name to apply to the column</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="DataTable.js.html">DataTable.js</a>,
+				 <a href="DataTable.js.html#sunlight-1-line-96">line 96</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+        <p class="code-caption">Rename an existing column</p>
+    
+    <pre class="sunlight-highlight-javascript">var dt = new DataTable(); dt.rows.push({val1:1,val2:2},              {val1:2,val2:2}); dt.renameColumn(&#x27;val1&#x27;,&#x27;val3&#x27;); console.log(dt.rows[0].val1); // prints undefined console.log(dt.rows[1].val1); // prints undefined console.log(dt.rows[0].val2); // prints 2 console.log(dt.rows[1].val2); // prints 2 console.log(dt.rows[0].val3); // prints 1 console.log(dt.rows[1].val3); // prints 2</pre>
+
+
+    
+</dd>
+
         </dl>
     
 
