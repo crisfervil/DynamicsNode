@@ -979,7 +979,7 @@ export class CRMClient {
      * @param entityName {string} Name of the entity which state or status you want to set
      * @param entityId {Guid|string} GUID of the record which state or status you want to set
      * @param state {number|string} Name or Value of the State you want to set 
-     * @param statis {number|string} Name or Value of the Status you want to set 
+     * @param status {number|string} Name or Value of the Status you want to set 
      * @example <caption>Set the state of a task to Completed (1) and the Status to Completed (5)</caption>
      * crm.setState('task','6fefeb79-5447-e511-a5db-0050568a69e2',1,5);
      * @example <caption>Set the state of a task using the text values</caption>

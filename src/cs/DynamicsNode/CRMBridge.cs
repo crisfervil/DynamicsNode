@@ -19,8 +19,9 @@ namespace DynamicsNode
 
         public CRMBridge(string connectionString, bool useFake)
         {
+            // TODO: Fix this
             // This is to force .net framework to load the Microsoft.Crm.Sdk assembly
-            WhoAmIRequest x=null;
+            var x = new WhoAmIRequest();
 
             if (useFake)
             {
