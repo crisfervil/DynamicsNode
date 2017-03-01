@@ -11,9 +11,6 @@ namespace DynamicsNode
             string connectionString = options.connectionString;
             bool useFake = options.useFake;
 
-            Console.WriteLine("Loaded assemblies:");
-            AppDomain.CurrentDomain.GetAssemblies().All(x => { Console.WriteLine(x.GetName().FullName); return true; });
-
             CRMBridge bridge = new CRMBridge(connectionString, useFake);
             return new
             {
