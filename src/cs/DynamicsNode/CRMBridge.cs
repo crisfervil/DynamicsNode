@@ -191,6 +191,12 @@ namespace DynamicsNode
         private Assembly GetAssembly(string name)
         {
             var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => string.Compare(x.GetName().Name,name,true)==0);
+
+            if (assembly == null)
+            {
+                // TODO: Try to load the assembly from a file
+            }
+
             return assembly;
         }
 
