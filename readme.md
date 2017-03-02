@@ -1,5 +1,12 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/github/crisfervil/dynamicsnode?svg=true)](https://ci.appveyor.com/project/crisfervil/dynamicsnode)
-[![Build Status](https://travis-ci.org/crisfervil/DynamicsNode.svg?branch=master)](https://travis-ci.org/crisfervil/DynamicsNode) [![codecov.io](https://codecov.io/github/crisfervil/DynamicsNode/coverage.svg?branch=master)](https://codecov.io/github/crisfervil/DynamicsNode?branch=master) [![Coverage Status](https://coveralls.io/repos/github/crisfervil/DynamicsNode/badge.svg?branch=master)](https://coveralls.io/github/crisfervil/DynamicsNode?branch=master) [![npm](https://img.shields.io/npm/v/dynamicsnode.svg)](https://www.npmjs.com/package/dynamicsnode)
+[![Windows Build](https://ci.appveyor.com/api/projects/status/github/crisfervil/dynamicsnode?svg=true)](https://ci.appveyor.com/project/crisfervil/dynamicsnode)
+[![Ubuntu Build](https://travis-ci.org/crisfervil/DynamicsNode.svg?branch=master)](https://travis-ci.org/crisfervil/DynamicsNode) 
+[![Coveralls](https://coveralls.io/repos/github/crisfervil/DynamicsNode/badge.svg?branch=master)](https://coveralls.io/github/crisfervil/DynamicsNode?branch=master) 
+[![npm](https://img.shields.io/npm/v/dynamicsnode.svg)](https://www.npmjs.com/package/dynamicsnode)
+[![npm downloads](https://img.shields.io/npm/dt/dynamicsnode.svg)](http://npm-stats.com/~packages/dynamicsnode)
+[![dependencies](https://david-dm.org/crisfervil/dynamicsnode.svg)](https://david-dm.org/crisfervil/dynamicsnode)
+
+<!-- [![codecov.io](https://codecov.io/github/crisfervil/DynamicsNode/coverage.svg?branch=master)](https://codecov.io/github/crisfervil/DynamicsNode?branch=master)--> 
+
 # Project description
 
 DynamicsNode is a library built on node.js that allows you to quickly create scripts to interact with Microsoft Dynamics CRM using JavaScript.
@@ -68,7 +75,7 @@ It has been tested in Windows environments only, but could potentially work in L
 # Supported CRM versions
 Tested on CRM 2011, 2013 and CRM Online so far.
 
-Volunteers to run the integration tests on other versions are more than welcome :)
+Volunteers to [run the integration tests](https://dynamicsnode.js.org/tutorial-CompileAndTesting.html) on other versions are more than welcome :)
 
 
 # Backlog
@@ -79,6 +86,8 @@ Volunteers to run the integration tests on other versions are more than welcome 
 * [ ] Refactor to minimize .net code
 * [ ] Increase code coverage
 * [ ] Add paging support in queries
+* [ ] Add async support
+* [ ] Improve Exception handling
 * [ ] Add support for .net core
 * [ ] Make it work in Mono and Linux
 * [ ] Improve Exception Handling to show errors in CRM side
