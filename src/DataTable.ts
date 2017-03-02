@@ -19,6 +19,14 @@ export class DataTable {
         }
     }
 
+    /**
+     * Callback that receives a row of a data table and returns a value for a column
+     * @callback DataTable~lookupCallback
+     * @param {object} row Object containing the values of a row
+     * @return {object} The value to apply to a specific column of that particular row
+     */
+
+
     /** Method to convert all the existing values in a column. 
      * Iterates through all the existing rows, and for every value in the specified column calls to the specified callback method.
      * Then, the returning value will be applied to the column.
@@ -26,8 +34,8 @@ export class DataTable {
      * those values to CRM.
      * For example, you may want to load a list of contacts, and you want to associate your contacts to existing parent accounts. 
      * What you can do, is use the phone number on the contact to try to find the parent account of the contact. 
-     * @columnName {string} Name of the column which values are going to be updated
-     * @updater {function} Function that will process every record in the Table.
+     * @param {string} columnName Name of the column which values are going to be updated
+     * @param {DataTable~lookupCallback} updater Function that will process every record in the Table.
      * @method DataTable#lookup
      * @example <caption>Lookup using simple values</caption>
      *  var dt = new DataTable();
@@ -78,8 +86,8 @@ export class DataTable {
     }
 
     /** Removes a column from the Table
-     * @param columnName {string} Name of the column to remove 
      * @method DataTable#removeColumn
+     * @param columnName {string} Name of the column to remove 
      * @example <caption>Remove an existing column</caption>
      *  var dt = new DataTable();
      *  dt.rows.push({val1:1,val2:2},
