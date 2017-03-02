@@ -32,14 +32,14 @@
     "istanbul": "^0.4.5",
     "jsdoc": "^3.4.1",
     "mocha": "^3.1.0",
-    "typescript": "^2.1.4"
+    "typescript": "^2.2.1"
   },
   "scripts": {
     "test": "mocha --recursive",
     "integration-test": "mocha test/integration",
     "build": "tsc",
-    "build-linux":"tsc && npm run build-linux-nuget && npm run build-linux-net",
-    "build-linux-nuget":"nuget restore src/cs/DynamicsNode.sln",
+    "build-linux": "tsc && npm run build-linux-nuget && npm run build-linux-net",
+    "build-linux-nuget": "nuget restore src/cs/DynamicsNode.sln",
     "build-linux-net": "xbuild src/cs/DynamicsNode.sln /p:Configuration=Release",
     "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- --recursive",
     "doc": "tsc && jsdoc -c jsdoc.json"
