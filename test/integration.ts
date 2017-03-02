@@ -2,6 +2,7 @@ import { CRMClient } from "../src/CRMClient";
 import { Fetch } from "../src/Fetch";
 import { Guid } from "../src/Guid";
 import { DataTable } from "../src/DataTable";
+import { DataTableSerializer } from "../src/DataTableSerializer";
 import assert = require("assert");
 import path = require("path");
 import fs = require("fs");
@@ -384,7 +385,7 @@ function addTestsFor(connectionStringName: string, connectionStringValue: string
             var fileName = `test/tmp/accounts-${connectionStringName}.xml`;
             crm.export("account", fileName);
             // Try to load exported data
-            var data = DataTable.load(fileName);
+            var data = DataTableSerializer.load(fileName);
             assert.ok(data, JSON.stringify(data));
             assert.ok(data.rows.length > 0, JSON.stringify(data));
         });
@@ -394,8 +395,8 @@ function addTestsFor(connectionStringName: string, connectionStringValue: string
             var fileName = `test/tmp/users-${connectionStringName}.xml`;
 
             var users = crm.retrieveAll("systemuser");
-            users.save(fileName);
-            var users2 = DataTable.load(fileName);
+            DataTableSerializer.save(users,fileName);
+            var users2 = DataTableSerializer.load(fileName);
             assert.deepEqual(users, users2);
 
         });

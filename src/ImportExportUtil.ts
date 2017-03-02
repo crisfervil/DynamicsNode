@@ -1,5 +1,6 @@
 import { CRMClient } from "./CRMClient";
 import { DataTable } from "./DataTable";
+import { DataTableSerializer } from "./DataTableSerializer";
 
 var info = require("debug")("dynamicsnode:info");
 
@@ -21,7 +22,7 @@ export class ImportExportUtil {
         var rowsCount = data ? data.rows ? data.rows.length : 0 : 0;
         info(`Retrieved ${rowsCount} records`);
         info("Saving...");
-        data.save(fileName);
+        DataTableSerializer.save(data,fileName);
     }
 
     /** Loads the specified file in CRM. If the record exists, then it updates. Otherwhise, it creates it. */
@@ -30,7 +31,7 @@ export class ImportExportUtil {
         info(`Importing ${fileName}...`);
 
         info("Loading data table...");
-        var dt = DataTable.load(fileName);
+        var dt = DataTableSerializer.load(fileName);
         info(`${dt.rows.length} records found`);
 
         info(`Getting metadata for entity ${dt.name}...`);

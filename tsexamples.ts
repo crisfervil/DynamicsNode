@@ -1,5 +1,6 @@
 import {CRMClient}  from "./src/CRMClient";
 import {DataTable}  from "./src/DataTable";
+import {DataTableSerializer}  from "./src/DataTableSerializer";
 
 //var crm = new CRMClient("default");
 var crm = new CRMClient("Url=http://crm.contoso.com/xrmContoso");
@@ -28,10 +29,10 @@ for(var i=0;i<10;i++){
   crm.delete("account",guid);
 }
 
-var accounts = DataTable.load("accounts.xml");
+var accounts = DataTableSerializer.load("accounts.xml");
 //crm.create("account",accounts.rows);
 
-var contacts = DataTable.load("contacts.xml");
+var contacts = DataTableSerializer.load("contacts.xml");
 
 // Perform some transformations before insert
 //contacts.lookup("accountid", row => crm.retrieve("account",{name:row.accountid}).accountid);
