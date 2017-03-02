@@ -4,6 +4,7 @@
 [![npm](https://img.shields.io/npm/v/dynamicsnode.svg)](https://www.npmjs.com/package/dynamicsnode)
 [![npm downloads](https://img.shields.io/npm/dt/dynamicsnode.svg)](http://npm-stats.com/~packages/dynamicsnode)
 [![dependencies](https://david-dm.org/crisfervil/dynamicsnode.svg)](https://david-dm.org/crisfervil/dynamicsnode)
+[![ghit.me](https://ghit.me/badge.svg?repo=crisfervil/dynamicsnode)](https://ghit.me/repo/crisfervil/dynamicsnode)
 
 <!-- [![codecov.io](https://codecov.io/github/crisfervil/DynamicsNode/coverage.svg?branch=master)](https://codecov.io/github/crisfervil/DynamicsNode?branch=master)--> 
 
