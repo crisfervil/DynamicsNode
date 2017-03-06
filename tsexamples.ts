@@ -47,3 +47,25 @@ var contacts = DataTableSerializer.load("contacts.xml");
 
 crm.update("account",{accountid:"2ad7a34f-11db-4910-8f1c-397b1352f0e3",name:"updated"});
 crm.update("account",{name:"updated"},{name:{like:"%test%"}});
+
+
+// Export the list of attributes of an entity to an excel file
+var dn = require("dynamicsnode");
+
+// set the environment where to execute this script
+crm = new dn.CRMClient("UAT"); 
+
+// Get the entity metadata
+var entityName = "account";
+var metadata = crm.getEntityMetadata(entityName);
+
+var outputTable = new dn.DataTable();
+
+for (var i = 0; i < metadata.Attributes.length; i++) {
+    var attr = metadata.Attributes[i];
+    outputTable.rows.push({name:attr.LogicalName,type:attr.AttributeType});
+    console.log(attr.LogicalName);
+}
+
+// save the results to an external excel file
+dn.DataTableSerializer.save(outputTable, `${entityName}Attributes.xlsx`);
