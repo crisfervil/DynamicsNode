@@ -2,6 +2,15 @@ import * as XLSX from 'xlsx';
 import { IDataTableSerializer } from './IDataTableSerializer'
 import { DataTable } from './DataTable';
 
+class WorkBook implements XLSX.IWorkBook{
+    Sheets: { [sheet: string]: XLSX.IWorkSheet };
+    SheetNames: string[];
+    Props: XLSX.IProperties;   
+}
+
+class WorkSheet implements XLSX.IWorkSheet{
+    [cell: string]: XLSX.IWorkSheetCell;
+}
 
 export class DataTableXlsSerializer implements IDataTableSerializer {
     readonly extension: string;
@@ -9,8 +18,94 @@ export class DataTableXlsSerializer implements IDataTableSerializer {
         this.extension = "xlsx";
     }
 
-    serialize(dataTable: DataTable): string {
-        throw new Error("Not Implemented");
+    serialize(dataTable: DataTable): Buffer {
+       
+        var wb = new WorkBook();
+        var ws = new WorkSheet();
+        wb.Sheets={};
+
+        var sheetName = dataTable.name || "DynamicsNode";
+
+        wb.Sheets[sheetName]=ws;
+        wb.SheetNames=[sheetName];
+
+        // Holds the list of columns in the dataTable
+        var columnNames:string[]=[];
+
+        for (var rowIndex = 0; rowIndex < dataTable.rows.length; rowIndex++) {
+            var row = dataTable.rows[rowIndex];
+            
+            for (var colName in row) {
+                if (row.hasOwnProperty(colName)) {
+                    var colValue = row[colName];
+                    if(colValue!==null){
+                        var colIndex = this.getColIndex(colName,columnNames);
+                        var cellRef = XLSX.utils.encode_cell({c:colIndex,r:rowIndex+1});
+                        var cellType=this.getCellType(colValue);
+
+                        // convert to milliseconds
+                        var isDate=colValue instanceof Date;
+                        if(isDate) colValue=(<Date>colValue).valueOf();
+
+                        var cell:XLSX.IWorkSheetCell = {v:colValue,t:cellType};
+                        
+                        if(isDate) cell.z = (<any>XLSX).SSF._table[14];
+
+                        ws[cellRef] = cell;
+                    }
+                }
+            }
+        }
+
+        // add the column names
+        for (var colIndex = 0; colIndex < columnNames.length; colIndex++) {
+            var columnName = columnNames[colIndex];
+            var cellRef = XLSX.utils.encode_cell({c:colIndex,r:0});
+            var cell:XLSX.IWorkSheetCell = {v:columnName,t:'s'};
+            ws[cellRef] = cell;
+        }
+
+        var range:XLSX.IRange;
+        var encodedRange:string;
+        var rangeColumnsTo=columnNames.length>0?columnNames.length-1:0;
+        var rangeRowsTo=dataTable.rows.length;
+        
+        if(rangeColumnsTo==0 && rangeRowsTo==0){
+            encodedRange="A1:A1";
+        }
+        else {
+            range={e:{c:0,r:0},s:{c:rangeColumnsTo,r:rangeRowsTo}};
+            encodedRange=XLSX.utils.encode_range(range.e,range.s);
+        }
+        
+        ws['!ref']=<any>encodedRange;
+
+        var serialized= XLSX.write(wb,{bookType:'xlsx', type: 'buffer'});
+        return serialized;
+    }
+
+    private getCellType(value: any): string {
+        var type:string='s';
+        if (typeof value === 'number'){
+            type = 'n';
+        } 
+        else if (typeof value === 'boolean') {
+            type = 'b';
+        } 
+        else if (value instanceof Date) {
+            type = 'n'; 
+        }
+        return type;
+    }
+
+    /** Gets the index of the column. If it doesn't exist, it adds it to the columns array  */
+    private getColIndex(colName:string,columns:string[]):number{
+        var index=columns.indexOf(colName);
+        if(index==-1){
+            columns.push(colName);
+            index=columns.length-1;
+        }
+        return index;
     }
 
     deserialize(data: Buffer): DataTable {
@@ -26,6 +121,7 @@ export class DataTableXlsSerializer implements IDataTableSerializer {
         var from = range.s, to = range.e;
 
         // Assume the firs row contains column names
+        // TODO: Make this optional
         for (var rowIndex = from.r + 1, tableRowIndex = 0; rowIndex <= to.r; rowIndex++ , tableRowIndex++) {
             var row = {};
             for (var colIndex = from.c, tableColIndex = 0; colIndex <= to.c; colIndex++ , tableColIndex++) {

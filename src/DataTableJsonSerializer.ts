@@ -9,8 +9,8 @@ export class DataTableJsonSerializer implements IDataTableSerializer {
         this.extension="json";
     }
 
-    serialize(dataTable:DataTable):string{
-        return JSON.stringify(dataTable, null, 4);
+    serialize(dataTable:DataTable):Buffer{
+        return new Buffer(JSON.stringify(dataTable, null, 4),'utf8');
     }
 
     deserialize(data:Buffer):DataTable{

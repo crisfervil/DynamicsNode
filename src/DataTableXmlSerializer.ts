@@ -11,7 +11,7 @@ export class DataTableXmlSerializer implements IDataTableSerializer {
         this.extension = 'xml';
     }
 
-    serialize(dataTable: DataTable): string {
+    serialize(dataTable: DataTable): Buffer {
         var returnValue: string;
         if (dataTable != null) {
             var xw = new XMLWriter(true);
@@ -47,7 +47,7 @@ export class DataTableXmlSerializer implements IDataTableSerializer {
             xw.endElement(); // DataTable
             returnValue = xw.toString();
         }
-        return returnValue;
+        return new Buffer(returnValue,'utf8');
     }
 
     deserialize(xmlContent: Buffer): DataTable {
