@@ -36,3 +36,10 @@ export class SetStateRequest{
     public State:OptionSetValue;
     public Status:OptionSetValue;
 }
+
+export class SetBusinessSystemUserRequest {
+    public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.SetBusinessSystemUserRequest";
+    public BusinessId:string;
+    public UserId:string;
+    public ReassignPrincipal:EntityReference;
+}

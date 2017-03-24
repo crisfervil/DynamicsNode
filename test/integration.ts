@@ -7,7 +7,7 @@ import assert = require("assert");
 import path = require("path");
 import fs = require("fs");
 import { WhoAmIRequest, WhoAmIResponse } from "../src/Messages";
-
+import { SecurityUtil } from '../src/SecurityUtil';
 
 // Asserts that there is a value in the specified field in the specified record
 function checkFieldValue(dataTable, index, fieldName) {
@@ -457,5 +457,17 @@ function addTestsFor(connectionStringName: string, connectionStringValue: string
             crm.delete('phonecall',callId);
         });
 
+        it('changes a user businessunit using a SetBusinessSystemUserRequest message',function(){
+
+            var who = crm.whoAmI();
+            // Just set the same bu to the current user to make sure the call is performed correctly
+            SecurityUtil.SetUserBusinessUnit(crm,who.UserId,who.BusinessUnitId);
+        });
+
+        it('changes a user businessunit using a systemuser update',function(){
+            var who = crm.whoAmI();
+            crm.update('systemuser',{systemuserid:who.UserId, businessunitid:who.BusinessUnitId});
+        });
+        
     });
 }
