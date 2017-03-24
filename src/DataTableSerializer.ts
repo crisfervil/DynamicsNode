@@ -7,23 +7,28 @@ import { DataTableXlsSerializer } from './DataTableXlsSerializer';
 import path = require('path');
 import fs = require('fs');
 
-// register serializers here
-var AvailableSerializers: IDataTableSerializer[] =
+/** Default constructor
+ * @class DataTableSerializer
+ * @classdesc Utility to load and save DataTable objects to different file formats. 
+ */
+export class DataTableSerializer {
+    /** @lends DataTableSerializer */
+
+    // register serializers here
+    static AvailableSerializers: IDataTableSerializer[] =
     [
         new DataTableJsonSerializer(),
         new DataTableXlsSerializer(),
         new DataTableXmlSerializer()
     ];
 
-export class DataTableSerializer {
-
     private static getSerializer(extension: string): IDataTableSerializer {
         var retVal: IDataTableSerializer = null;
         if (extension !== null && extension.length > 0) {
             // remove first '.' if the extension begins with it
             if (extension.indexOf(".") == 0) extension = extension.substr(1);
-            for (var i = 0; i < AvailableSerializers.length; i++) {
-                var serializer = AvailableSerializers[i];
+            for (var i = 0; i < this.AvailableSerializers.length; i++) {
+                var serializer = this.AvailableSerializers[i];
                 if (serializer.extension && serializer.extension.toLocaleLowerCase() == extension.toLowerCase()) {
                     retVal = serializer;
                     break;
@@ -33,7 +38,10 @@ export class DataTableSerializer {
         return retVal;
     }
 
-    /** The path is relative to process.cwd() */
+    /** Saves the specified datatable object to the specified file.
+     * @param {dataTable} DataTable Table to save to the specified file.  
+     * @param {fileName} string File path where to save the DataTable object. The path is relative to process.cwd() 
+    */
     static save(dataTable: DataTable, fileName: string) {
 
         var ext = path.extname(fileName);
