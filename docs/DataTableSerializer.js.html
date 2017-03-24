@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>DynamicsNode Index</title>
+	<title>DynamicsNode Source: DataTableSerializer.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -74,95 +74,82 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-	
-	
-
-
-
-
-
-    <section class="readme-section">
-        <article><p><a href="https://ci.appveyor.com/project/crisfervil/dynamicsnode"><img src="https://ci.appveyor.com/api/projects/status/github/crisfervil/dynamicsnode?svg=true" alt="Windows Build"></a><br><a href="https://travis-ci.org/crisfervil/DynamicsNode"><img src="https://travis-ci.org/crisfervil/DynamicsNode.svg?branch=master" alt="Ubuntu Build"></a><br><a href="https://coveralls.io/github/crisfervil/DynamicsNode?branch=master"><img src="https://coveralls.io/repos/github/crisfervil/DynamicsNode/badge.svg?branch=master" alt="Coveralls"></a><br><a href="https://www.npmjs.com/package/dynamicsnode"><img src="https://img.shields.io/npm/v/dynamicsnode.svg" alt="npm"></a><br><a href="http://npm-stats.com/~packages/dynamicsnode"><img src="https://img.shields.io/npm/dt/dynamicsnode.svg" alt="npm downloads"></a><br><a href="https://david-dm.org/crisfervil/dynamicsnode"><img src="https://david-dm.org/crisfervil/dynamicsnode.svg" alt="dependencies"></a><br><a href="https://ghit.me/repo/crisfervil/dynamicsnode"><img src="https://ghit.me/badge.svg?repo=crisfervil/dynamicsnode" alt="ghit.me"></a></p>
-<!-- [![codecov.io](https://codecov.io/github/crisfervil/DynamicsNode/coverage.svg?branch=master)](https://codecov.io/github/crisfervil/DynamicsNode?branch=master)--> 
-<h1>Project description</h1><p>DynamicsNode is a library built on node.js that allows you to quickly create scripts to interact with Microsoft Dynamics CRM using JavaScript.</p>
-<p>The main goal of DynamicsNode is to make you very productive when it comes to automate small tasks in Dynamics CRM. Just create a .js file, add a few lines and execute it.</p>
-<p>No more .net console applications with all the boilerplate code just for creating one record. Go productive!</p>
-<p>Github project: <a href="https://github.com/crisfervil/DynamicsNode">https://github.com/crisfervil/DynamicsNode</a></p>
-<p>Review the <a href="//github.com/crisfervil/DynamicsNode/blob/master/changelog.md">changelog</a> to see the latest changes.</p>
-<h1>How to use it</h1><p>Create a new directory to store your scripts and cd into it</p>
-<pre class="prettyprint source"><code>$ mkdir MyScripts && cd MyScripts</code></pre><p>Install DynamicsNode</p>
-<pre class="prettyprint source"><code>$  npm install dynamicsnode</code></pre><h2>Writing code</h2><p>Create a new js file named myscript.js and start adding code</p>
-<pre class="prettyprint source lang-javascript"><code>var dn = require(&quot;dynamicsnode&quot;);
-
-// update this with your CRM url and credentials if needed
-var crm = new dn.CRMClient(&quot;Url=http://crm.contoso.com/xrmContoso&quot;); 
-
-// retrieve current user information
-var who = crm.whoAmI();
-var myUserInfo = crm.retrieve(&quot;systemuser&quot;,who.UserId);
-console.log(myUserInfo.fullname); // prints your user name
-
-// retrieve a user named John Doe
-var anotherUser = crm.retrieve(&quot;systemuser&quot;,{fullname:&quot;John Doe&quot;});
-console.log(anotherUser); // prints all the attributes of the user</code></pre><p>Save the file and run the script.</p>
-<p>In order to run the script use node</p>
-<pre class="prettyprint source"><code>$ node myscript</code></pre><p><strong>Further information:</strong> <a href="//dynamicsnode.js.org/classes.list.html">API</a></p>
-<p><strong>How to compile and test the code:</strong> <a href="//dynamicsnode.js.org/tutorial-CompileAndTesting.html">Compile and Testing</a></p>
-<p><strong>Use it as a command line tool:</strong> <a href="//dynamicsnode.js.org/tutorial-CommandsAndRepl.html">Commands and Repl</a></p>
-<h1>Requirements</h1><p>Requires <a href="//nodejs.org">Node.js</a></p>
-<p>This tool is based on <a href="//github.com/tjanczuk/edge">Edge</a> and requires .NET Framework 4.5 to be installed.</p>
-<p>It has been tested in Windows environments only, but could potentially work in Linux too using Mono.</p>
-<h1>Supported CRM versions</h1><p>Tested on CRM 2011, 2013 and CRM Online so far.</p>
-<p>Volunteers to <a href="https://dynamicsnode.js.org/tutorial-CompileAndTesting.html">run the integration tests</a> on other versions are more than welcome :)</p>
-<h1>Backlog</h1><p>(Ordered by priority)</p>
-<ul>
-<li>[ ] <em>Improve documentation (work In progress)</em></li>
-<li>[ ] <em>Add DataTable functions (work in progress)</em></li>
-<li>[ ] Refactor to minimize .net code</li>
-<li>[ ] Increase code coverage</li>
-<li>[ ] Add paging support in queries</li>
-<li>[ ] Add async support</li>
-<li>[ ] Improve Exception handling</li>
-<li>[ ] Add support for .net core</li>
-<li>[ ] Make it work in Mono and Linux</li>
-<li>[ ] Improve Exception Handling to show errors in CRM side</li>
-<li>[ ] Add functions to work with solutions</li>
-<li>[ ] Add integration tests for activities</li>
-<li>[ ] Add an Assert object to allow create integration tests</li>
-<li>[ ] Add examples page</li>
-<li>[ ] Add a commands to work with connections</li>
-<li>[ ] Add more commands to repl mode</li>
-<li>[ ] Add support for missing operators in condition objects</li>
-<li>[ ] Add d.ts file to Typings repository </li>
-<li>[ ] Add functions to create performance tests</li>
-<li>[ ] Add functions to allow Continuos Integration tools</li>
-<li>[ ] Add extensibility</li>
-<li>[x] <del>Improve testeability and integration tests</del></li>
-<li>[x] <del>Add import/export commands</del></li>
-<li>[x] <del>Add test coverage reports</del></li>
-<li>[x] <del>Upload npm package</del></li>
-</ul></article>
-    </section>
-
-
+		<h1 class="page-title">Source: DataTableSerializer.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var DataTableJsonSerializer_1 = require("./DataTableJsonSerializer");
+var DataTableXmlSerializer_1 = require("./DataTableXmlSerializer");
+var DataTableXlsSerializer_1 = require("./DataTableXlsSerializer");
+var path = require("path");
+var fs = require("fs");
+/** Default constructor
+ * @class DataTableSerializer
+ * @classdesc Utility to load and save DataTable objects to different file formats.
+ */
+var DataTableSerializer = (function () {
+    function DataTableSerializer() {
+    }
+    DataTableSerializer.getSerializer = function (extension) {
+        var retVal = null;
+        if (extension !== null &amp;&amp; extension.length > 0) {
+            // remove first '.' if the extension begins with it
+            if (extension.indexOf(".") == 0)
+                extension = extension.substr(1);
+            for (var i = 0; i &lt; this.AvailableSerializers.length; i++) {
+                var serializer = this.AvailableSerializers[i];
+                if (serializer.extension &amp;&amp; serializer.extension.toLocaleLowerCase() == extension.toLowerCase()) {
+                    retVal = serializer;
+                    break;
+                }
+            }
+        }
+        return retVal;
+    };
+    /** Saves the specified datatable object to the specified file.
+     * @param {dataTable} DataTable Table to save to the specified file.
+     * @param {fileName} string File path where to save the DataTable object. The path is relative to process.cwd()
+    */
+    DataTableSerializer.save = function (dataTable, fileName) {
+        var ext = path.extname(fileName);
+        var serializer = this.getSerializer(ext);
+        if (serializer === null)
+            throw new Error("Format '" + ext + "' not supported");
+        var data = serializer.serialize(dataTable);
+        fs.writeFileSync(fileName, data);
+    };
+    /** The path is relative to process.cwd() */
+    DataTableSerializer.load = function (fileName) {
+        var dt;
+        var ext = path.extname(fileName);
+        var serializer = this.getSerializer(ext);
+        if (serializer === null)
+            throw new Error("Format '" + ext + "' not supported");
+        var buffer = fs.readFileSync(fileName);
+        dt = serializer.deserialize(buffer);
+        return dt;
+    };
+    return DataTableSerializer;
+}());
+/** @lends DataTableSerializer */
+// register serializers here
+DataTableSerializer.AvailableSerializers = [
+    new DataTableJsonSerializer_1.DataTableJsonSerializer(),
+    new DataTableXlsSerializer_1.DataTableXlsSerializer(),
+    new DataTableXmlSerializer_1.DataTableXmlSerializer()
+];
+exports.DataTableSerializer = DataTableSerializer;
+//# sourceMappingURL=DataTableSerializer.js.map</pre>
+    </article>
+</section>
 
 
 
@@ -173,10 +160,6 @@ console.log(anotherUser); // prints all the attributes of the user</code></pre><
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>

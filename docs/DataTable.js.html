@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="CRMClient.html">CRMClient</a></li><li><a href="DataTable.html">DataTable</a></li><li><a href="Fetch.html">Fetch</a></li><li><a href="Filter.html">Filter</a></li><li><a href="Guid.html">Guid</a></li>
+					<li><a href="CRMClient.html">CRMClient</a></li><li><a href="DataTable.html">DataTable</a></li><li><a href="DataTableSerializer.html">DataTableSerializer</a></li><li><a href="Fetch.html">Fetch</a></li><li><a href="Filter.html">Filter</a></li><li><a href="Guid.html">Guid</a></li>
 				</ul>
 			</li>
 			
@@ -85,12 +85,8 @@
     <article>
         <pre
             class="sunlight-highlight-javascript linenums">"use strict";
-var path = require("path");
-var fs = require("fs");
-var XMLWriter = require("xml-writer");
-var et = require("elementtree");
-var XLSX = require("xlsx");
-var debug = require("debug")("dynamicsnode");
+Object.defineProperty(exports, "__esModule", { value: true });
+var debug = require('debug')('dynamicsnode');
 var DataTable = (function () {
     /** Default constructor
      * @class DataTable
@@ -123,7 +119,7 @@ var DataTable = (function () {
      *  var dt = new DataTable();
      *  dt.rows.push({val1:1,val2:2},
      *               {val1:2,val2:2});
-     *  dt.lookup("val1",row=>++row.val1);
+     *  dt.lookup('val1',row=>++row.val1);
      *  console.log(dt.rows[0].val1); // prints out 2
      *  console.log(dt.rows[1].val1); // prints out 3
      * @example &lt;caption>Find the parent account of a contact using the phone number&lt;/caption>
@@ -209,225 +205,6 @@ var DataTable = (function () {
             }
         }
     };
-    /** The path is relative to process.cwd() */
-    DataTable.prototype.save = function (fileName) {
-        var strValue;
-        var ext = path.extname(fileName);
-        if (ext != null)
-            ext = ext.toLowerCase();
-        if (ext == ".json") {
-            debug("Serializing to json...");
-            strValue = JSON.stringify(this, null, 4);
-        }
-        else if (ext == ".xml") {
-            debug("Serializing to xml...");
-            strValue = this.serializeXml(this);
-        }
-        else {
-            throw new Error("Format \"" + ext + "\" not supported");
-        }
-        if (strValue != null) {
-            debug("About to write " + strValue.length + " bytes to file...");
-            fs.writeFileSync(fileName, strValue);
-        }
-    };
-    /** The path is relative to process.cwd() */
-    DataTable.load = function (fileName) {
-        var dt;
-        var ext = path.extname(fileName);
-        if (ext != null)
-            ext = ext.toLowerCase();
-        var strContent;
-        if (ext == ".json") {
-            strContent = fs.readFileSync(fileName, "utf8");
-            dt = JSON.parse(strContent, this.JSONDataReviver);
-            if (dt &amp;&amp; dt.rows === undefined)
-                throw "The parsed file doesn't look like a DataTable";
-        }
-        else if (ext == ".xml") {
-            strContent = fs.readFileSync(fileName, "utf8");
-            dt = this.parseXml(strContent);
-        }
-        else if (ext == ".xlsx") {
-            dt = this.parseExcel(fileName);
-        }
-        else {
-            throw new Error("Format \"" + ext + "\" not supported");
-        }
-        return dt;
-    };
-    DataTable.parseNumbers = function (str) {
-        var result = null;
-        // http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
-        var isNumber = !Array.isArray(str) &amp;&amp; (+str - parseFloat(str) + 1) >= 0;
-        if (isNumber) {
-            result = +str;
-        }
-        return result;
-    };
-    ;
-    DataTable.parseBooleans = function (str) {
-        var result = null;
-        if (/^(?:true|false)$/i.test(str)) {
-            result = str.toLowerCase() === 'true';
-        }
-        return result;
-    };
-    ;
-    DataTable.parseDates = function (str) {
-        var result = null;
-        var dateParts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.*(\d*)Z$/.exec(str);
-        if (dateParts !== null) {
-            result = new Date(Date.UTC(+dateParts[1], +dateParts[2] - 1, +dateParts[3], +dateParts[4], +dateParts[5], +dateParts[6], +dateParts[7]));
-        }
-        return result;
-    };
-    DataTable.parseValue = function (str) {
-        var result = str;
-        if (typeof str === 'string') {
-            var parsedValue = DataTable.parseBooleans(str);
-            if (parsedValue === null) {
-                parsedValue = DataTable.parseNumbers(str);
-            }
-            if (parsedValue === null) {
-                parsedValue = DataTable.parseDates(str);
-            }
-            if (parsedValue !== null) {
-                result = parsedValue;
-            }
-        }
-        return result;
-    };
-    DataTable.JSONDataReviver = function (key, str) {
-        var result = str;
-        if (typeof str === 'string' || str instanceof String) {
-            var parsedValue = DataTable.parseDates(str);
-            if (parsedValue !== null) {
-                result = parsedValue;
-            }
-        }
-        return result;
-    };
-    ;
-    DataTable.parseExcel = function (fileName) {
-        var dt = new DataTable();
-        var workBook = XLSX.readFile(fileName);
-        var sheetName = workBook.SheetNames[0];
-        var workSheet = workBook.Sheets[sheetName];
-        dt.name = sheetName;
-        var rangeName = workSheet["!ref"];
-        var range = XLSX.utils.decode_range(rangeName);
-        var from = range.s, to = range.e;
-        // Assume the firs row contains column names
-        for (var rowIndex = from.r + 1, tableRowIndex = 0; rowIndex &lt;= to.r; rowIndex++, tableRowIndex++) {
-            var row = {};
-            for (var colIndex = from.c, tableColIndex = 0; colIndex &lt;= to.c; colIndex++, tableColIndex++) {
-                // Get the column name
-                var nameColRange = XLSX.utils.encode_cell({ r: from.r, c: colIndex });
-                var colName = workSheet[nameColRange];
-                var currentRange = XLSX.utils.encode_cell({ r: rowIndex, c: colIndex });
-                var colValue = workSheet[currentRange];
-                if (colName !== undefined &amp;&amp; colName.v !== null &amp;&amp; colName.v !== null &amp;&amp;
-                    colValue !== undefined &amp;&amp; colValue.v !== undefined &amp;&amp; colValue.v !== null) {
-                    row[colName.v] = colValue.v;
-                }
-            }
-            dt.rows.push(row);
-        }
-        return dt;
-    };
-    DataTable.parseXml = function (xmlContent) {
-        var dt = new DataTable();
-        var etree = et.parse(xmlContent);
-        var rootElement = etree.getroot();
-        var attrName = rootElement.attrib["name"];
-        if (attrName)
-            dt.name = attrName;
-        var rowElements = rootElement.getchildren();
-        for (var i = 0; i &lt; rowElements.length; i++) {
-            var rowElement = rowElements[i];
-            var rowItem = {};
-            var rowFieldElements = rowElement.getchildren();
-            for (var j = 0; j &lt; rowFieldElements.length; j++) {
-                var rowFieldElement = rowFieldElements[j];
-                var fieldName = rowFieldElement.tag;
-                var fieldValue = rowFieldElement.text;
-                var fieldType = rowFieldElement.attrib["type"];
-                var parsedValue = DataTable.parseXmlValue(fieldValue);
-                if (fieldType) {
-                    parsedValue = { type: fieldType, value: parsedValue };
-                }
-                rowItem[fieldName] = parsedValue;
-            }
-            dt.rows.push(rowItem);
-        }
-        return dt;
-    };
-    DataTable.parseXmlValue = function (strValue) {
-        var result = strValue;
-        var parsedValue = DataTable.parseBooleans(strValue);
-        if (parsedValue === null) {
-            parsedValue = DataTable.parseNumbers(strValue);
-        }
-        if (parsedValue === null) {
-            parsedValue = DataTable.parseDates(strValue);
-        }
-        if (parsedValue !== null) {
-            result = parsedValue;
-        }
-        return result;
-    };
-    DataTable.prototype.serializeXml = function (data) {
-        var returnValue;
-        if (DataTable != null) {
-            var xw = new XMLWriter(true);
-            xw.startElement('DataTable');
-            if (this.name)
-                xw.writeAttribute("name", this.name);
-            for (var i = 0; i &lt; data.rows.length; i++) {
-                xw.startElement('row');
-                var rowItem = data.rows[i];
-                for (var propName in rowItem) {
-                    var propValue = rowItem[propName];
-                    if (propValue != null) {
-                        var strValue = null, propType = null;
-                        if (typeof propValue == "object" &amp;&amp; !(propValue instanceof Date) &amp;&amp; propValue.type !== null &amp;&amp; propValue.type !== undefined) {
-                            // this value must contain typeinfo
-                            propType = propValue.type;
-                            strValue = this.serializeValue(propValue.value);
-                        }
-                        else {
-                            strValue = this.serializeValue(propValue);
-                        }
-                        if (strValue !== null) {
-                            xw.startElement(propName);
-                            if (propType !== null &amp;&amp; propType !== undefined) {
-                                xw.writeAttribute("type", propValue.type);
-                            }
-                            xw.text(strValue);
-                            xw.endElement();
-                        }
-                    }
-                }
-                xw.endElement(); // row
-            }
-            xw.endElement(); // DataTable
-            returnValue = xw.toString();
-        }
-        return returnValue;
-    };
-    DataTable.prototype.serializeValue = function (value) {
-        var result = null;
-        if (value !== null &amp;&amp; value !== undefined) {
-            if (value instanceof Date) {
-                result = JSON.stringify(value).replace(/\"/g, "");
-            }
-            else {
-                result = value.toString();
-            }
-        }
-        return result;
-    };
     return DataTable;
 }());
 exports.DataTable = DataTable;
@@ -476,7 +253,7 @@ exports.DataTable = DataTable;
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Thu Mar 2nd 2017
+		on Fri Mar 24th 2017
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

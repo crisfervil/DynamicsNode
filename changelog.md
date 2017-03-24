@@ -1,3 +1,9 @@
+0.0.19
+- Improved code coverage
+- Added Save to Excel capabilities to the [DataTable](https://dynamicsnode.js.org/DataTable.html) object. See DataTableSerializer object.
+- Lots of refactoring to make the code more SOLID
+- Added SetBusinessSystemUserRequest message and SecurityHelper class. 
+
 0.0.18
 
 - Updated CRM Dlls to the latest SDK version. This is a breaking change in the Connections String, that now have to 

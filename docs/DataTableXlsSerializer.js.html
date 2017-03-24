@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>DynamicsNode Index</title>
+	<title>DynamicsNode Source: DataTableXlsSerializer.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -74,95 +74,142 @@
 <div class="row">
 
 	
-	<div class="col-md-8">
+	<div class="col-md-12">
 	
 		<div id="main">
 			
 
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-	
-	
-
-
-
-
-
-    <section class="readme-section">
-        <article><p><a href="https://ci.appveyor.com/project/crisfervil/dynamicsnode"><img src="https://ci.appveyor.com/api/projects/status/github/crisfervil/dynamicsnode?svg=true" alt="Windows Build"></a><br><a href="https://travis-ci.org/crisfervil/DynamicsNode"><img src="https://travis-ci.org/crisfervil/DynamicsNode.svg?branch=master" alt="Ubuntu Build"></a><br><a href="https://coveralls.io/github/crisfervil/DynamicsNode?branch=master"><img src="https://coveralls.io/repos/github/crisfervil/DynamicsNode/badge.svg?branch=master" alt="Coveralls"></a><br><a href="https://www.npmjs.com/package/dynamicsnode"><img src="https://img.shields.io/npm/v/dynamicsnode.svg" alt="npm"></a><br><a href="http://npm-stats.com/~packages/dynamicsnode"><img src="https://img.shields.io/npm/dt/dynamicsnode.svg" alt="npm downloads"></a><br><a href="https://david-dm.org/crisfervil/dynamicsnode"><img src="https://david-dm.org/crisfervil/dynamicsnode.svg" alt="dependencies"></a><br><a href="https://ghit.me/repo/crisfervil/dynamicsnode"><img src="https://ghit.me/badge.svg?repo=crisfervil/dynamicsnode" alt="ghit.me"></a></p>
-<!-- [![codecov.io](https://codecov.io/github/crisfervil/DynamicsNode/coverage.svg?branch=master)](https://codecov.io/github/crisfervil/DynamicsNode?branch=master)--> 
-<h1>Project description</h1><p>DynamicsNode is a library built on node.js that allows you to quickly create scripts to interact with Microsoft Dynamics CRM using JavaScript.</p>
-<p>The main goal of DynamicsNode is to make you very productive when it comes to automate small tasks in Dynamics CRM. Just create a .js file, add a few lines and execute it.</p>
-<p>No more .net console applications with all the boilerplate code just for creating one record. Go productive!</p>
-<p>Github project: <a href="https://github.com/crisfervil/DynamicsNode">https://github.com/crisfervil/DynamicsNode</a></p>
-<p>Review the <a href="//github.com/crisfervil/DynamicsNode/blob/master/changelog.md">changelog</a> to see the latest changes.</p>
-<h1>How to use it</h1><p>Create a new directory to store your scripts and cd into it</p>
-<pre class="prettyprint source"><code>$ mkdir MyScripts && cd MyScripts</code></pre><p>Install DynamicsNode</p>
-<pre class="prettyprint source"><code>$  npm install dynamicsnode</code></pre><h2>Writing code</h2><p>Create a new js file named myscript.js and start adding code</p>
-<pre class="prettyprint source lang-javascript"><code>var dn = require(&quot;dynamicsnode&quot;);
-
-// update this with your CRM url and credentials if needed
-var crm = new dn.CRMClient(&quot;Url=http://crm.contoso.com/xrmContoso&quot;); 
-
-// retrieve current user information
-var who = crm.whoAmI();
-var myUserInfo = crm.retrieve(&quot;systemuser&quot;,who.UserId);
-console.log(myUserInfo.fullname); // prints your user name
-
-// retrieve a user named John Doe
-var anotherUser = crm.retrieve(&quot;systemuser&quot;,{fullname:&quot;John Doe&quot;});
-console.log(anotherUser); // prints all the attributes of the user</code></pre><p>Save the file and run the script.</p>
-<p>In order to run the script use node</p>
-<pre class="prettyprint source"><code>$ node myscript</code></pre><p><strong>Further information:</strong> <a href="//dynamicsnode.js.org/classes.list.html">API</a></p>
-<p><strong>How to compile and test the code:</strong> <a href="//dynamicsnode.js.org/tutorial-CompileAndTesting.html">Compile and Testing</a></p>
-<p><strong>Use it as a command line tool:</strong> <a href="//dynamicsnode.js.org/tutorial-CommandsAndRepl.html">Commands and Repl</a></p>
-<h1>Requirements</h1><p>Requires <a href="//nodejs.org">Node.js</a></p>
-<p>This tool is based on <a href="//github.com/tjanczuk/edge">Edge</a> and requires .NET Framework 4.5 to be installed.</p>
-<p>It has been tested in Windows environments only, but could potentially work in Linux too using Mono.</p>
-<h1>Supported CRM versions</h1><p>Tested on CRM 2011, 2013 and CRM Online so far.</p>
-<p>Volunteers to <a href="https://dynamicsnode.js.org/tutorial-CompileAndTesting.html">run the integration tests</a> on other versions are more than welcome :)</p>
-<h1>Backlog</h1><p>(Ordered by priority)</p>
-<ul>
-<li>[ ] <em>Improve documentation (work In progress)</em></li>
-<li>[ ] <em>Add DataTable functions (work in progress)</em></li>
-<li>[ ] Refactor to minimize .net code</li>
-<li>[ ] Increase code coverage</li>
-<li>[ ] Add paging support in queries</li>
-<li>[ ] Add async support</li>
-<li>[ ] Improve Exception handling</li>
-<li>[ ] Add support for .net core</li>
-<li>[ ] Make it work in Mono and Linux</li>
-<li>[ ] Improve Exception Handling to show errors in CRM side</li>
-<li>[ ] Add functions to work with solutions</li>
-<li>[ ] Add integration tests for activities</li>
-<li>[ ] Add an Assert object to allow create integration tests</li>
-<li>[ ] Add examples page</li>
-<li>[ ] Add a commands to work with connections</li>
-<li>[ ] Add more commands to repl mode</li>
-<li>[ ] Add support for missing operators in condition objects</li>
-<li>[ ] Add d.ts file to Typings repository </li>
-<li>[ ] Add functions to create performance tests</li>
-<li>[ ] Add functions to allow Continuos Integration tools</li>
-<li>[ ] Add extensibility</li>
-<li>[x] <del>Improve testeability and integration tests</del></li>
-<li>[x] <del>Add import/export commands</del></li>
-<li>[x] <del>Add test coverage reports</del></li>
-<li>[x] <del>Upload npm package</del></li>
-</ul></article>
-    </section>
-
-
+		<h1 class="page-title">Source: DataTableXlsSerializer.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var XLSX = require("xlsx");
+var DataTable_1 = require("./DataTable");
+var WorkBook = (function () {
+    function WorkBook() {
+    }
+    return WorkBook;
+}());
+var WorkSheet = (function () {
+    function WorkSheet() {
+    }
+    return WorkSheet;
+}());
+var DataTableXlsSerializer = (function () {
+    function DataTableXlsSerializer() {
+        this.extension = "xlsx";
+    }
+    DataTableXlsSerializer.prototype.serialize = function (dataTable) {
+        var wb = new WorkBook();
+        var ws = new WorkSheet();
+        wb.Sheets = {};
+        var sheetName = dataTable.name || "DynamicsNode";
+        wb.Sheets[sheetName] = ws;
+        wb.SheetNames = [sheetName];
+        // Holds the list of columns in the dataTable
+        var columnNames = [];
+        for (var rowIndex = 0; rowIndex &lt; dataTable.rows.length; rowIndex++) {
+            var row = dataTable.rows[rowIndex];
+            for (var colName in row) {
+                if (row.hasOwnProperty(colName)) {
+                    var colValue = row[colName];
+                    if (colValue !== null) {
+                        var colIndex = this.getColIndex(colName, columnNames);
+                        var cellRef = XLSX.utils.encode_cell({ c: colIndex, r: rowIndex + 1 });
+                        var cellType = this.getCellType(colValue);
+                        // convert to milliseconds
+                        var isDate = colValue instanceof Date;
+                        if (isDate)
+                            colValue = colValue.valueOf();
+                        var cell = { v: colValue, t: cellType };
+                        if (isDate)
+                            cell.z = XLSX.SSF._table[14];
+                        ws[cellRef] = cell;
+                    }
+                }
+            }
+        }
+        // add the column names
+        for (var colIndex = 0; colIndex &lt; columnNames.length; colIndex++) {
+            var columnName = columnNames[colIndex];
+            var cellRef = XLSX.utils.encode_cell({ c: colIndex, r: 0 });
+            var cell = { v: columnName, t: 's' };
+            ws[cellRef] = cell;
+        }
+        var range;
+        var encodedRange;
+        var rangeColumnsTo = columnNames.length > 0 ? columnNames.length - 1 : 0;
+        var rangeRowsTo = dataTable.rows.length;
+        if (rangeColumnsTo == 0 &amp;&amp; rangeRowsTo == 0) {
+            encodedRange = "A1:A1";
+        }
+        else {
+            range = { e: { c: 0, r: 0 }, s: { c: rangeColumnsTo, r: rangeRowsTo } };
+            encodedRange = XLSX.utils.encode_range(range.e, range.s);
+        }
+        ws['!ref'] = encodedRange;
+        var serialized = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+        return serialized;
+    };
+    DataTableXlsSerializer.prototype.getCellType = function (value) {
+        var type = 's';
+        if (typeof value === 'number') {
+            type = 'n';
+        }
+        else if (typeof value === 'boolean') {
+            type = 'b';
+        }
+        else if (value instanceof Date) {
+            type = 'n';
+        }
+        return type;
+    };
+    /** Gets the index of the column. If it doesn't exist, it adds it to the columns array  */
+    DataTableXlsSerializer.prototype.getColIndex = function (colName, columns) {
+        var index = columns.indexOf(colName);
+        if (index == -1) {
+            columns.push(colName);
+            index = columns.length - 1;
+        }
+        return index;
+    };
+    DataTableXlsSerializer.prototype.deserialize = function (data) {
+        var dt = new DataTable_1.DataTable();
+        var workBook = XLSX.read(data);
+        var sheetName = workBook.SheetNames[0];
+        var workSheet = workBook.Sheets[sheetName];
+        dt.name = sheetName;
+        var rangeName = workSheet["!ref"];
+        var range = XLSX.utils.decode_range(rangeName);
+        var from = range.s, to = range.e;
+        // Assume the firs row contains column names
+        // TODO: Make this optional
+        for (var rowIndex = from.r + 1, tableRowIndex = 0; rowIndex &lt;= to.r; rowIndex++, tableRowIndex++) {
+            var row = {};
+            for (var colIndex = from.c, tableColIndex = 0; colIndex &lt;= to.c; colIndex++, tableColIndex++) {
+                // Get the column name
+                var nameColRange = XLSX.utils.encode_cell({ r: from.r, c: colIndex });
+                var colName = workSheet[nameColRange];
+                var currentRange = XLSX.utils.encode_cell({ r: rowIndex, c: colIndex });
+                var colValue = workSheet[currentRange];
+                if (colName !== undefined &amp;&amp; colName.v !== null &amp;&amp; colName.v !== null &amp;&amp;
+                    colValue !== undefined &amp;&amp; colValue.v !== undefined &amp;&amp; colValue.v !== null) {
+                    row[colName.v] = colValue.v;
+                }
+            }
+            dt.rows.push(row);
+        }
+        return dt;
+    };
+    return DataTableXlsSerializer;
+}());
+exports.DataTableXlsSerializer = DataTableXlsSerializer;
+//# sourceMappingURL=DataTableXlsSerializer.js.map</pre>
+    </article>
+</section>
 
 
 
@@ -173,10 +220,6 @@ console.log(anotherUser); // prints all the attributes of the user</code></pre><
 
 	<div class="clearfix"></div>
 
-	
-		<div class="col-md-3">
-			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
-		</div>
 	
 
 </div>
