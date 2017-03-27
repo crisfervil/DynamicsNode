@@ -3,6 +3,7 @@
 - Added Save to Excel capabilities to the [DataTable](https://dynamicsnode.js.org/DataTable.html) object. See DataTableSerializer object.
 - Lots of refactoring to make the code more SOLID
 - Added SetBusinessSystemUserRequest message and SecurityHelper class. 
+- Corrected bug in DataTableXmlSerializer on the serialization of the attribute names.
 
 0.0.18
 

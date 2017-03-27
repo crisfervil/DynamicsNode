@@ -1,5 +1,6 @@
 import { IDataTableSerializer } from './IDataTableSerializer'
 import { DataTable } from './DataTable';
+import { XmlEncode } from './XmlEncode';
 import XMLWriter = require('xml-writer');
 import et = require('elementtree');
 
@@ -33,7 +34,7 @@ export class DataTableXmlSerializer implements IDataTableSerializer {
                             strValue = this.serializeValue(propValue);
                         }
                         if (strValue !== null) {
-                            xw.startElement(propName);
+                            xw.startElement(XmlEncode.encodeName(propName));
                             if (propType !== null && propType !== undefined) {
                                 xw.writeAttribute("type", propValue.type);
                             }
@@ -65,7 +66,7 @@ export class DataTableXmlSerializer implements IDataTableSerializer {
             var rowFieldElements = rowElement.getchildren();
             for (var j = 0; j < rowFieldElements.length; j++) {
                 var rowFieldElement = rowFieldElements[j];
-                var fieldName = rowFieldElement.tag;
+                var fieldName = XmlEncode.decodeName(rowFieldElement.tag);
                 var fieldValue = rowFieldElement.text;
                 var fieldType = rowFieldElement.attrib["type"];
                 var parsedValue = this.parseXmlValue(fieldValue);
