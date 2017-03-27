@@ -1,3 +1,6 @@
+0.0.20
+- 
+
 0.0.19
 - Improved code coverage
 - Added Save to Excel capabilities to the [DataTable](https://dynamicsnode.js.org/DataTable.html) object. See DataTableSerializer object.
