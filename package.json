@@ -1,6 +1,6 @@
 {
   "name": "dynamicsnode",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "description": "Create simple scripts to interact with Dynamics CRM using Node.js",
   "repository": {
     "type": "git",
