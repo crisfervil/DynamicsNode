@@ -84,8 +84,8 @@ Volunteers to [run the integration tests](https://dynamicsnode.js.org/tutorial-C
 # Backlog
 (Ordered by priority)
 
+* [ ] Get 85%+ code coverage
 * [ ] Refactor to minimize .net code
-* [ ] Increase code coverage
 * [ ] Add paging support in queries
 * [ ] Add async support
 * [ ] Improve Exception handling
