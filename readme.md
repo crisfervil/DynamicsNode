@@ -93,7 +93,6 @@ Volunteers to [run the integration tests](https://dynamicsnode.js.org/tutorial-C
 * [ ] Make it work in Mono and Linux
 * [ ] Improve Exception Handling to show errors in CRM side
 * [ ] Add functions to work with solutions
-* [ ] Add integration tests for activities
 * [ ] Add an Assert object to allow create integration tests
 * [ ] Add examples page
 * [ ] Add a commands to work with connections
@@ -103,6 +102,7 @@ Volunteers to [run the integration tests](https://dynamicsnode.js.org/tutorial-C
 * [ ] Add functions to create performance tests
 * [ ] Add functions to allow Continuos Integration tools
 * [ ] Add extensibility
+* [x] ~~Add integration tests for activities~~
 * [x] ~~Improve documentation (work In progress)~~
 * [x] ~~Add DataTable functions (work in progress)~~
 * [x] ~~Improve testeability and integration tests~~
