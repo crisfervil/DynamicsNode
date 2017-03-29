@@ -12,12 +12,21 @@ class WorkSheet implements XLSX.IWorkSheet{
     [cell: string]: XLSX.IWorkSheetCell;
 }
 
+/** Default constructor
+ * @class DataTableXlsSerializer
+ * @classdesc Saves and loads a {DataTable} object to and from a MS Excel file (xlsx). 
+ * When reading from an Excel file, the data is taken from the first sheet in the workbook. 
+ * It is assumed that the first row contains the column names. 
+ */
 export class DataTableXlsSerializer implements IDataTableSerializer {
     readonly extension: string;
     constructor() {
         this.extension = "xlsx";
     }
 
+    /** Serializes the specified {DataTable} object into a Buffer data.
+     * @method DataTableXlsSerializer#serialize
+    */
     serialize(dataTable: DataTable): Buffer {
        
         var wb = new WorkBook();
@@ -108,6 +117,9 @@ export class DataTableXlsSerializer implements IDataTableSerializer {
         return index;
     }
 
+    /** Deserializes the specified buffer data into a DataTable object
+     * @method DataTableXlsSerializer#deserialize
+    */
     deserialize(data: Buffer): DataTable {
         var dt = new DataTable();
         var workBook = XLSX.read(data);

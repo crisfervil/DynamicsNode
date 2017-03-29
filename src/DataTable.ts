@@ -1,3 +1,5 @@
+import { DataTableSerializer } from './DataTableSerializer';
+
 var debug = require('debug')('dynamicsnode');
 
 export class DataTable {
@@ -121,5 +123,28 @@ export class DataTable {
                 delete this.rows[i][columnName];
             }
         }
+    }
+
+    /** Saves the specified datatable object to the specified file.
+     * The format of the file depends on the extension provided. 
+     * The supported formats are json, xml and xlsx. 
+     * @param {dataTable} DataTable Table to save to the specified file.
+     * @param {fileName} string File path where to save the DataTable object. The path is relative to process.cwd()
+     * @example <caption>Saves the datatable to a .json file</caption>
+     * var dt = new DataTable();
+     * dt.save('mydata.json'); 
+    */
+    save(fileName:string):void{
+        DataTableSerializer.save(this,fileName);
+    }
+
+    /**
+     * Loads the {DataTable} object from the specified file. 
+     * @param {fileName} string File path where to save the DataTable object. The path is relative to process.cwd() 
+     * @example <caption>Loads the table from an xlsx file</caption>
+     * var dt = DataTable.load('mydata.xlsx');
+     */
+    static load(fileName:string):DataTable{
+        return DataTableSerializer.load(fileName);
     }
 }

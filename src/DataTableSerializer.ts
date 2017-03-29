@@ -38,10 +38,6 @@ export class DataTableSerializer {
         return retVal;
     }
 
-    /** Saves the specified datatable object to the specified file.
-     * @param {dataTable} DataTable Table to save to the specified file.  
-     * @param {fileName} string File path where to save the DataTable object. The path is relative to process.cwd() 
-    */
     static save(dataTable: DataTable, fileName: string) {
 
         var ext = path.extname(fileName);
