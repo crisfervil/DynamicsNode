@@ -88,10 +88,9 @@ Volunteers to [run the integration tests](https://dynamicsnode.js.org/tutorial-C
 * [ ] Refactor to minimize .net code
 * [ ] Add paging support in queries
 * [ ] Add async support
-* [ ] Improve Exception handling
+* [ ] Improve Exception handling and Show errors thrown in the CRM side
 * [ ] Add support for .net core
 * [ ] Make it work in Mono and Linux
-* [ ] Improve Exception Handling to show errors in CRM side
 * [ ] Add functions to work with solutions
 * [ ] Add an Assert object to allow create integration tests
 * [ ] Add examples page
