@@ -84,8 +84,6 @@ Volunteers to [run the integration tests](https://dynamicsnode.js.org/tutorial-C
 # Backlog
 (Ordered by priority)
 
-* [ ] *Improve documentation (work In progress)*
-* [ ] *Add DataTable functions (work in progress)*
 * [ ] Refactor to minimize .net code
 * [ ] Increase code coverage
 * [ ] Add paging support in queries
@@ -105,6 +103,8 @@ Volunteers to [run the integration tests](https://dynamicsnode.js.org/tutorial-C
 * [ ] Add functions to create performance tests
 * [ ] Add functions to allow Continuos Integration tools
 * [ ] Add extensibility
+* [x] ~~Improve documentation (work In progress)~~
+* [x] ~~Add DataTable functions (work in progress)~~
 * [x] ~~Improve testeability and integration tests~~
 * [x] ~~Add import/export commands~~
 * [x] ~~Add test coverage reports~~
