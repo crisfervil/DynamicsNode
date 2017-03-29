@@ -59,4 +59,37 @@ describe("DataTable", function() {
         assert.deepEqual(dt.rows[0].val1,undefined);
         assert.deepEqual(dt.rows[1].val1,3);
     });
+
+    it("Renames a column", function(){
+
+        var dt = new DataTable();
+        dt.rows.push({val1:1,val2:2},
+                     {val1:2,val3:3});
+        
+        dt.renameColumn('val1','val4');
+        dt.renameColumn('val2','val5');
+
+        // val1 and val2 should have gone
+        assert.deepEqual(dt.rows[0],{val4:1,val5:2});
+        assert.deepEqual(dt.rows[1],{val4:2,val3:3});
+    });
+    
+    it("Removes a column", function(){
+
+        var dt = new DataTable();
+        dt.rows.push({val1:1,val2:2},
+                     {val1:2,val3:3});
+        
+        dt.removeColumn('val2');
+
+        // val2 should have gone
+        assert.deepEqual(dt.rows[0],{val1:1});
+        assert.deepEqual(dt.rows[1],{val1:2,val3:3});
+
+        dt.removeColumn('val3');
+
+        // val3 should have gone
+        assert.deepEqual(dt.rows[0],{val1:1});
+        assert.deepEqual(dt.rows[1],{val1:2});
+    });
 });

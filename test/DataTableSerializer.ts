@@ -1,5 +1,4 @@
 import {DataTable} from "../src/DataTable";
-import {DataTableSerializer} from "../src/DataTableSerializer";
 
 import {Guid} from "../src/Guid";
 import assert = require("assert");
@@ -21,9 +20,9 @@ describe("DataTableSerializer", function() {
         d1.rows.push({ prop1: Guid.create().toString(), prop2: "value2&" }); // use xml not permitted values
         d1.rows.push({ prop1: true, prop2: "val\tue2\n", prop3: "" }); // use xml not permitted values
         d1.rows.push({ prop1: false,prop2:new Date(), prop3: 12, prop4: 12.5 });
-        DataTableSerializer.save(d1,fileName);
+        d1.save(fileName);
 
-        var d2 = DataTableSerializer.load(fileName);
+        var d2 = DataTable.load(fileName);
         assert.deepEqual(d2, d1, JSON.stringify(d2, null, 4));
 
     });
@@ -38,15 +37,15 @@ describe("DataTableSerializer", function() {
         d1.rows.push({ prop1: true, prop2: "val\tue2\n", prop3: "0001", "1 <&\'>\" ":"test" }); // use xml not permitted values as property names
         d1.rows.push({ prop1: false, prop2: new Date(), prop3: 12, prop4: 12.5, prop5: "12345" });
         d1.rows.push({ prop1: "whatever", prop2: { type: "myType", value: "my value" } });
-        DataTableSerializer.save(d1,fileName);
+        d1.save(fileName);
 
-        var d2 = DataTableSerializer.load(fileName);
+        var d2 = DataTable.load(fileName);
         assert.deepEqual(d2, d1, JSON.stringify(d2, null, 4));
     });
 
     it("Loads and reads Excel data", function() {
         var fileName = "test/assets/Book1.xlsx";
-        var dt = DataTableSerializer.load(fileName);
+        var dt = DataTable.load(fileName);
 
         assert.equal(dt.name,"Sheet1");
         assert.equal(dt.rows.length,7);
@@ -70,20 +69,20 @@ describe("DataTableSerializer", function() {
         d1.rows.push({ prop1: false, prop2: new Date(), prop3: 12, prop4: 12.5, prop5: "12345" });
         d1.rows.push({ prop1: "whatever", prop2: { type: "myType", value: "my value" } });
 
-        DataTableSerializer.save(d1,fileName);
+        d1.save(fileName);
 
         // I should be able to read what I've just written
-        var d2=DataTableSerializer.load(fileName);
+        var d2=DataTable.load(fileName);
     }); 
 
     it("Writes an empty Excel table", function() {
         var fileName = "test/tmp/book2.xlsx";
 
         var d1 = new DataTable();
-        DataTableSerializer.save(d1,fileName);
+        d1.save(fileName);
 
         // I should be able to read what I've just written
-        var d2=DataTableSerializer.load(fileName);
+        var d2=DataTable.load(fileName);
     }); 
 
     it("Throws an error on load when the extension is not supported", function() {
@@ -93,7 +92,7 @@ describe("DataTableSerializer", function() {
 
         assert.throws(()=>{
 
-            DataTableSerializer.load(fileName);
+            DataTable.load(fileName);
         
         },`Format '${ext}' not supported`);
 
@@ -108,7 +107,7 @@ describe("DataTableSerializer", function() {
 
         assert.throws(()=>{
 
-            DataTableSerializer.save(d1,fileName);
+            d1.save(fileName);
         
         },`Format '${ext}' not supported`);
 
