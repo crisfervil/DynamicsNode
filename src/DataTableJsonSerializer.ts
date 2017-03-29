@@ -2,6 +2,10 @@ import {IDataTableSerializer} from './IDataTableSerializer'
 import {DataTable} from './DataTable';
 
 
+/** Default constructor
+ * @class DataTableJsonSerializer
+ * @classdesc Saves and loads a {@link DataTable} object to and from an json file. 
+ */
 export class DataTableJsonSerializer implements IDataTableSerializer {
     readonly extension:string;
 
@@ -9,10 +13,16 @@ export class DataTableJsonSerializer implements IDataTableSerializer {
         this.extension="json";
     }
 
+    /** Serializes the specified {@link DataTable} object into a Buffer data.
+     * @method DataTableJsonSerializer#serialize
+    */
     serialize(dataTable:DataTable):Buffer{
         return new Buffer(JSON.stringify(dataTable, null, 4),'utf8');
     }
 
+    /** Deserializes the specified buffer data into a {@link DataTable} object
+     * @method DataTableJsonSerializer#deserialize
+    */
     deserialize(data:Buffer):DataTable{
         return JSON.parse(data.toString('utf8'), DataTableJsonSerializer.JSONDataReviver);
     }

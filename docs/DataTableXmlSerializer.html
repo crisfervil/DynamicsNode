@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>DynamicsNode Source: DataTableSerializer.js</title>
+	<title>DynamicsNode Class: DataTableXmlSerializer</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -74,80 +74,319 @@
 <div class="row">
 
 	
-	<div class="col-md-12">
+	<div class="col-md-8">
 	
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: DataTableSerializer.js</h1>
-    
+	<h1 class="page-title">Class: DataTableXmlSerializer</h1>
 <section>
-    <article>
-        <pre
-            class="sunlight-highlight-javascript linenums">"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var DataTableJsonSerializer_1 = require("./DataTableJsonSerializer");
-var DataTableXmlSerializer_1 = require("./DataTableXmlSerializer");
-var DataTableXlsSerializer_1 = require("./DataTableXlsSerializer");
-var path = require("path");
-var fs = require("fs");
-/** Default constructor
- * @class DataTableSerializer
- * @classdesc Utility to load and save DataTable objects to different file formats.
- * More Info: {@link DataTableJsonSerializer} {@link DataTableXlsSerializer} {@link DataTableXmlSerializer}
- */
-var DataTableSerializer = (function () {
-    function DataTableSerializer() {
-    }
-    DataTableSerializer.getSerializer = function (extension) {
-        var retVal = null;
-        if (extension !== null &amp;&amp; extension.length > 0) {
-            // remove first '.' if the extension begins with it
-            if (extension.indexOf(".") == 0)
-                extension = extension.substr(1);
-            for (var i = 0; i &lt; this.AvailableSerializers.length; i++) {
-                var serializer = this.AvailableSerializers[i];
-                if (serializer.extension &amp;&amp; serializer.extension.toLocaleLowerCase() == extension.toLowerCase()) {
-                    retVal = serializer;
-                    break;
-                }
-            }
-        }
-        return retVal;
-    };
-    DataTableSerializer.save = function (dataTable, fileName) {
-        var ext = path.extname(fileName);
-        var serializer = this.getSerializer(ext);
-        if (serializer === null)
-            throw new Error("Format '" + ext + "' not supported");
-        var data = serializer.serialize(dataTable);
-        fs.writeFileSync(fileName, data);
-    };
-    /** The path is relative to process.cwd() */
-    DataTableSerializer.load = function (fileName) {
-        var dt;
-        var ext = path.extname(fileName);
-        var serializer = this.getSerializer(ext);
-        if (serializer === null)
-            throw new Error("Format '" + ext + "' not supported");
-        var buffer = fs.readFileSync(fileName);
-        dt = serializer.deserialize(buffer);
-        return dt;
-    };
-    return DataTableSerializer;
-}());
-/** @lends DataTableSerializer */
-// register serializers here
-DataTableSerializer.AvailableSerializers = [
-    new DataTableJsonSerializer_1.DataTableJsonSerializer(),
-    new DataTableXlsSerializer_1.DataTableXlsSerializer(),
-    new DataTableXmlSerializer_1.DataTableXmlSerializer()
-];
-exports.DataTableSerializer = DataTableSerializer;
-//# sourceMappingURL=DataTableSerializer.js.map</pre>
-    </article>
-</section>
 
+<header>
+    
+        <h2>
+        DataTableXmlSerializer
+        </h2>
+        
+            <div class="class-description"><p>Saves and loads a <a href="DataTable.html">DataTable</a> object to and from an Xml file.</p></div>
+        
+    
+</header>
+
+
+<article>
+    <div class="container-overview">
+    
+        
+<hr>
+<dt>
+    <h4 class="name" id="DataTableXmlSerializer"><span class="type-signature"></span>new DataTableXmlSerializer()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Default constructor</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="DataTableXmlSerializer.js.html">DataTableXmlSerializer.js</a>,
+				 <a href="DataTableXmlSerializer.js.html#sunlight-1-line-7">line 7</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+<hr>
+<dt>
+    <h4 class="name" id="deserialize"><span class="type-signature"></span>deserialize()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Deserializes the specified buffer data into a <a href="DataTable.html">DataTable</a> object</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="DataTableXmlSerializer.js.html">DataTableXmlSerializer.js</a>,
+				 <a href="DataTableXmlSerializer.js.html#sunlight-1-line-57">line 57</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="serialize"><span class="type-signature"></span>serialize()</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Serializes the specified <a href="DataTable.html">DataTable</a> object into a Buffer data.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="DataTableXmlSerializer.js.html">DataTableXmlSerializer.js</a>,
+				 <a href="DataTableXmlSerializer.js.html#sunlight-1-line-15">line 15</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dd>
+
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -157,6 +396,10 @@ exports.DataTableSerializer = DataTableSerializer;
 
 	<div class="clearfix"></div>
 
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
 	
 
 </div>

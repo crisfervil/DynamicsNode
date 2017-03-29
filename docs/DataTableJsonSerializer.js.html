@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>DynamicsNode Source: DataTableSerializer.js</title>
+	<title>DynamicsNode Source: DataTableJsonSerializer.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -79,72 +79,56 @@
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: DataTableSerializer.js</h1>
+		<h1 class="page-title">Source: DataTableJsonSerializer.js</h1>
     
 <section>
     <article>
         <pre
             class="sunlight-highlight-javascript linenums">"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var DataTableJsonSerializer_1 = require("./DataTableJsonSerializer");
-var DataTableXmlSerializer_1 = require("./DataTableXmlSerializer");
-var DataTableXlsSerializer_1 = require("./DataTableXlsSerializer");
-var path = require("path");
-var fs = require("fs");
 /** Default constructor
- * @class DataTableSerializer
- * @classdesc Utility to load and save DataTable objects to different file formats.
- * More Info: {@link DataTableJsonSerializer} {@link DataTableXlsSerializer} {@link DataTableXmlSerializer}
+ * @class DataTableJsonSerializer
+ * @classdesc Saves and loads a {@link DataTable} object to and from an json file.
  */
-var DataTableSerializer = (function () {
-    function DataTableSerializer() {
+var DataTableJsonSerializer = (function () {
+    function DataTableJsonSerializer() {
+        this.extension = "json";
     }
-    DataTableSerializer.getSerializer = function (extension) {
-        var retVal = null;
-        if (extension !== null &amp;&amp; extension.length > 0) {
-            // remove first '.' if the extension begins with it
-            if (extension.indexOf(".") == 0)
-                extension = extension.substr(1);
-            for (var i = 0; i &lt; this.AvailableSerializers.length; i++) {
-                var serializer = this.AvailableSerializers[i];
-                if (serializer.extension &amp;&amp; serializer.extension.toLocaleLowerCase() == extension.toLowerCase()) {
-                    retVal = serializer;
-                    break;
-                }
+    /** Serializes the specified {@link DataTable} object into a Buffer data.
+     * @method DataTableJsonSerializer#serialize
+    */
+    DataTableJsonSerializer.prototype.serialize = function (dataTable) {
+        return new Buffer(JSON.stringify(dataTable, null, 4), 'utf8');
+    };
+    /** Deserializes the specified buffer data into a {@link DataTable} object
+     * @method DataTableJsonSerializer#deserialize
+    */
+    DataTableJsonSerializer.prototype.deserialize = function (data) {
+        return JSON.parse(data.toString('utf8'), DataTableJsonSerializer.JSONDataReviver);
+    };
+    DataTableJsonSerializer.JSONDataReviver = function (key, str) {
+        var result = str;
+        if (typeof str === 'string' || str instanceof String) {
+            var parsedValue = DataTableJsonSerializer.parseDates(str);
+            if (parsedValue !== null) {
+                result = parsedValue;
             }
         }
-        return retVal;
+        return result;
     };
-    DataTableSerializer.save = function (dataTable, fileName) {
-        var ext = path.extname(fileName);
-        var serializer = this.getSerializer(ext);
-        if (serializer === null)
-            throw new Error("Format '" + ext + "' not supported");
-        var data = serializer.serialize(dataTable);
-        fs.writeFileSync(fileName, data);
+    ;
+    DataTableJsonSerializer.parseDates = function (str) {
+        var result = null;
+        var dateParts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.*(\d*)Z$/.exec(str);
+        if (dateParts !== null) {
+            result = new Date(Date.UTC(+dateParts[1], +dateParts[2] - 1, +dateParts[3], +dateParts[4], +dateParts[5], +dateParts[6], +dateParts[7]));
+        }
+        return result;
     };
-    /** The path is relative to process.cwd() */
-    DataTableSerializer.load = function (fileName) {
-        var dt;
-        var ext = path.extname(fileName);
-        var serializer = this.getSerializer(ext);
-        if (serializer === null)
-            throw new Error("Format '" + ext + "' not supported");
-        var buffer = fs.readFileSync(fileName);
-        dt = serializer.deserialize(buffer);
-        return dt;
-    };
-    return DataTableSerializer;
+    return DataTableJsonSerializer;
 }());
-/** @lends DataTableSerializer */
-// register serializers here
-DataTableSerializer.AvailableSerializers = [
-    new DataTableJsonSerializer_1.DataTableJsonSerializer(),
-    new DataTableXlsSerializer_1.DataTableXlsSerializer(),
-    new DataTableXmlSerializer_1.DataTableXmlSerializer()
-];
-exports.DataTableSerializer = DataTableSerializer;
-//# sourceMappingURL=DataTableSerializer.js.map</pre>
+exports.DataTableJsonSerializer = DataTableJsonSerializer;
+//# sourceMappingURL=DataTableJsonSerializer.js.map</pre>
     </article>
 </section>
 

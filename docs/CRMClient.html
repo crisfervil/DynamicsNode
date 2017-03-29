@@ -33,7 +33,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="CRMClient.html">CRMClient</a></li><li><a href="DataTable.html">DataTable</a></li><li><a href="DataTableSerializer.html">DataTableSerializer</a></li><li><a href="Fetch.html">Fetch</a></li><li><a href="Filter.html">Filter</a></li><li><a href="Guid.html">Guid</a></li>
+					<li><a href="CRMClient.html">CRMClient</a></li><li><a href="DataTable.html">DataTable</a></li><li><a href="DataTableJsonSerializer.html">DataTableJsonSerializer</a></li><li><a href="DataTableSerializer.html">DataTableSerializer</a></li><li><a href="DataTableXlsSerializer.html">DataTableXlsSerializer</a></li><li><a href="DataTableXmlSerializer.html">DataTableXmlSerializer</a></li><li><a href="Fetch.html">Fetch</a></li><li><a href="Filter.html">Filter</a></li><li><a href="Guid.html">Guid</a></li>
 				</ul>
 			</li>
 			
@@ -287,152 +287,6 @@
             
 <hr>
 <dt>
-    <h4 class="name" id="create"><span class="type-signature"></span>create(data)</h4>
-    
-    
-</dt>
-<dd>
-
-    
-    <div class="description">
-        <p>Creates records in CRM using the rows defined in the DataTable.<br>The id attribute of every created record will be updated with the generated CRM GUID.<br>You need to set the name of the table with the entity name that you want to create.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="DataTable.html">DataTable</a></span>
-
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>DataTable with the data to be created in CRM.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-    
-
-    
-<dl class="details">
-    
-
-	
-
-	
-
-	
-
-    
-
-    
-
-    
-
-    
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="CRMClient.js.html">CRMClient.js</a>,
-				 <a href="CRMClient.js.html#sunlight-1-line-335">line 335</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-
-	
-</dl>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h5>Example</h5>
-        
-        <p class="code-caption">Create a set of accounts using an excel file</p>
-    
-    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.create(accountsToLoad);console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record</pre>
-
-
-    
-</dd>
-
-        
-            
-<hr>
-<dt>
     <h4 class="name" id="create"><span class="type-signature"></span>create(entityName, attributes)</h4>
     
     
@@ -622,6 +476,152 @@
         <p class="code-caption">Create an email with activity parties</p>
     
     <pre class="sunlight-highlight-javascript">var contact1Id = &quot;{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}&quot;var contact2Id = &quot;{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}&quot;var userId = &quot;{6633f95b-c146-45d4-ae99-6bd84f9bf7bc}&quot;var email = {              To : [{id:contact1Id,type:&quot;contact&quot;},{id:contact2Id,type:&quot;contact&quot;}],              From : [{id:userId,type:&quot;systemuser&quot;}],              Subject : &quot;Test Email&quot;,              Description : &quot;Test Email&quot;,              DirectionCode : true             };var emailId = crm.create(&quot;email&quot;,email);</pre>
+
+
+    
+</dd>
+
+        
+            
+<hr>
+<dt>
+    <h4 class="name" id="create"><span class="type-signature"></span>create(data)</h4>
+    
+    
+</dt>
+<dd>
+
+    
+    <div class="description">
+        <p>Creates records in CRM using the rows defined in the DataTable.<br>The id attribute of every created record will be updated with the generated CRM GUID.<br>You need to set the name of the table with the entity name that you want to create.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DataTable.html">DataTable</a></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>DataTable with the data to be created in CRM.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    
+
+    
+<dl class="details">
+    
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source method-doc-label method-doc-details-label">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="CRMClient.js.html">CRMClient.js</a>,
+				 <a href="CRMClient.js.html#sunlight-1-line-335">line 335</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h5>Example</h5>
+        
+        <p class="code-caption">Create a set of accounts using an excel file</p>
+    
+    <pre class="sunlight-highlight-javascript">var accountsToLoad = DataTable.load(&quot;AccountsToLoad.xlsx&quot;);crm.create(accountsToLoad);console.log(accountsToLoad.rows[0].accountid); // This will output the GUID of the created record</pre>
 
 
     
@@ -3074,7 +3074,7 @@
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.1</a>
 	
-		on Fri Mar 24th 2017
+		on Wed Mar 29th 2017
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>

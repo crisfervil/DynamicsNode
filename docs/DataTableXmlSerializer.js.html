@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>DynamicsNode Source: DataTableSerializer.js</title>
+	<title>DynamicsNode Source: DataTableXmlSerializer.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -79,72 +79,153 @@
 		<div id="main">
 			
 
-		<h1 class="page-title">Source: DataTableSerializer.js</h1>
+		<h1 class="page-title">Source: DataTableXmlSerializer.js</h1>
     
 <section>
     <article>
         <pre
             class="sunlight-highlight-javascript linenums">"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var DataTableJsonSerializer_1 = require("./DataTableJsonSerializer");
-var DataTableXmlSerializer_1 = require("./DataTableXmlSerializer");
-var DataTableXlsSerializer_1 = require("./DataTableXlsSerializer");
-var path = require("path");
-var fs = require("fs");
+var DataTable_1 = require("./DataTable");
+var XmlEncode_1 = require("./XmlEncode");
+var XMLWriter = require("xml-writer");
+var et = require("elementtree");
 /** Default constructor
- * @class DataTableSerializer
- * @classdesc Utility to load and save DataTable objects to different file formats.
- * More Info: {@link DataTableJsonSerializer} {@link DataTableXlsSerializer} {@link DataTableXmlSerializer}
+ * @class DataTableXmlSerializer
+ * @classdesc Saves and loads a {@link DataTable} object to and from an Xml file.
  */
-var DataTableSerializer = (function () {
-    function DataTableSerializer() {
+var DataTableXmlSerializer = (function () {
+    function DataTableXmlSerializer() {
+        this.extension = 'xml';
     }
-    DataTableSerializer.getSerializer = function (extension) {
-        var retVal = null;
-        if (extension !== null &amp;&amp; extension.length > 0) {
-            // remove first '.' if the extension begins with it
-            if (extension.indexOf(".") == 0)
-                extension = extension.substr(1);
-            for (var i = 0; i &lt; this.AvailableSerializers.length; i++) {
-                var serializer = this.AvailableSerializers[i];
-                if (serializer.extension &amp;&amp; serializer.extension.toLocaleLowerCase() == extension.toLowerCase()) {
-                    retVal = serializer;
-                    break;
+    /** Serializes the specified {@link DataTable} object into a Buffer data.
+     * @method DataTableXmlSerializer#serialize
+    */
+    DataTableXmlSerializer.prototype.serialize = function (dataTable) {
+        var returnValue;
+        if (dataTable != null) {
+            var xw = new XMLWriter(true);
+            xw.startElement('DataTable');
+            if (dataTable.name)
+                xw.writeAttribute("name", dataTable.name);
+            for (var i = 0; i &lt; dataTable.rows.length; i++) {
+                xw.startElement('row');
+                var rowItem = dataTable.rows[i];
+                for (var propName in rowItem) {
+                    var propValue = rowItem[propName];
+                    if (propValue != null) {
+                        var strValue = null, propType = null;
+                        if (typeof propValue == "object" &amp;&amp; !(propValue instanceof Date) &amp;&amp; propValue.type !== null &amp;&amp; propValue.type !== undefined) {
+                            // this value must contain typeinfo
+                            propType = propValue.type;
+                            strValue = this.serializeValue(propValue.value);
+                        }
+                        else {
+                            strValue = this.serializeValue(propValue);
+                        }
+                        if (strValue !== null) {
+                            xw.startElement(XmlEncode_1.XmlEncode.encodeName(propName));
+                            if (propType !== null &amp;&amp; propType !== undefined) {
+                                xw.writeAttribute("type", propValue.type);
+                            }
+                            xw.text(strValue);
+                            xw.endElement();
+                        }
+                    }
                 }
+                xw.endElement(); // row
             }
+            xw.endElement(); // DataTable
+            returnValue = xw.toString();
         }
-        return retVal;
+        return new Buffer(returnValue, 'utf8');
     };
-    DataTableSerializer.save = function (dataTable, fileName) {
-        var ext = path.extname(fileName);
-        var serializer = this.getSerializer(ext);
-        if (serializer === null)
-            throw new Error("Format '" + ext + "' not supported");
-        var data = serializer.serialize(dataTable);
-        fs.writeFileSync(fileName, data);
-    };
-    /** The path is relative to process.cwd() */
-    DataTableSerializer.load = function (fileName) {
-        var dt;
-        var ext = path.extname(fileName);
-        var serializer = this.getSerializer(ext);
-        if (serializer === null)
-            throw new Error("Format '" + ext + "' not supported");
-        var buffer = fs.readFileSync(fileName);
-        dt = serializer.deserialize(buffer);
+    /** Deserializes the specified buffer data into a {@link DataTable} object
+     * @method DataTableXmlSerializer#deserialize
+    */
+    DataTableXmlSerializer.prototype.deserialize = function (xmlContent) {
+        var dt = new DataTable_1.DataTable();
+        var etree = et.parse(xmlContent.toString('utf8'));
+        var rootElement = etree.getroot();
+        var attrName = rootElement.attrib["name"];
+        if (attrName)
+            dt.name = attrName;
+        var rowElements = rootElement.getchildren();
+        for (var i = 0; i &lt; rowElements.length; i++) {
+            var rowElement = rowElements[i];
+            var rowItem = {};
+            var rowFieldElements = rowElement.getchildren();
+            for (var j = 0; j &lt; rowFieldElements.length; j++) {
+                var rowFieldElement = rowFieldElements[j];
+                var fieldName = XmlEncode_1.XmlEncode.decodeName(rowFieldElement.tag);
+                var fieldValue = rowFieldElement.text;
+                var fieldType = rowFieldElement.attrib["type"];
+                var parsedValue = this.parseXmlValue(fieldValue);
+                if (fieldType) {
+                    parsedValue = { type: fieldType, value: parsedValue };
+                }
+                rowItem[fieldName] = parsedValue;
+            }
+            dt.rows.push(rowItem);
+        }
         return dt;
     };
-    return DataTableSerializer;
+    DataTableXmlSerializer.prototype.serializeValue = function (value) {
+        var result = null;
+        if (value !== null &amp;&amp; value !== undefined) {
+            if (value instanceof Date) {
+                result = JSON.stringify(value).replace(/\"/g, "");
+            }
+            else {
+                result = value.toString();
+            }
+        }
+        return result;
+    };
+    DataTableXmlSerializer.prototype.parseXmlValue = function (strValue) {
+        var result = strValue;
+        var parsedValue = this.parseBooleans(strValue);
+        if (parsedValue === null) {
+            parsedValue = this.parseNumbers(strValue);
+        }
+        if (parsedValue === null) {
+            parsedValue = this.parseDates(strValue);
+        }
+        if (parsedValue !== null) {
+            result = parsedValue;
+        }
+        return result;
+    };
+    DataTableXmlSerializer.prototype.parseNumbers = function (str) {
+        var result = null;
+        // http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
+        var isNumber = !Array.isArray(str) &amp;&amp; (+str - parseFloat(str) + 1) >= 0;
+        if (isNumber) {
+            result = +str;
+        }
+        return result;
+    };
+    ;
+    DataTableXmlSerializer.prototype.parseBooleans = function (str) {
+        var result = null;
+        if (/^(?:true|false)$/i.test(str)) {
+            result = str.toLowerCase() === 'true';
+        }
+        return result;
+    };
+    ;
+    DataTableXmlSerializer.prototype.parseDates = function (str) {
+        var result = null;
+        var dateParts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.*(\d*)Z$/.exec(str);
+        if (dateParts !== null) {
+            result = new Date(Date.UTC(+dateParts[1], +dateParts[2] - 1, +dateParts[3], +dateParts[4], +dateParts[5], +dateParts[6], +dateParts[7]));
+        }
+        return result;
+    };
+    return DataTableXmlSerializer;
 }());
-/** @lends DataTableSerializer */
-// register serializers here
-DataTableSerializer.AvailableSerializers = [
-    new DataTableJsonSerializer_1.DataTableJsonSerializer(),
-    new DataTableXlsSerializer_1.DataTableXlsSerializer(),
-    new DataTableXmlSerializer_1.DataTableXmlSerializer()
-];
-exports.DataTableSerializer = DataTableSerializer;
-//# sourceMappingURL=DataTableSerializer.js.map</pre>
+exports.DataTableXmlSerializer = DataTableXmlSerializer;
+//# sourceMappingURL=DataTableXmlSerializer.js.map</pre>
     </article>
 </section>
 

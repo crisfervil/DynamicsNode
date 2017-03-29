@@ -5,6 +5,10 @@ import XMLWriter = require('xml-writer');
 import et = require('elementtree');
 
 
+/** Default constructor
+ * @class DataTableXmlSerializer
+ * @classdesc Saves and loads a {@link DataTable} object to and from an Xml file. 
+ */
 export class DataTableXmlSerializer implements IDataTableSerializer {
     readonly extension: string;
 
@@ -12,6 +16,9 @@ export class DataTableXmlSerializer implements IDataTableSerializer {
         this.extension = 'xml';
     }
 
+    /** Serializes the specified {@link DataTable} object into a Buffer data.
+     * @method DataTableXmlSerializer#serialize
+    */
     serialize(dataTable: DataTable): Buffer {
         var returnValue: string;
         if (dataTable != null) {
@@ -51,6 +58,9 @@ export class DataTableXmlSerializer implements IDataTableSerializer {
         return new Buffer(returnValue,'utf8');
     }
 
+    /** Deserializes the specified buffer data into a {@link DataTable} object
+     * @method DataTableXmlSerializer#deserialize
+    */
     deserialize(xmlContent: Buffer): DataTable {
         var dt = new DataTable();
         var etree = et.parse(xmlContent.toString('utf8'));

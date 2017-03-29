@@ -10,6 +10,7 @@ import fs = require('fs');
 /** Default constructor
  * @class DataTableSerializer
  * @classdesc Utility to load and save DataTable objects to different file formats. 
+ * More Info: {@link DataTableJsonSerializer} {@link DataTableXlsSerializer} {@link DataTableXmlSerializer}
  */
 export class DataTableSerializer {
     /** @lends DataTableSerializer */

@@ -128,6 +128,7 @@ export class DataTable {
     /** Saves the specified datatable object to the specified file.
      * The format of the file depends on the extension provided. 
      * The supported formats are json, xml and xlsx. 
+     * @method DataTable#save
      * @param {dataTable} DataTable Table to save to the specified file.
      * @param {fileName} string File path where to save the DataTable object. The path is relative to process.cwd()
      * @example <caption>Saves the datatable to a .json file</caption>
@@ -139,7 +140,9 @@ export class DataTable {
     }
 
     /**
-     * Loads the {DataTable} object from the specified file. 
+     * Loads the {@link DataTable} object from the specified file. 
+     * @memberof DataTable
+     * @static
      * @param {fileName} string File path where to save the DataTable object. The path is relative to process.cwd() 
      * @example <caption>Loads the table from an xlsx file</caption>
      * var dt = DataTable.load('mydata.xlsx');

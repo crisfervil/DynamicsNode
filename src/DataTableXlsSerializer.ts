@@ -14,9 +14,10 @@ class WorkSheet implements XLSX.IWorkSheet{
 
 /** Default constructor
  * @class DataTableXlsSerializer
- * @classdesc Saves and loads a {DataTable} object to and from a MS Excel file (xlsx). 
+ * @classdesc Saves and loads a {@link DataTable} object to and from a MS Excel file (xlsx). 
  * When reading from an Excel file, the data is taken from the first sheet in the workbook. 
  * It is assumed that the first row contains the column names. 
+ * When serializing, the name of the sheet containing the data will be the name in the DataTable object.
  */
 export class DataTableXlsSerializer implements IDataTableSerializer {
     readonly extension: string;
@@ -24,7 +25,7 @@ export class DataTableXlsSerializer implements IDataTableSerializer {
         this.extension = "xlsx";
     }
 
-    /** Serializes the specified {DataTable} object into a Buffer data.
+    /** Serializes the specified {@link DataTable} object into a Buffer data.
      * @method DataTableXlsSerializer#serialize
     */
     serialize(dataTable: DataTable): Buffer {
@@ -117,7 +118,7 @@ export class DataTableXlsSerializer implements IDataTableSerializer {
         return index;
     }
 
-    /** Deserializes the specified buffer data into a DataTable object
+    /** Deserializes the specified buffer data into a {@link DataTable} object
      * @method DataTableXlsSerializer#deserialize
     */
     deserialize(data: Buffer): DataTable {
