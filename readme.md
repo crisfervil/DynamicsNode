@@ -1,5 +1,4 @@
 [![Windows Build](https://ci.appveyor.com/api/projects/status/github/crisfervil/dynamicsnode?svg=true)](https://ci.appveyor.com/project/crisfervil/dynamicsnode)
-[![Ubuntu Build](https://travis-ci.org/crisfervil/DynamicsNode.svg?branch=master)](https://travis-ci.org/crisfervil/DynamicsNode) 
 [![Coveralls](https://coveralls.io/repos/github/crisfervil/DynamicsNode/badge.svg?branch=master)](https://coveralls.io/github/crisfervil/DynamicsNode?branch=master) 
 [![npm](https://img.shields.io/npm/v/dynamicsnode.svg)](https://www.npmjs.com/package/dynamicsnode)
 [![npm downloads](https://img.shields.io/npm/dt/dynamicsnode.svg)](http://npm-stats.com/~packages/dynamicsnode)
@@ -8,7 +7,8 @@
 [![Package Quality](http://npm.packagequality.com/shield/dynamicsnode.svg)](http://packagequality.com/#?package=dynamicsnode)
 
 
-<!-- [![codecov.io](https://codecov.io/github/crisfervil/DynamicsNode/coverage.svg?branch=master)](https://codecov.io/github/crisfervil/DynamicsNode?branch=master)--> 
+<!-- [![Ubuntu Build](https://travis-ci.org/crisfervil/DynamicsNode.svg?branch=master)](https://travis-ci.org/crisfervil/DynamicsNode) -->
+<!-- [![codecov.io](https://codecov.io/github/crisfervil/DynamicsNode/coverage.svg?branch=master)](https://codecov.io/github/crisfervil/DynamicsNode?branch=master) --> 
 
 # Project description
 
@@ -104,8 +104,8 @@ Volunteers to [run the integration tests](https://dynamicsnode.js.org/tutorial-C
 * [ ] Add functions to allow Continuos Integration tools
 * [ ] Add extensibility
 * [x] ~~Add integration tests for activities~~
-* [x] ~~Improve documentation (work In progress)~~
-* [x] ~~Add DataTable functions (work in progress)~~
+* [x] ~~Improve documentation~~
+* [x] ~~Add DataTable functions~~
 * [x] ~~Improve testeability and integration tests~~
 * [x] ~~Add import/export commands~~
 * [x] ~~Add test coverage reports~~
