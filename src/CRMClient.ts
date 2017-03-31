@@ -65,18 +65,9 @@ export class CRMClient {
     private getBridge(fakeBridge: boolean) {
 
         var assemblyFile = path.join(__dirname, "bin/DynamicsNode.dll");
-        var refs: Array<string> =
-            [path.join(__dirname, "bin/Microsoft.Crm.Sdk.Proxy.dll")
-                , path.join(__dirname, "bin/Microsoft.Xrm.Tooling.Connector.dll")
-                , path.join(__dirname, "bin/Microsoft.Xrm.Sdk.dll")
-                , "System.Runtime.Serialization.dll"
-                , "System.ServiceModel.dll"
-                , path.join(__dirname, "bin/Microsoft.IdentityModel.Clients.ActiveDirectory.dll")
-            ];
 
         var createBridge = edge.func({
-            assemblyFile: assemblyFile,
-            references: refs
+            assemblyFile: assemblyFile
         });
 
         var bridge = createBridge({ connectionString: this.connectionString, useFake: fakeBridge }, true);
