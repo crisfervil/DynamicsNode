@@ -56,6 +56,14 @@ export class AttributeMetadata{
     public OptionSet:OptionsetMetadata|BooleanOptionsetMetadata;
 }
 
+export class RolePrivilege {
+    // https://msdn.microsoft.com/en-us/library/microsoft.crm.sdk.messages.roleprivilege.aspx
+    public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.RolePrivilege";
+    public Name:string;
+    public PrivilegeId:string;
+    public Depth:PrivilegeDepth;
+}
+
 export enum AttributeTypeCode{
     BigInt=0x12,
     Boolean=0,	
@@ -88,4 +96,12 @@ export enum EntityFilters
     Privileges = 4,
     Relationships = 8,
     All = 15
+}
+
+export enum PrivilegeDepth{
+    // https://msdn.microsoft.com/en-us/library/microsoft.crm.sdk.messages.privilegedepth.aspx
+    Basic=0,
+    Deep=2,
+    Global=3,
+    Local=1
 }

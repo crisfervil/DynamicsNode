@@ -230,6 +230,10 @@ namespace DynamicsNode
                             ExpandoObject propExpando = (ExpandoObject)propValue;
                             propValue = ConvertFromDynamic(propExpando);
                         }
+                        else if (propValueType.IsArray)
+                        {
+                            propValue = ConvertFromArray((Array)prop.Value);
+                        }
                         else if (propDef.PropertyType == typeof(Guid) && propValueType == typeof(string))
                         {
                             propValue = new Guid((string)propValue);

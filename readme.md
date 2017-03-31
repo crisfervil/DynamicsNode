@@ -22,7 +22,7 @@ Github project: [https://github.com/crisfervil/DynamicsNode](https://github.com/
 
 Review the [changelog](//github.com/crisfervil/DynamicsNode/blob/master/changelog.md) to see the latest changes.
 
-If you want to receive notifications about new releases, you can start the project in GitHub and use https://sibbell.com
+If you want to receive notifications about new releases, you can star this project in GitHub and use https://sibbell.com
 
 # How to use it
 Create a new directory to store your scripts and cd into it

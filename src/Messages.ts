@@ -1,4 +1,4 @@
-import {EntityMetadata,EntityReference,EntityFilters,OptionSetValue} from "./CRMDataTypes";
+import {EntityMetadata,EntityReference,EntityFilters,OptionSetValue,RolePrivilege} from "./CRMDataTypes";
 
 export class WhoAmIRequest{
     public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.WhoAmIRequest";
@@ -42,4 +42,11 @@ export class SetBusinessSystemUserRequest {
     public BusinessId:string;
     public UserId:string;
     public ReassignPrincipal:EntityReference;
+}
+
+export class AddPrivilegesRoleRequest {
+    //https://msdn.microsoft.com/en-us/library/microsoft.crm.sdk.messages.addprivilegesrolerequest.aspx
+    public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.AddPrivilegesRoleRequest";
+    public RoleId:string;
+    public Privileges:RolePrivilege[];
 }

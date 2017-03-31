@@ -1,5 +1,5 @@
 0.0.20
-- 
+- Added the AddPrivilegesRoleRequest message.
 
 0.0.19
 - Improved code coverage
