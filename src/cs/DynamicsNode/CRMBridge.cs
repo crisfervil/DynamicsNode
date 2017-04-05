@@ -206,42 +206,58 @@ namespace DynamicsNode
             var valueDictionary = (IDictionary<string, object>)value;
             string typeName = (string)valueDictionary["__typeName"];
 
-            if (string.IsNullOrEmpty(typeName)) throw new Exception("Class Type Name not specified");
+            if (string.IsNullOrEmpty(typeName)) throw new Exception("Type Name not specified");
 
-            converted = GetTypeInstance(typeName);
-            Type convertedType = converted.GetType();
-
-            foreach (var prop in valueDictionary)
+            // Convert from a simple object
+            if (typeName==typeof(Guid).FullName)
             {
-                if (prop.Value != null)
+                string propValue = (string)valueDictionary["Value"];
+                converted = new Guid(propValue);
+            }
+            else if (typeName == typeof(Decimal).FullName)
+            {
+                object propValue = valueDictionary["Value"];
+                converted = System.Convert.ToDecimal(propValue);
+            }
+            else
+            {
+                // Create an instance of the object to return
+                converted = GetTypeInstance(typeName);
+                Type convertedType = converted.GetType();
+
+                foreach (var prop in valueDictionary)
                 {
-                    var propDef = convertedType.GetProperty(prop.Key);
-                    if (propDef != null)
+                    if (prop.Value != null)
                     {
-                        object propValue = prop.Value;
-                        Type propValueType = prop.Value.GetType();
-                        if (propDef.PropertyType == typeof(AttributeCollection))
+                        var propDef = convertedType.GetProperty(prop.Key);
+                        if (propDef != null)
                         {
-                            if (propValueType != typeof(ExpandoObject)) throw new Exception(string.Format("Can't convert from {0} to AttributeCollection", propValueType.Name));
-                            propValue = ConvertFromDynamicToAttributeCollection((ExpandoObject)propValue);
+                            object propValue = prop.Value;
+                            Type propValueType = prop.Value.GetType();
+                            if (propDef.PropertyType == typeof(AttributeCollection))
+                            {
+                                if (propValueType != typeof(ExpandoObject)) throw new Exception(string.Format("Can't convert from {0} to AttributeCollection", propValueType.Name));
+                                propValue = ConvertFromDynamicToAttributeCollection((ExpandoObject)propValue);
+                            }
+                            else if (propValueType == typeof(ExpandoObject))
+                            {
+                                var propExpando = (ExpandoObject)propValue;
+                                propValue = ConvertFromDynamic(propExpando);
+                            }
+                            else if (propValueType.IsArray)
+                            {
+                                propValue = ConvertFromArray((Array)prop.Value);
+                            }
+                            else if (propDef.PropertyType == typeof(Guid) && propValueType == typeof(string))
+                            {
+                                propValue = new Guid((string)propValue);
+                            }
+                            propDef.SetValue(converted, propValue);
                         }
-                        else if (propValueType == typeof(ExpandoObject))
-                        {
-                            ExpandoObject propExpando = (ExpandoObject)propValue;
-                            propValue = ConvertFromDynamic(propExpando);
-                        }
-                        else if (propValueType.IsArray)
-                        {
-                            propValue = ConvertFromArray((Array)prop.Value);
-                        }
-                        else if (propDef.PropertyType == typeof(Guid) && propValueType == typeof(string))
-                        {
-                            propValue = new Guid((string)propValue);
-                        }
-                        propDef.SetValue(converted, propValue);
                     }
                 }
             }
+
             return converted;
         }
 
@@ -254,10 +270,10 @@ namespace DynamicsNode
                 if (valueDictionary.Keys.Count > 0) retVal = new AttributeCollection();
                 foreach (var prop in valueDictionary)
                 {
+                    object convertedValue = prop.Value;
                     if (prop.Value != null)
                     {
                         // Convert values
-                        object convertedValue = prop.Value;
                         var propValueType = prop.Value.GetType();
 
                         if (propValueType == typeof(ExpandoObject))
@@ -276,8 +292,8 @@ namespace DynamicsNode
                                 convertedValue = guidValue;
                             }
                         }
-                        retVal.Add(prop.Key, convertedValue);
                     }
+                    retVal.Add(prop.Key, convertedValue);
                 }
             }
             return retVal;

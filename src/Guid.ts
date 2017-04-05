@@ -1,7 +1,10 @@
 export class Guid {
     private static EMPTY = "00000000-0000-0000-0000-000000000000";
     private static validator = new RegExp("^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$", "i");
-    private value: string;
+    private _value: string;
+
+    // Used for convertion purposes, from JS to .net
+    public __typeName="System.Guid";
 
     /**
      * Default constructor
@@ -11,11 +14,11 @@ export class Guid {
      */
     constructor(guid?: string) {
         if (guid === undefined) {
-            this.value = Guid.EMPTY;
+            this._value = Guid.EMPTY;
         }
         else {
             if (Guid.isGuid(guid)) {
-                this.value = guid;
+                this._value = guid;
             }
             else {
                 throw new Error("Invalid GUID value");
@@ -34,24 +37,29 @@ export class Guid {
     equals(other: Guid|string):boolean {
         // Comparing string `value` against provided `guid` will auto-call
         // toString on `guid` for comparison
-        if(other instanceof Guid) return this.value == other.getValue();
-        return Guid.isGuid(other) && this.value == other;
+        if(other instanceof Guid) return this._value == other.getValue();
+        return Guid.isGuid(other) && this._value == other;
     };
 
     isEmpty():boolean {
-        return this.value === Guid.EMPTY;
+        return this._value === Guid.EMPTY;
     };
 
     toString():string {
-        return this.value;
+        return this._value;
     };
 
     toJSON():string {
-        return this.value;
+        return this._value;
     };
 
+    // TODO: obsolete. Remove this. Replaced by the Value property
     getValue():string {
-        return this.value;
+        return this._value;
+    }
+
+    get Value():string{
+        return this._value;
     }
 
     static isGuid(value: string | Guid):boolean {

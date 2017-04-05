@@ -3,7 +3,7 @@ import { DataTable } from "./DataTable";
 import { Guid } from "./Guid";
 import { Fetch } from "./Fetch";
 import { AssignRequest, WhoAmIRequest, WhoAmIResponse, RetrieveEntityRequest, RetrieveEntityResponse } from "./Messages";
-import { Entity, EntityReference, OptionSetValue, AttributeTypeCode, EntityFilters, EntityMetadata, AttributeMetadata, BooleanOptionsetMetadata, OptionsetMetadata } from "./CRMDataTypes";
+import { Entity, EntityReference, OptionSetValue, AttributeTypeCode, EntityFilters, EntityMetadata, AttributeMetadata, BooleanOptionsetMetadata, OptionsetMetadata, Money, Decimal } from "./CRMDataTypes";
 import { ImportExportUtil } from "./ImportExportUtil";
 import { StateUtil } from "./StateUtil";
 import { MetadataUtil } from "./MetadataUtil";
@@ -454,6 +454,12 @@ export class CRMClient {
                     else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.PartyList]) {
                         attributeValue = this.ConvertToPartyList(attributes[prop], attributeMetadata);
                     }
+                    else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Money]) {
+                        attributeValue = this.ConvertToMoney(prop, attributes[prop]);
+                    }
+                    else if (attributeMetadata.AttributeType == AttributeTypeCode[AttributeTypeCode.Decimal]) {
+                        attributeValue = this.ConvertToDecimal(prop, attributes[prop]);
+                    }
                     else {
                         debug(`Attribute '${prop}' type '${attributeMetadata.AttributeType}' not converted. Using the raw value`);
                         attributeValue = attributes[prop];
@@ -471,6 +477,32 @@ export class CRMClient {
         debug(`Converted value:`);
         debug(entity);
         return entity;
+    }
+
+    private ConvertToDecimal(attributeName, attributeValue):Decimal{
+        var decimalValue:Decimal=null;
+        if(attributeValue!==null&&attributeValue!==undefined){
+            if(typeof attributeValue==="number"){
+                decimalValue=new Decimal(attributeValue);
+            }
+            else {
+                throw new Error(`Cannot convert attribute '${attributeName}' value '${attributeValue}' from '${typeof attributeValue}' to 'Decimal'`);                
+            }
+        }
+        return decimalValue;
+    }
+
+    private ConvertToMoney(attributeName, attributeValue):Money{
+        var moneyValue:Money=null;
+        if(attributeValue!==null&&attributeValue!==undefined){
+            if(typeof attributeValue==="number"){
+                moneyValue=new Money(new Decimal(attributeValue));
+            }
+            else {
+                throw new Error(`Cannot convert attribute '${attributeName}' value '${attributeValue}' from '${typeof attributeValue}' to 'Money'`);                
+            }
+        }
+        return moneyValue;
     }
 
     private ConvertToString(attributeName, attributeValue):string{

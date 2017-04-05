@@ -105,3 +105,16 @@ export enum PrivilegeDepth{
     Global=3,
     Local=1
 }
+
+export class Decimal {
+    public __typeName="System.Decimal";
+    constructor(public Value:number){
+    }
+}
+
+export class Money {
+    public __typeName="Microsoft.Xrm.Sdk,Microsoft.Xrm.Sdk.Money";
+    constructor(public Value:Decimal){
+    }
+}
+
