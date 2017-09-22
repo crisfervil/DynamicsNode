@@ -6,8 +6,9 @@ import { DataTableSerializer } from "../src/DataTableSerializer";
 import assert = require("assert");
 import path = require("path");
 import fs = require("fs");
-import { WhoAmIRequest, WhoAmIResponse } from "../src/Messages";
+import { WhoAmIRequest, WhoAmIResponse, AddToQueueRequest } from "../src/Messages";
 import { SecurityUtil } from '../src/SecurityUtil';
+import { EntityReference } from "../src/CRMDataTypes";
 
 // Asserts that there is a value in the specified field in the specified record
 function checkFieldValue(dataTable, index, fieldName) {
@@ -467,7 +468,22 @@ function addTestsFor(connectionStringName: string, connectionStringValue: string
         it('changes a user businessunit using a systemuser update',function(){
             var who = crm.whoAmI();
             crm.update('systemuser',{systemuserid:who.UserId, businessunitid:who.BusinessUnitId});
-        });
-        
+		});
+
+		it("creates a task and adds it to a queue", () => {
+
+            var callId:string = crm.create("phonecall",{subject:"test"});
+
+			// get the current user's default queue
+			var whoAmI:WhoAmIResponse = crm.whoAmI();
+			var currentUser:any = crm.retrieve("systemuser",whoAmI.UserId,["queueid"]);
+			var defaultQueueId:string = currentUser.queueid;
+
+			var request:AddToQueueRequest = new AddToQueueRequest();
+			request.DestinationQueueId = defaultQueueId;
+			request.Target = new EntityReference(callId, "phonecall");
+			crm.Execute(request);
+
+		});
     });
 }

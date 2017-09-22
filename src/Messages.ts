@@ -1,22 +1,22 @@
 import {EntityMetadata,EntityReference,EntityFilters,OptionSetValue,RolePrivilege} from "./CRMDataTypes";
 
-export class WhoAmIRequest{
+export class WhoAmIRequest {
     public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.WhoAmIRequest";
 }
 
-export class WhoAmIResponse{
+export class WhoAmIResponse {
     public BusinessUnitId:string;
     public OrganizationId:string;
     public UserId:string;
 }
 
-export class AssignRequest{
+export class AssignRequest {
     public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.AssignRequest";
     public Assignee:EntityReference;
-    public Target:EntityReference;    
+    public Target:EntityReference;
 }
 
-export class AssignResponse{
+export class AssignResponse {
 
 }
 
@@ -26,7 +26,7 @@ export class RetrieveEntityRequest{
     }
 }
 
-export class RetrieveEntityResponse{
+export class RetrieveEntityResponse {
     public EntityMetadata:EntityMetadata;
 }
 
@@ -45,8 +45,14 @@ export class SetBusinessSystemUserRequest {
 }
 
 export class AddPrivilegesRoleRequest {
-    //https://msdn.microsoft.com/en-us/library/microsoft.crm.sdk.messages.addprivilegesrolerequest.aspx
+    // https://msdn.microsoft.com/en-us/library/microsoft.crm.sdk.messages.addprivilegesrolerequest.aspx
     public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.AddPrivilegesRoleRequest";
     public RoleId:string;
     public Privileges:RolePrivilege[];
+}
+
+export class AddToQueueRequest {
+    public __typeName="Microsoft.Crm.Sdk.Proxy,Microsoft.Crm.Sdk.Messages.AddToQueueRequest";
+    public DestinationQueueId:string;
+    public Target:EntityReference;
 }
